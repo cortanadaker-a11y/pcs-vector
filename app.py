@@ -56,11 +56,8 @@ if "report_markdown" not in st.session_state:
 if "report_error" not in st.session_state:
     st.session_state.report_error = None
 
-sidebar_page = render_sidebar()
+render_sidebar()
 render_config_warnings()
-
-if sidebar_page != st.session_state.page:
-    st.session_state.page = sidebar_page
 
 current_page = st.session_state.page
 

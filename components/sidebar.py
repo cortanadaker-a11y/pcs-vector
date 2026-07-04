@@ -20,11 +20,13 @@ def render_sidebar() -> str:
 
         st.divider()
 
-        page = st.radio(
+        # Use key="page" so sidebar stays in sync with programmatic navigation
+        # (e.g. "Start Your PCS Plan" sets st.session_state.page before rerun).
+        st.radio(
             "Navigate",
             options=["home", "input", "report"],
             format_func=lambda p: PAGE_LABELS[p],
-            key="nav_page",
+            key="page",
             label_visibility="collapsed",
         )
 
@@ -46,4 +48,4 @@ def render_sidebar() -> str:
         st.divider()
         st.caption("CONUS Army moves only")
 
-    return page
+    return st.session_state.page
