@@ -1,0 +1,258 @@
+"""Report view page for PCS Vector."""
+
+import json
+from datetime import datetime
+
+import streamlit as st
+
+from components.form_state import (
+    budget_display,
+    priority_summary,
+    resolved_concerns,
+    resolved_current_installation,
+    resolved_gaining_installation,
+    resolved_housing_must_haves,
+    resolved_spouse_career,
+)
+from components.payment_handler import (
+    clear_payment_success_screen,
+    is_payment_verified,
+    require_payment,
+)
+from services.pdf_generator import PDFGenerationError, build_pdf_metadata, generate_pdf_report
+from services.report_generator import GrokAPIError, generate_report
+from views.payment_gate import render_payment_required
+from views.post_payment import generate_report_with_loading, render_payment_success_screen
+
+
+def _render_submitted_summary() -> None:
+    data = st.session_state.get("form_data", {})
+    if not data.get("form_submitted"):
+        return
+
+    gaining = resolved_gaining_installation(data)
+    rank_display = data.get("rank_pay_grade", "")
+    if data.get("rank_title"):
+        rank_display = f"{rank_display} — {data['rank_title']}"
+
+    with st.expander("Your submitted details", expanded=False):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown("**Move**")
+            st.markdown(
+                f"- **Rank:** {rank_display}  \n"
+                f"- **From:** {resolved_current_installation(data)}  \n"
+                f"- **To:** {gaining}  \n"
+                f"- **Window:** {data.get('move_window', '—')}  \n"
+                f"- **Flexibility:** {data.get('move_flexibility', '—')}"
+            )
+
+            st.markdown("**Family**")
+            children = data.get("num_children", 0)
+            child_line = f"{children} child{'ren' if children != 1 else ''}"
+            if children and data.get("child_age_ranges"):
+                child_line += f" ({', '.join(data['child_age_ranges'])})"
+            if data.get("has_pets") == "Yes — we have pets":
+                pets = ", ".join(data.get("pet_types") or [])
+                if data.get("pet_details"):
+                    pets = f"{pets} — {data['pet_details']}" if pets else data["pet_details"]
+                pets = pets or "Yes"
+            else:
+                pets = "No"
+
+            st.markdown(
+                f"- **Spouse:** {resolved_spouse_career(data)}  \n"
+                f"- **Children:** {child_line}  \n"
+                f"- **Pets:** {pets}"
+            )
+
+        with col2:
+            st.markdown("**Housing**")
+            st.markdown(
+                f"- **Preference:** {data.get('housing_preference', '—')}  \n"
+                f"- **Budget:** {budget_display(data)}  \n"
+                f"- **Must-haves:** {resolved_housing_must_haves(data)}"
+            )
+
+            st.markdown("**Priorities**")
+            for label, value in priority_summary(data).items():
+                st.markdown(f"- {label}: **{value}**")
+
+            st.markdown("**Logistics**")
+            st.markdown(
+                f"- **Vehicles:** {data.get('num_vehicles', '—')}  \n"
+                f"- **DITY / PPM:** {data.get('dity_interest', '—')}"
+            )
+
+        concerns = resolved_concerns(data)
+        if concerns != "None noted" or data.get("other_priorities"):
+            st.markdown("**Notes**")
+            if data.get("other_priorities"):
+                st.markdown(f"- *Other priorities:* {data['other_priorities']}")
+            if concerns != "None noted":
+                st.markdown(f"- *Concerns:* {concerns}")
+
+
+@st.cache_data(show_spinner=False)
+def _cached_pdf(report_text: str, metadata_json: str) -> bytes:
+    """Cache PDF bytes for identical report content within a session."""
+    metadata = json.loads(metadata_json) if metadata_json else None
+    return generate_pdf_report(report_text, metadata)
+
+
+def _build_pdf_bytes(report: str) -> bytes:
+    """Generate PDF bytes — requires live Stripe payment verification."""
+    if not require_payment():
+        return b""
+
+    form_data = st.session_state.get("form_data", {})
+    metadata = build_pdf_metadata(form_data)
+    metadata_json = json.dumps(metadata, sort_keys=True)
+
+    try:
+        with st.spinner("Preparing your PDF…"):
+            return _cached_pdf(report, metadata_json)
+    except PDFGenerationError as exc:
+        st.warning(f"PDF export issue: {exc}. Try regenerating the report.")
+        try:
+            return generate_pdf_report(report, metadata)
+        except PDFGenerationError:
+            return b""
+
+
+def _generate_report_if_paid() -> str | None:
+    """Generate Grok report only after Stripe re-verification passes."""
+    if not require_payment():
+        st.error("Payment verification failed. Please complete checkout again.")
+        return None
+
+    data = st.session_state.get("form_data", {})
+    if not data.get("form_submitted"):
+        return None
+
+    cached = st.session_state.get("report_markdown")
+    if cached:
+        return cached
+
+    try:
+        report = generate_report_with_loading(lambda: generate_report(data))
+        st.session_state.report_markdown = report
+        st.session_state.report_error = None
+        clear_payment_success_screen()
+        return report
+    except GrokAPIError as exc:
+        st.session_state.report_error = str(exc)
+        return None
+
+
+def render_report() -> None:
+    """Render the Grok-generated PCS strategic plan."""
+    st.markdown("## Your PCS Strategic Plan")
+
+    if st.session_state.get("report_error"):
+        st.error(st.session_state.report_error)
+
+    form_submitted = st.session_state.get("form_data", {}).get("form_submitted")
+
+    if form_submitted and not is_payment_verified():
+        render_payment_required()
+        _render_footer_nav()
+        return
+
+    # Post-payment: show success confirmation while Grok generates the report.
+    if is_payment_verified() and st.session_state.get("show_payment_success_screen"):
+        render_payment_success_screen()
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    report = _generate_report_if_paid()
+
+    if not report:
+        if form_submitted and is_payment_verified():
+            st.warning(
+                "We couldn't generate your report. Use Regenerate below or edit your details."
+            )
+        else:
+            st.info("Complete the input form first, then proceed to payment.")
+            with st.container(border=True):
+                st.markdown(
+                    "Your AI-powered plan covers housing, schools, spouse career, "
+                    "finances, a 30-day action plan, and prioritized next steps."
+                )
+        _render_footer_nav()
+        return
+
+    st.success("Your PCS strategic plan is ready.", icon="✅")
+    _render_submitted_summary()
+
+    date_stamp = datetime.now().strftime("%Y%m%d")
+    md_filename = f"pcs-vector-report-{date_stamp}.md"
+    pdf_filename = f"pcs-vector-report-{date_stamp}.pdf"
+
+    pdf_bytes = _build_pdf_bytes(report)
+    pdf_ready = bool(pdf_bytes)
+
+    col_pdf, col_md, col_regen = st.columns([1.2, 1, 1])
+
+    with col_pdf:
+        st.download_button(
+            label="Download PDF Report",
+            data=pdf_bytes if pdf_ready else b"",
+            file_name=pdf_filename,
+            mime="application/pdf",
+            type="primary",
+            use_container_width=True,
+            disabled=not pdf_ready,
+        )
+
+    with col_md:
+        if not require_payment():
+            st.caption("Payment verification required for downloads.")
+        else:
+            st.download_button(
+                label="Download Markdown",
+                data=report,
+                file_name=md_filename,
+                mime="text/markdown",
+                use_container_width=True,
+            )
+
+    with col_regen:
+        if st.button("Regenerate Report", use_container_width=True):
+            if not require_payment():
+                st.error("Payment verification failed. Please complete checkout again.")
+            else:
+                try:
+                    with st.spinner("Regenerating your report with Grok…"):
+                        st.session_state.report_markdown = generate_report(
+                            st.session_state.form_data
+                        )
+                    st.session_state.report_error = None
+                    st.rerun()
+                except GrokAPIError as exc:
+                    st.session_state.report_error = str(exc)
+                    st.error(str(exc))
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        st.markdown(report)
+
+    st.caption("Generated by Grok AI for PCS Vector. Verify BAH and entitlements with your finance office.")
+
+    _render_footer_nav()
+
+
+def _render_footer_nav() -> None:
+    st.markdown("<br>", unsafe_allow_html=True)
+    col_back, col_spacer, col_home = st.columns([1, 2, 1])
+
+    with col_back:
+        if st.button("← Edit Details", use_container_width=True):
+            st.session_state.page = "input"
+            st.rerun()
+
+    with col_home:
+        if st.button("Back to Home", use_container_width=True):
+            st.session_state.page = "home"
+            st.rerun()

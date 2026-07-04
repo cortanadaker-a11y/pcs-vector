@@ -1,0 +1,25 @@
+# PCS Vector — Streamlit configuration (local + Streamlit Community Cloud)
+
+[theme]
+primaryColor = "#c45c26"
+backgroundColor = "#f7f9fc"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#1e3a5f"
+font = "sans serif"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 5
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
+
+[runner]
+fastReruns = true
+
+[client]
+showErrorDetails = false
