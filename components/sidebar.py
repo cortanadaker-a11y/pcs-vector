@@ -16,6 +16,7 @@ def render_sidebar() -> str:
     with st.sidebar:
         st.markdown("## PCS Vector")
         st.caption("Personalized PCS strategic plans for Army families.")
+        st.caption("Built by a serving Army officer · $25/report")
 
         st.divider()
 

@@ -64,8 +64,8 @@ def get_stripe_secret_key() -> str:
     ).strip()
     if not key:
         raise StripeConfigError(
-            "Stripe secret key not found. Add [stripe] secret_key to Streamlit Secrets "
-            "(see DEPLOYMENT.md) or export STRIPE_SECRET_KEY."
+            "Stripe isn't configured yet. Add [stripe] secret_key to Streamlit Secrets "
+            "(Settings → Secrets) or see DEPLOYMENT.md / PRELAUNCH.md."
         )
     return key
 

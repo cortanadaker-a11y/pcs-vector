@@ -136,7 +136,13 @@ Local URL defaults to `http://localhost:8501` for Stripe redirects.
 
 ---
 
-## 7. Production considerations
+## 7. Pre-launch checklist
+
+Before going live, complete every item in **[PRELAUNCH.md](PRELAUNCH.md)**.
+
+---
+
+## 8. Production considerations
 
 ### Before going live
 
@@ -167,7 +173,7 @@ Local URL defaults to `http://localhost:8501` for Stripe redirects.
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
@@ -179,7 +185,7 @@ Local URL defaults to `http://localhost:8501` for Stripe redirects.
 
 ---
 
-## 9. Re-deploying updates
+## 10. Re-deploying updates
 
 Push changes to GitHub — Streamlit Cloud rebuilds automatically:
 

@@ -32,7 +32,7 @@ def get_grok_api_key() -> str:
     key = _from_streamlit_secrets("grok.api_key") or os.environ.get("GROK_API_KEY", "").strip()
     if not key:
         raise GrokConfigError(
-            "Grok API key not found. Add [grok] api_key to `.streamlit/secrets.toml` "
-            "or set the GROK_API_KEY environment variable."
+            "Grok isn't configured yet. Add [grok] api_key to Streamlit Secrets "
+            "or set GROK_API_KEY. See DEPLOYMENT.md."
         )
     return key

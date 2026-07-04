@@ -49,7 +49,7 @@ def render_config_warnings() -> None:
             for err in status["errors"]:
                 if "localhost" not in err:
                     st.caption(f"• {err}")
-            st.caption("See DEPLOYMENT.md for setup instructions.")
+            st.caption("See DEPLOYMENT.md or PRELAUNCH.md for setup.")
     elif any("localhost" in e for e in status["errors"]):
         with st.sidebar:
             st.warning("Set pcs_vector.app_url in secrets for production Stripe redirects.")

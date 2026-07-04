@@ -12,8 +12,13 @@ def render_payment_required() -> None:
 
     st.markdown("## Almost there — complete your payment")
     st.markdown(
-        f"Your move details are saved. Pay **{price}** once to unlock your full "
-        "AI-generated strategic plan and PDF download."
+        f"Your move details are saved. Pay **{price}** once to unlock your personalized "
+        "8-section strategic plan and professional PDF."
+    )
+    st.info(
+        "No subscription. One payment → one report. If checkout was interrupted, "
+        "use the button below — you won't need to re-enter your answers.",
+        icon="ℹ️",
     )
 
     with st.container(border=True):

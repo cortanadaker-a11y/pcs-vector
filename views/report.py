@@ -173,11 +173,11 @@ def render_report() -> None:
                 "We couldn't generate your report. Use Regenerate below or edit your details."
             )
         else:
-            st.info("Complete the input form first, then proceed to payment.")
+            st.info("Start on the home page, complete the form, then proceed to payment.")
             with st.container(border=True):
                 st.markdown(
-                    "Your AI-powered plan covers housing, schools, spouse career, "
-                    "finances, a 30-day action plan, and prioritized next steps."
+                    "Your plan includes 8 personalized sections — housing & BAH analysis, "
+                    "spouse career, schools, finances, a 30-day action plan, and a PDF download."
                 )
         _render_footer_nav()
         return

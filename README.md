@@ -24,7 +24,8 @@ streamlit run app.py
 
 ## Deploy to Streamlit Cloud
 
-See **[DEPLOYMENT.md](DEPLOYMENT.md)** for full step-by-step instructions including secrets configuration and Stripe redirect setup.
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** — step-by-step deploy and secrets setup
+- **[PRELAUNCH.md](PRELAUNCH.md)** — pre-launch checklist before going live
 
 ## Configuration
 

@@ -400,8 +400,12 @@ def render_input_form() -> None:
     st.markdown("## Tell us about your move")
     price = get_price_display()
     st.markdown(
-        f"Most families finish in **6–8 minutes**. Your answers shape a personalized "
-        f"strategic plan — **{price}** one-time, secure payment via Stripe."
+        f"Most families finish in **6–8 minutes**. After checkout (**{price}** one-time), "
+        "you'll receive your full 8-section plan and PDF download."
+    )
+    st.caption(
+        "Your answers stay in this browser session only — used to generate your report. "
+        "We don't sell your data. Payment is handled securely by Stripe."
     )
 
     if st.session_state.get("payment_cancelled"):
