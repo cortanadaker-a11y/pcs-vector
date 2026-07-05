@@ -15,7 +15,7 @@ from components.form_options import (
     HOUSING_PREFERENCES,
     MOVE_FLEXIBILITY,
     MOVE_WINDOWS,
-    REPORT_NEEDED_BY,
+
     PET_OPTIONS,
     PET_TYPES,
     PRIORITY_CHOICES,
@@ -124,7 +124,7 @@ def _render_move_basics() -> None:
             ),
         )
 
-    col_window, col_report_need = st.columns(2)
+    col_window, col_flex = st.columns(2)
     with col_window:
         set_form_value(
             "move_window",
@@ -134,25 +134,15 @@ def _render_move_basics() -> None:
                 index=_option_index(MOVE_WINDOWS, get_form_value("move_window")),
             ),
         )
-    with col_report_need:
+    with col_flex:
         set_form_value(
-            "report_needed_by",
+            "move_flexibility",
             st.selectbox(
-                "When do you need the report?",
-                options=REPORT_NEEDED_BY,
-                index=_option_index(REPORT_NEEDED_BY, get_form_value("report_needed_by")),
-                help="Most families on orders choose the reporting-date option.",
+                "Date flexibility",
+                options=MOVE_FLEXIBILITY,
+                index=_option_index(MOVE_FLEXIBILITY, get_form_value("move_flexibility")),
             ),
         )
-
-    set_form_value(
-        "move_flexibility",
-        st.selectbox(
-            "Date flexibility",
-            options=MOVE_FLEXIBILITY,
-            index=_option_index(MOVE_FLEXIBILITY, get_form_value("move_flexibility")),
-        ),
-    )
 
 
 def _render_family_situation() -> None:
@@ -394,8 +384,28 @@ def _render_specific_concerns() -> None:
 
 def _render_form_step_indicator(step: int) -> None:
     labels = [title for title, _ in FORM_STEPS]
-    st.caption(f"Step {step + 1} of {len(FORM_STEPS)}: **{labels[step]}**")
-    st.progress((step + 1) / len(FORM_STEPS))
+    parts: list[str] = ['<div class="pcs-steps pcs-form-steps">']
+    for index, label in enumerate(labels):
+        if index > 0:
+            connector_class = "pcs-step-connector completed" if index <= step else "pcs-step-connector"
+            parts.append(f'<div class="{connector_class}"></div>')
+        if index < step:
+            state_class = "pcs-step completed"
+            circle_content = "✓"
+        elif index == step:
+            state_class = "pcs-step active"
+            circle_content = str(index + 1)
+        else:
+            state_class = "pcs-step"
+            circle_content = str(index + 1)
+        parts.append(
+            f'<div class="{state_class}">'
+            f'<div class="pcs-step-circle">{circle_content}</div>'
+            f'<div class="pcs-step-label">{label}</div>'
+            f"</div>"
+        )
+    parts.append("</div>")
+    st.markdown("".join(parts), unsafe_allow_html=True)
 
 
 def render_input_form() -> None:
@@ -447,24 +457,28 @@ def render_input_form() -> None:
         with st.container(border=True):
             _render_specific_concerns()
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="pcs-form-nav">', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="pcs-form-nav-title">Continue your PCS plan</p>',
+        unsafe_allow_html=True,
+    )
 
-    col_back, col_spacer, col_next = st.columns([1, 2, 1])
+    col_back, col_next = st.columns([1, 1.35], gap="medium")
     next_step_title = FORM_STEPS[step + 1][0] if step < len(FORM_STEPS) - 1 else None
 
     with col_back:
         if step == 0:
-            if st.button("← Back to Home", use_container_width=True):
+            if st.button("← Back to Home", use_container_width=True, key="form_nav_back"):
                 st.session_state.form_step = 0
                 navigate_to("home")
-        elif st.button("← Previous Section", use_container_width=True):
+        elif st.button("← Previous section", use_container_width=True, key="form_nav_back"):
             st.session_state.form_step = step - 1
             st.rerun()
 
     with col_next:
         if step < len(FORM_STEPS) - 1:
-            button_label = f"Proceed to {next_step_title} →"
-            if st.button(button_label, type="primary", use_container_width=True):
+            button_label = f"Continue to {next_step_title}"
+            if st.button(button_label, type="primary", use_container_width=True, key="form_nav_next"):
                 form_data = collect_form_from_widgets()
                 errors = validate_form_step(step, form_data)
                 if errors:
@@ -474,9 +488,10 @@ def render_input_form() -> None:
                     st.session_state.form_step = step + 1
                     st.rerun()
         elif st.button(
-            f"Proceed to Payment — {price}",
+            f"Proceed to secure payment · {price}",
             type="primary",
             use_container_width=True,
+            key="form_nav_pay",
         ):
             form_data = collect_form_from_widgets()
             errors = validate_form(form_data)
@@ -497,3 +512,5 @@ def render_input_form() -> None:
                     queue_checkout_redirect(checkout_url, session_id)
                 except StripePaymentError as exc:
                     st.error(str(exc))
+
+    st.markdown("</div>", unsafe_allow_html=True)

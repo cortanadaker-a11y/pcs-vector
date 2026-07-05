@@ -460,6 +460,60 @@ CUSTOM_CSS = """
         padding-left: 1.25rem;
         line-height: 1.7;
     }
+
+    .pcs-form-steps {
+        margin: 0 0 1.5rem 0;
+    }
+
+    .pcs-form-nav {
+        background: linear-gradient(180deg, var(--pcs-surface) 0%, #f9fbfd 100%);
+        border: 1px solid var(--pcs-border);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+        margin-top: 0.5rem;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.08);
+    }
+
+    .pcs-form-nav-title {
+        color: var(--pcs-navy);
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        margin: 0 0 1rem 0;
+        text-align: center;
+    }
+
+    .pcs-form-nav div[data-testid="stButton"] > button {
+        min-height: 3rem;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        border: 1px solid var(--pcs-border);
+        background: var(--pcs-surface);
+        color: var(--pcs-navy);
+        box-shadow: 0 2px 6px rgba(30, 58, 95, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .pcs-form-nav div[data-testid="stButton"] > button:hover {
+        border-color: #cbd5e0;
+        background: #f8fafc;
+        color: var(--pcs-navy);
+    }
+
+    .pcs-form-nav div[data-testid="stButton"] > button[kind="primary"] {
+        background: linear-gradient(135deg, var(--pcs-navy) 0%, var(--pcs-navy-light) 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 8px 18px rgba(30, 58, 95, 0.18);
+    }
+
+    .pcs-form-nav div[data-testid="stButton"] > button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #18324f 0%, #265483 100%);
+        border: none;
+        color: white;
+        transform: translateY(-1px);
+    }
 </style>
 """
 

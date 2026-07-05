@@ -47,7 +47,6 @@ def _render_submitted_summary() -> None:
                 f"- **From:** {resolved_current_installation(data)}  \n"
                 f"- **To:** {gaining}  \n"
                 f"- **Window:** {data.get('move_window', '—')}  \n"
-                f"- **Report needed:** {data.get('report_needed_by', '—')}  \n"
                 f"- **Flexibility:** {data.get('move_flexibility', '—')}"
             )
 
@@ -167,10 +166,16 @@ def render_report() -> None:
         return
 
     if is_payment_verified() and not form_submitted:
+        ensure_form_data_restored()
+        form_data = st.session_state.get("form_data", {})
+        form_submitted = form_data.get("form_submitted")
+
+    if is_payment_verified() and not form_submitted:
         st.error(
-            "Your payment was confirmed, but your form answers are no longer in this browser "
-            f"session (order **{get_order_reference()}**). "
-            "Re-enter your move details on the Input Form — you will not be charged again."
+            "Your payment was confirmed, but we could not restore your form answers "
+            f"(order **{get_order_reference()}**). "
+            "Please contact support with your order reference. "
+            "You will not be charged again if you re-submit the form."
         )
         _render_footer_nav()
         return

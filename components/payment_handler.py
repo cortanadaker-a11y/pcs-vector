@@ -53,20 +53,40 @@ def _query_param(key: str, default: str = "") -> str:
     return value or default
 
 
+def save_checkout_form_backup(session_id: str, form_data: dict) -> None:
+    """Keep a session-scoped copy keyed by Checkout session ID."""
+    backups = st.session_state.setdefault("checkout_form_backups", {})
+    backups[session_id] = form_data.copy()
+
+
+def _restore_from_session_backup(session_id: str) -> bool:
+    backups = st.session_state.get("checkout_form_backups", {})
+    restored = backups.get(session_id)
+    if restored and restored.get("form_submitted"):
+        apply_restored_form_data(restored)
+        return True
+    return False
+
+
 def restore_form_data_after_payment(session_id: str) -> bool:
-    """Restore submitted form answers from Stripe when the browser session was reset."""
+    """Restore submitted form answers after Stripe redirect."""
     if get_form_value("form_submitted"):
+        return True
+
+    if _restore_from_session_backup(session_id):
         return True
 
     try:
         restored = restore_form_data_from_checkout(session_id)
     except StripePaymentError:
-        return False
+        restored = None
 
     if restored and restored.get("form_submitted"):
         apply_restored_form_data(restored)
+        save_checkout_form_backup(session_id, restored)
         return True
-    return False
+
+    return _restore_from_session_backup(session_id)
 
 
 def ensure_form_data_restored() -> bool:
@@ -188,6 +208,9 @@ def queue_checkout_redirect(checkout_url: str, session_id: str) -> None:
     st.session_state.stripe_checkout_session_id = session_id
     st.session_state.payment_message = None
     st.session_state.checkout_redirect_url = checkout_url
+    form_data = st.session_state.get("form_data")
+    if form_data and form_data.get("form_submitted"):
+        save_checkout_form_backup(session_id, form_data)
     st.rerun()
 
 

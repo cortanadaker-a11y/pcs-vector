@@ -16,6 +16,7 @@ from services.form_persistence import (
     normalize_stripe_metadata,
     pack_form_data_for_stripe,
     unpack_form_data_from_stripe,
+    verify_packed_metadata,
 )
 from services.stripe_config import (
     REPORT_PRICE_CENTS,
@@ -87,6 +88,14 @@ def create_checkout_session(form_data: dict | None = None) -> tuple[str, str]:
 
     if not session.url or not session.id:
         raise StripePaymentError("Stripe returned an invalid checkout session.")
+
+    if form_data:
+        stored = normalize_stripe_metadata(session.metadata)
+        if not verify_packed_metadata(stored, form_data):
+            raise StripePaymentError(
+                "Could not store your form answers on the checkout session. "
+                "Please try again — do not re-enter payment if Stripe already charged you."
+            )
 
     return session.url, session.id
 

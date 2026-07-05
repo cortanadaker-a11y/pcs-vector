@@ -23,8 +23,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "gaining_installation": "Fort Bragg, NC",
     "gaining_installation_other": "",
     "move_window": "1–3 months",
-    "report_needed_by": "Before reporting date (orders in hand)",
-    "move_flexibility": "Somewhat flexible (±2 weeks)",
+    "move_flexibility": "Fixed — must align with reporting date",
     "spouse_career_field": "Not currently working — seeking employment",
     "spouse_career_other": "",
     "num_children": 0,
@@ -207,9 +206,6 @@ def validate_form_step(step: int, data: dict[str, Any]) -> list[str]:
             "gaining_installation_other", ""
         ).strip():
             errors.append("Enter your gaining installation when Other is selected.")
-
-        if not data.get("report_needed_by"):
-            errors.append("Select when you need the report.")
 
         if data.get("spouse_career_field") == "Other field" and not data.get(
             "spouse_career_other", ""
