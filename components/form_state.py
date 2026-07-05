@@ -8,6 +8,13 @@ import streamlit as st
 
 from components.form_options import PRIORITY_CHOICES, PRIORITY_LABELS
 
+MULTISELECT_FORM_KEYS = (
+    "child_age_ranges",
+    "pet_types",
+    "housing_must_haves_selected",
+    "concern_flags",
+)
+
 FORM_DEFAULTS: dict[str, Any] = {
     "rank_pay_grade": "E-5",
     "rank_title": "",
@@ -55,6 +62,49 @@ def get_form_value(key: str) -> Any:
 def set_form_value(key: str, value: Any) -> None:
     """Write a single form value to session state."""
     st.session_state.form_data[key] = value
+
+
+def _multiselect_widget_key(form_key: str) -> str:
+    return f"ms_{form_key}"
+
+
+def clear_multiselect_widget_state() -> None:
+    """Reset widget-bound multiselect keys (e.g. after restoring saved form data)."""
+    for key in MULTISELECT_FORM_KEYS:
+        st.session_state.pop(_multiselect_widget_key(key), None)
+
+
+def render_multiselect(
+    label: str,
+    options: list[str],
+    form_key: str,
+    *,
+    help: str | None = None,
+) -> list[str]:
+    """Render a multiselect bound to a stable widget key to avoid dropped selections."""
+    widget_key = _multiselect_widget_key(form_key)
+    if widget_key not in st.session_state:
+        stored = get_form_value(form_key) or []
+        st.session_state[widget_key] = [item for item in stored if item in options]
+
+    kwargs: dict[str, Any] = {"options": options, "key": widget_key}
+    if help:
+        kwargs["help"] = help
+    selected = st.multiselect(label, **kwargs)
+    set_form_value(form_key, selected)
+    return selected
+
+
+def reset_multiselect(form_key: str) -> None:
+    """Clear a multiselect field and its widget state."""
+    st.session_state[_multiselect_widget_key(form_key)] = []
+    set_form_value(form_key, [])
+
+
+def apply_restored_form_data(form_data: dict[str, Any]) -> None:
+    """Apply form data recovered from Stripe and refresh multiselect widget state."""
+    st.session_state.form_data = form_data
+    clear_multiselect_widget_state()
 
 
 def collect_form_from_widgets() -> dict[str, Any]:

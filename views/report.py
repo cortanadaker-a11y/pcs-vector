@@ -16,6 +16,7 @@ from components.form_state import (
     resolved_spouse_career,
 )
 from components.payment_handler import (
+    ensure_form_data_restored,
     get_order_reference,
     is_payment_verified,
     require_payment,
@@ -152,6 +153,9 @@ def render_report() -> None:
 
     if st.session_state.get("report_error"):
         st.error(st.session_state.report_error)
+
+    if is_payment_verified():
+        ensure_form_data_restored()
 
     form_data = st.session_state.get("form_data", {})
     form_submitted = form_data.get("form_submitted")

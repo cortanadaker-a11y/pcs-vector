@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import stripe
 
+from services.form_persistence import pack_form_data_for_stripe, unpack_form_data_from_stripe
 from services.stripe_config import (
     REPORT_PRICE_CENTS,
     REPORT_PRICE_DISPLAY,
@@ -34,8 +35,11 @@ def _configure_stripe() -> None:
         raise StripePaymentError(str(exc)) from exc
 
 
-def create_checkout_session() -> tuple[str, str]:
+def create_checkout_session(form_data: dict | None = None) -> tuple[str, str]:
     """Create a hosted Stripe Checkout session.
+
+    Form data is embedded in session metadata so it can be restored after the
+    Stripe redirect even if the Streamlit browser session is reset.
 
     Returns:
         (checkout_url, session_id) — redirect the user to checkout_url.
@@ -46,6 +50,12 @@ def create_checkout_session() -> tuple[str, str]:
     base_url = get_app_base_url()
     success_url = f"{base_url}/?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{base_url}/?payment=cancelled"
+
+    metadata = (
+        pack_form_data_for_stripe(form_data)
+        if form_data
+        else {"product": "pcs_vector_report"}
+    )
 
     try:
         session = stripe.checkout.Session.create(
@@ -66,7 +76,7 @@ def create_checkout_session() -> tuple[str, str]:
             ],
             success_url=success_url,
             cancel_url=cancel_url,
-            metadata={"product": "pcs_vector_report"},
+            metadata=metadata,
         )
     except stripe.error.StripeError as exc:
         raise StripePaymentError(f"Could not start checkout: {exc.user_message or exc}") from exc
@@ -108,6 +118,22 @@ def format_order_reference(session_id: str) -> str:
         return "N/A"
     suffix = session_id.replace("cs_test_", "").replace("cs_live_", "")[-8:].upper()
     return f"PCS-{suffix}"
+
+
+def restore_form_data_from_checkout(session_id: str) -> dict | None:
+    """Load saved form answers from a paid Checkout session's metadata."""
+    if not session_id:
+        return None
+
+    _configure_stripe()
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+    except stripe.error.StripeError as exc:
+        raise StripePaymentError(
+            f"Could not restore form data: {exc.user_message or exc}"
+        ) from exc
+
+    return unpack_form_data_from_stripe(dict(session.metadata or {}))
 
 
 def get_checkout_receipt(session_id: str) -> dict[str, str]:

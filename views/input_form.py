@@ -22,7 +22,14 @@ from components.form_options import (
     SPOUSE_CAREER_FIELDS,
     VEHICLE_COUNTS,
 )
-from components.form_state import collect_form_from_widgets, get_form_value, set_form_value, validate_form
+from components.form_state import (
+    collect_form_from_widgets,
+    get_form_value,
+    render_multiselect,
+    reset_multiselect,
+    set_form_value,
+    validate_form,
+)
 from components.payment_handler import queue_checkout_redirect, render_checkout_redirect
 from views.payment_cancelled import render_payment_cancelled_banner
 from services.stripe_payment import StripePaymentError, create_checkout_session, get_price_display
@@ -174,17 +181,13 @@ def _render_family_situation() -> None:
         )
     with col_ages:
         if get_form_value("num_children") > 0:
-            current_ages = get_form_value("child_age_ranges") or []
-            set_form_value(
+            render_multiselect(
+                "Children's age ranges",
+                CHILD_AGE_RANGES,
                 "child_age_ranges",
-                st.multiselect(
-                    "Children's age ranges",
-                    options=CHILD_AGE_RANGES,
-                    default=[a for a in current_ages if a in CHILD_AGE_RANGES],
-                ),
             )
         else:
-            set_form_value("child_age_ranges", [])
+            reset_multiselect("child_age_ranges")
             st.caption("No children — school planning will be lighter.")
 
     set_form_value(
@@ -198,14 +201,7 @@ def _render_family_situation() -> None:
     )
 
     if get_form_value("has_pets") == "Yes — we have pets":
-        set_form_value(
-            "pet_types",
-            st.multiselect(
-                "Pet type(s)",
-                options=PET_TYPES,
-                default=[p for p in (get_form_value("pet_types") or []) if p in PET_TYPES],
-            ),
-        )
+        render_multiselect("Pet type(s)", PET_TYPES, "pet_types")
         set_form_value(
             "pet_details",
             st.text_input(
@@ -215,7 +211,7 @@ def _render_family_situation() -> None:
             ),
         )
     else:
-        set_form_value("pet_types", [])
+        reset_multiselect("pet_types")
         set_form_value("pet_details", "")
 
 
@@ -278,18 +274,11 @@ def _render_housing_budget() -> None:
     else:
         set_form_value("max_monthly_budget", 0)
 
-    set_form_value(
+    render_multiselect(
+        "Housing must-haves",
+        HOUSING_MUST_HAVES,
         "housing_must_haves_selected",
-        st.multiselect(
-            "Housing must-haves",
-            options=HOUSING_MUST_HAVES,
-            default=[
-                h
-                for h in (get_form_value("housing_must_haves_selected") or [])
-                if h in HOUSING_MUST_HAVES
-            ],
-            help="Select all that apply.",
-        ),
+        help="Select all that apply.",
     )
     set_form_value(
         "housing_must_haves_other",
@@ -377,14 +366,7 @@ def _render_specific_concerns() -> None:
         "Flag anything that should shape your plan.",
     )
 
-    set_form_value(
-        "concern_flags",
-        st.multiselect(
-            "Common concerns",
-            options=CONCERN_FLAGS,
-            default=[c for c in (get_form_value("concern_flags") or []) if c in CONCERN_FLAGS],
-        ),
-    )
+    render_multiselect("Common concerns", CONCERN_FLAGS, "concern_flags")
     set_form_value(
         "specific_concerns",
         st.text_area(
@@ -474,7 +456,7 @@ def render_input_form() -> None:
                 st.session_state.stripe_checkout_session_id = None
 
                 try:
-                    checkout_url, session_id = create_checkout_session()
+                    checkout_url, session_id = create_checkout_session(form_data)
                     queue_checkout_redirect(checkout_url, session_id)
                 except StripePaymentError as exc:
                     st.error(str(exc))

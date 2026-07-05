@@ -17,11 +17,13 @@ from datetime import datetime
 import streamlit as st
 import streamlit.components.v1 as components
 
+from components.form_state import apply_restored_form_data, get_form_value
 from components.sidebar import set_page
 from services.stripe_payment import (
     StripePaymentError,
     format_order_reference,
     get_checkout_receipt,
+    restore_form_data_from_checkout,
     verify_checkout_session,
 )
 
@@ -49,6 +51,32 @@ def _query_param(key: str, default: str = "") -> str:
     if isinstance(value, list):
         return value[0] if value else default
     return value or default
+
+
+def restore_form_data_after_payment(session_id: str) -> bool:
+    """Restore submitted form answers from Stripe when the browser session was reset."""
+    if get_form_value("form_submitted"):
+        return True
+
+    try:
+        restored = restore_form_data_from_checkout(session_id)
+    except StripePaymentError:
+        return False
+
+    if restored and restored.get("form_submitted"):
+        apply_restored_form_data(restored)
+        return True
+    return False
+
+
+def ensure_form_data_restored() -> bool:
+    """Best-effort restore of form data for a verified payment in this session."""
+    if get_form_value("form_submitted"):
+        return True
+    session_id = st.session_state.get("stripe_checkout_session_id", "")
+    if not session_id or not st.session_state.get("payment_verified"):
+        return False
+    return restore_form_data_after_payment(session_id)
 
 
 def _set_payment_message(message: str, msg_type: str = "info") -> None:
@@ -84,6 +112,7 @@ def handle_payment_callback() -> None:
                 st.session_state.payment_cancelled = False
                 st.session_state.report_markdown = None
                 st.session_state.report_error = None
+                restore_form_data_after_payment(session_id)
                 set_page("report")
                 st.session_state._sync_nav_from_page = True
                 _set_payment_message(None, "success")
@@ -207,8 +236,13 @@ def retry_checkout_from_saved_form() -> None:
     """Shared helper: create a new Checkout session without re-entering the form."""
     from services.stripe_payment import StripePaymentError, create_checkout_session
 
+    form_data = st.session_state.get("form_data")
+    if not form_data or not form_data.get("form_submitted"):
+        st.error("Complete the form before retrying payment.")
+        return
+
     try:
-        checkout_url, session_id = create_checkout_session()
+        checkout_url, session_id = create_checkout_session(form_data)
         queue_checkout_redirect(checkout_url, session_id)
     except StripePaymentError as exc:
         st.error(str(exc))
