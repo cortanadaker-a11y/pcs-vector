@@ -233,6 +233,7 @@ def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
         ("Moving from", metadata.get("from_installation", "")),
         ("Moving to", metadata.get("to_installation", "")),
         ("Move window", metadata.get("move_window", "")),
+        ("Report needed by", metadata.get("report_needed_by", "")),
         ("Primary priority", metadata.get("primary_priority", "")),
     ]
     styles = _build_styles()
@@ -539,5 +540,6 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, str]:
         "from_installation": resolved_current_installation(form_data),
         "to_installation": resolved_gaining_installation(form_data),
         "move_window": str(form_data.get("move_window", "")),
+        "report_needed_by": str(form_data.get("report_needed_by", "")),
         "primary_priority": str(form_data.get("primary_priority", "")),
     }

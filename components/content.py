@@ -80,7 +80,7 @@ FAQ_ITEMS = [
     },
     {
         "q": "How long does the form take?",
-        "a": "Most families finish in 6–8 minutes. You can move between tabs before checkout — "
+        "a": "Most families finish in 6–8 minutes. The form walks you through three short sections before checkout — "
         "your answers stay saved if you need a break.",
     },
     {

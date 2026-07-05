@@ -52,6 +52,14 @@ MOVE_WINDOWS = [
     "Orders not firm yet",
 ]
 
+REPORT_NEEDED_BY = [
+    "Before reporting date (orders in hand)",
+    "Within 30 days of report date",
+    "1–3 months before move",
+    "3–6 months before move",
+    "Exploring — no firm date yet",
+]
+
 MOVE_FLEXIBILITY = [
     "Fixed — must align with reporting date",
     "Somewhat flexible (±2 weeks)",

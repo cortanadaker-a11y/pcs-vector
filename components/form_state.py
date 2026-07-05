@@ -22,7 +22,8 @@ FORM_DEFAULTS: dict[str, Any] = {
     "current_installation_other": "",
     "gaining_installation": "Fort Bragg, NC",
     "gaining_installation_other": "",
-    "move_window": "3–6 months",
+    "move_window": "1–3 months",
+    "report_needed_by": "Before reporting date (orders in hand)",
     "move_flexibility": "Somewhat flexible (±2 weeks)",
     "spouse_career_field": "Not currently working — seeking employment",
     "spouse_career_other": "",
@@ -103,7 +104,9 @@ def reset_multiselect(form_key: str) -> None:
 
 def apply_restored_form_data(form_data: dict[str, Any]) -> None:
     """Apply form data recovered from Stripe and refresh multiselect widget state."""
-    st.session_state.form_data = form_data
+    merged = FORM_DEFAULTS.copy()
+    merged.update(form_data)
+    st.session_state.form_data = merged
     clear_multiselect_widget_state()
 
 
@@ -173,50 +176,75 @@ def priority_rank_scores(data: dict[str, Any]) -> dict[str, int]:
     }
 
 
-def validate_form(data: dict[str, Any]) -> list[str]:
-    """Return a list of validation error messages."""
+FORM_STEPS: tuple[tuple[str, str], ...] = (
+    ("Move & Family", "basics"),
+    ("Housing & Priorities", "housing"),
+    ("Logistics & Notes", "logistics"),
+)
+
+
+def init_form_step() -> None:
+    if "form_step" not in st.session_state:
+        st.session_state.form_step = 0
+
+
+def validate_form_step(step: int, data: dict[str, Any]) -> list[str]:
+    """Validate fields for a single wizard step before advancing."""
     errors: list[str] = []
 
-    if not data.get("rank_pay_grade"):
-        errors.append("Select a pay grade.")
+    if step == 0:
+        if not data.get("rank_pay_grade"):
+            errors.append("Select a pay grade.")
 
-    if data.get("rank_pay_grade") == "Other" and not data.get("rank_title", "").strip():
-        errors.append("Enter your rank or title when pay grade is Other.")
+        if data.get("rank_pay_grade") == "Other" and not data.get("rank_title", "").strip():
+            errors.append("Enter your rank or title when pay grade is Other.")
 
-    if not resolved_current_installation(data):
-        errors.append("Select or enter your current Army installation.")
+        if not resolved_current_installation(data):
+            errors.append("Select or enter your current Army installation.")
 
-    gaining = data.get("gaining_installation", "")
-    if gaining == "Other CONUS installation" and not data.get(
-        "gaining_installation_other", ""
-    ).strip():
-        errors.append("Enter your gaining installation when Other is selected.")
+        gaining = data.get("gaining_installation", "")
+        if gaining == "Other CONUS installation" and not data.get(
+            "gaining_installation_other", ""
+        ).strip():
+            errors.append("Enter your gaining installation when Other is selected.")
 
-    if data.get("spouse_career_field") == "Other field" and not data.get(
-        "spouse_career_other", ""
-    ).strip():
-        errors.append("Describe your spouse's field when Other is selected.")
+        if not data.get("report_needed_by"):
+            errors.append("Select when you need the report.")
 
-    if data.get("has_pets") == "Yes — we have pets" and not (
-        data.get("pet_types") or data.get("pet_details", "").strip()
-    ):
-        errors.append("Select pet type(s) or add brief pet details.")
+        if data.get("spouse_career_field") == "Other field" and not data.get(
+            "spouse_career_other", ""
+        ).strip():
+            errors.append("Describe your spouse's field when Other is selected.")
 
-    if data.get("budget_mode") == "Set a monthly budget cap":
-        if data.get("budget_preset") == "Custom amount":
-            budget = data.get("max_monthly_budget", 0)
-            if not budget or budget <= 0:
-                errors.append("Enter a monthly housing budget greater than $0.")
+        num_children = data.get("num_children", 0)
+        if num_children > 0 and not data.get("child_age_ranges"):
+            errors.append("Select at least one child age range.")
 
-    primary = data.get("primary_priority", "")
-    secondary = data.get("secondary_priority", "")
-    if primary and secondary and primary == secondary:
-        errors.append("Choose different primary and secondary priorities.")
+        if data.get("has_pets") == "Yes — we have pets" and not (
+            data.get("pet_types") or data.get("pet_details", "").strip()
+        ):
+            errors.append("Select pet type(s) or add brief pet details.")
 
-    num_children = data.get("num_children", 0)
-    if num_children > 0 and not data.get("child_age_ranges"):
-        errors.append("Select at least one child age range.")
+    elif step == 1:
+        if data.get("budget_mode") == "Set a monthly budget cap":
+            if data.get("budget_preset") == "Custom amount":
+                budget = data.get("max_monthly_budget", 0)
+                if not budget or budget <= 0:
+                    errors.append("Enter a monthly housing budget greater than $0.")
 
+        primary = data.get("primary_priority", "")
+        secondary = data.get("secondary_priority", "")
+        if primary and secondary and primary == secondary:
+            errors.append("Choose different primary and secondary priorities.")
+
+    return errors
+
+
+def validate_form(data: dict[str, Any]) -> list[str]:
+    """Return a list of validation error messages for the full form."""
+    errors: list[str] = []
+    for step in range(len(FORM_STEPS)):
+        errors.extend(validate_form_step(step, data))
     return errors
 
 

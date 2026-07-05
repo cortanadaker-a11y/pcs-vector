@@ -47,6 +47,7 @@ def _render_submitted_summary() -> None:
                 f"- **From:** {resolved_current_installation(data)}  \n"
                 f"- **To:** {gaining}  \n"
                 f"- **Window:** {data.get('move_window', '—')}  \n"
+                f"- **Report needed:** {data.get('report_needed_by', '—')}  \n"
                 f"- **Flexibility:** {data.get('move_flexibility', '—')}"
             )
 

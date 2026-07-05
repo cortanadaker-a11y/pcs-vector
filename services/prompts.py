@@ -84,6 +84,7 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
             "current_installation": resolved_current_installation(form_data),
             "gaining_installation": gaining,
             "move_window": form_data.get("move_window"),
+            "report_needed_by": form_data.get("report_needed_by"),
             "move_flexibility": form_data.get("move_flexibility"),
         },
         "family": {

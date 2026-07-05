@@ -15,6 +15,7 @@ from components.form_options import (
     HOUSING_PREFERENCES,
     MOVE_FLEXIBILITY,
     MOVE_WINDOWS,
+    REPORT_NEEDED_BY,
     PET_OPTIONS,
     PET_TYPES,
     PRIORITY_CHOICES,
@@ -23,12 +24,15 @@ from components.form_options import (
     VEHICLE_COUNTS,
 )
 from components.form_state import (
+    FORM_STEPS,
     collect_form_from_widgets,
     get_form_value,
+    init_form_step,
     render_multiselect,
     reset_multiselect,
     set_form_value,
     validate_form,
+    validate_form_step,
 )
 from components.payment_handler import queue_checkout_redirect, render_checkout_redirect
 from views.payment_cancelled import render_payment_cancelled_banner
@@ -120,7 +124,7 @@ def _render_move_basics() -> None:
             ),
         )
 
-    col_window, col_flex = st.columns(2)
+    col_window, col_report_need = st.columns(2)
     with col_window:
         set_form_value(
             "move_window",
@@ -130,15 +134,25 @@ def _render_move_basics() -> None:
                 index=_option_index(MOVE_WINDOWS, get_form_value("move_window")),
             ),
         )
-    with col_flex:
+    with col_report_need:
         set_form_value(
-            "move_flexibility",
+            "report_needed_by",
             st.selectbox(
-                "Date flexibility",
-                options=MOVE_FLEXIBILITY,
-                index=_option_index(MOVE_FLEXIBILITY, get_form_value("move_flexibility")),
+                "When do you need the report?",
+                options=REPORT_NEEDED_BY,
+                index=_option_index(REPORT_NEEDED_BY, get_form_value("report_needed_by")),
+                help="Most families on orders choose the reporting-date option.",
             ),
         )
+
+    set_form_value(
+        "move_flexibility",
+        st.selectbox(
+            "Date flexibility",
+            options=MOVE_FLEXIBILITY,
+            index=_option_index(MOVE_FLEXIBILITY, get_form_value("move_flexibility")),
+        ),
+    )
 
 
 def _render_family_situation() -> None:
@@ -378,10 +392,21 @@ def _render_specific_concerns() -> None:
     )
 
 
+def _render_form_step_indicator(step: int) -> None:
+    labels = [title for title, _ in FORM_STEPS]
+    st.caption(f"Step {step + 1} of {len(FORM_STEPS)}: **{labels[step]}**")
+    st.progress((step + 1) / len(FORM_STEPS))
+
+
 def render_input_form() -> None:
     """Render the full PCS input form."""
     if render_checkout_redirect():
         return
+
+    init_form_step()
+    step = int(st.session_state.form_step)
+    step = max(0, min(step, len(FORM_STEPS) - 1))
+    st.session_state.form_step = step
 
     st.markdown("## Tell us about your move")
     price = get_price_display()
@@ -401,25 +426,21 @@ def render_input_form() -> None:
     if st.session_state.get("report_error"):
         st.error(st.session_state.report_error)
 
-    tab_basics, tab_family, tab_rest = st.tabs(
-        ["Move & Family", "Housing & Priorities", "Logistics & Notes"]
-    )
+    _render_form_step_indicator(step)
 
-    with tab_basics:
+    if step == 0:
         with st.container(border=True):
             _render_move_basics()
         st.markdown("<br>", unsafe_allow_html=True)
         with st.container(border=True):
             _render_family_situation()
-
-    with tab_family:
+    elif step == 1:
         with st.container(border=True):
             _render_housing_budget()
         st.markdown("<br>", unsafe_allow_html=True)
         with st.container(border=True):
             _render_priorities()
-
-    with tab_rest:
+    else:
         with st.container(border=True):
             _render_logistics()
         st.markdown("<br>", unsafe_allow_html=True)
@@ -428,14 +449,31 @@ def render_input_form() -> None:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    col_back, col_spacer, col_generate = st.columns([1, 2, 1])
+    col_back, col_spacer, col_next = st.columns([1, 2, 1])
+    next_step_title = FORM_STEPS[step + 1][0] if step < len(FORM_STEPS) - 1 else None
 
     with col_back:
-        if st.button("← Back", use_container_width=True):
-            navigate_to("home")
+        if step == 0:
+            if st.button("← Back to Home", use_container_width=True):
+                st.session_state.form_step = 0
+                navigate_to("home")
+        elif st.button("← Previous Section", use_container_width=True):
+            st.session_state.form_step = step - 1
+            st.rerun()
 
-    with col_generate:
-        if st.button(
+    with col_next:
+        if step < len(FORM_STEPS) - 1:
+            button_label = f"Proceed to {next_step_title} →"
+            if st.button(button_label, type="primary", use_container_width=True):
+                form_data = collect_form_from_widgets()
+                errors = validate_form_step(step, form_data)
+                if errors:
+                    for error in errors:
+                        st.error(error)
+                else:
+                    st.session_state.form_step = step + 1
+                    st.rerun()
+        elif st.button(
             f"Proceed to Payment — {price}",
             type="primary",
             use_container_width=True,
@@ -447,7 +485,6 @@ def render_input_form() -> None:
                 for error in errors:
                     st.error(error)
             else:
-                # Save form for use after Stripe redirect (same browser session).
                 form_data["form_submitted"] = True
                 st.session_state.form_data = form_data
                 st.session_state.report_markdown = None

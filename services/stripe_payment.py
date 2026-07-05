@@ -12,7 +12,11 @@ from __future__ import annotations
 
 import stripe
 
-from services.form_persistence import pack_form_data_for_stripe, unpack_form_data_from_stripe
+from services.form_persistence import (
+    normalize_stripe_metadata,
+    pack_form_data_for_stripe,
+    unpack_form_data_from_stripe,
+)
 from services.stripe_config import (
     REPORT_PRICE_CENTS,
     REPORT_PRICE_DISPLAY,
@@ -133,7 +137,7 @@ def restore_form_data_from_checkout(session_id: str) -> dict | None:
             f"Could not restore form data: {exc.user_message or exc}"
         ) from exc
 
-    return unpack_form_data_from_stripe(dict(session.metadata or {}))
+    return unpack_form_data_from_stripe(normalize_stripe_metadata(session.metadata))
 
 
 def get_checkout_receipt(session_id: str) -> dict[str, str]:
