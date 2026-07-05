@@ -37,7 +37,6 @@ def init_payment_state() -> None:
         "payment_cancelled": False,
         "payment_message": None,
         "payment_message_type": None,  # success | warning | error | info
-        "show_payment_success_screen": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -83,9 +82,10 @@ def handle_payment_callback() -> None:
                     "%B %d, %Y at %I:%M %p"
                 )
                 st.session_state.payment_cancelled = False
-                st.session_state.show_payment_success_screen = True
                 st.session_state.report_markdown = None
+                st.session_state.report_error = None
                 set_page("report")
+                st.session_state._sync_nav_from_page = True
                 _set_payment_message(None, "success")
             else:
                 st.session_state.payment_verified = False
@@ -143,11 +143,6 @@ def require_payment() -> bool:
     except StripePaymentError:
         st.session_state.payment_verified = False
         return False
-
-
-def clear_payment_success_screen() -> None:
-    """Hide the one-time post-payment welcome screen after report is ready."""
-    st.session_state.show_payment_success_screen = False
 
 
 def get_order_reference() -> str:

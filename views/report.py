@@ -16,14 +16,14 @@ from components.form_state import (
     resolved_spouse_career,
 )
 from components.payment_handler import (
-    clear_payment_success_screen,
+    get_order_reference,
     is_payment_verified,
     require_payment,
 )
 from services.pdf_generator import PDFGenerationError, build_pdf_metadata, generate_pdf_report
 from services.report_generator import GrokAPIError, generate_report
 from views.payment_gate import render_payment_required
-from views.post_payment import generate_report_with_loading, render_payment_success_screen
+from views.post_payment import generate_report_with_loading, render_payment_confirmation_banner
 
 
 def _render_submitted_summary() -> None:
@@ -140,7 +140,6 @@ def _generate_report_if_paid() -> str | None:
         report = generate_report_with_loading(lambda: generate_report(data))
         st.session_state.report_markdown = report
         st.session_state.report_error = None
-        clear_payment_success_screen()
         return report
     except GrokAPIError as exc:
         st.session_state.report_error = str(exc)
@@ -154,36 +153,45 @@ def render_report() -> None:
     if st.session_state.get("report_error"):
         st.error(st.session_state.report_error)
 
-    form_submitted = st.session_state.get("form_data", {}).get("form_submitted")
+    form_data = st.session_state.get("form_data", {})
+    form_submitted = form_data.get("form_submitted")
 
     if form_submitted and not is_payment_verified():
         render_payment_required()
         _render_footer_nav()
         return
 
-    # Post-payment: show success confirmation while Grok generates the report.
-    if is_payment_verified() and st.session_state.get("show_payment_success_screen"):
-        render_payment_success_screen()
-        st.markdown("<br>", unsafe_allow_html=True)
-
-    report = _generate_report_if_paid()
-
-    if not report:
-        if form_submitted and is_payment_verified():
-            st.warning(
-                "We couldn't generate your report. Use Regenerate below or edit your details."
-            )
-        else:
-            st.info("Start on the home page, complete the form, then proceed to payment.")
-            with st.container(border=True):
-                st.markdown(
-                    "Your plan includes 8 personalized sections — housing & BAH analysis, "
-                    "spouse career, schools, finances, a 30-day action plan, and a PDF download."
-                )
+    if is_payment_verified() and not form_submitted:
+        st.error(
+            "Your payment was confirmed, but your form answers are no longer in this browser "
+            f"session (order **{get_order_reference()}**). "
+            "Re-enter your move details on the Input Form — you will not be charged again."
+        )
         _render_footer_nav()
         return
 
-    st.success("Your PCS strategic plan is ready.", icon="✅")
+    if not form_submitted:
+        st.info("Start on the home page, complete the form, then proceed to payment.")
+        with st.container(border=True):
+            st.markdown(
+                "Your plan includes 8 personalized sections — housing & BAH analysis, "
+                "spouse career, schools, finances, a 30-day action plan, and a PDF download."
+            )
+        _render_footer_nav()
+        return
+
+    # Paid: generate immediately (loading UI) then show report + PDF on the same page.
+    report = _generate_report_if_paid()
+
+    if not report:
+        if is_payment_verified():
+            st.warning(
+                "We couldn't generate your report. Use Regenerate below or edit your details."
+            )
+        _render_footer_nav()
+        return
+
+    render_payment_confirmation_banner()
     _render_submitted_summary()
 
     date_stamp = datetime.now().strftime("%Y%m%d")

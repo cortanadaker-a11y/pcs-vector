@@ -1,4 +1,4 @@
-"""Post-payment success and report-generation loading UI."""
+"""Post-payment confirmation and report-generation loading UI."""
 
 from __future__ import annotations
 
@@ -8,44 +8,17 @@ from components.payment_handler import get_order_reference
 from services.stripe_payment import get_price_display
 
 
-def render_payment_success_screen() -> None:
-    """Show confirmation after Stripe payment, before/during Grok report generation."""
+def render_payment_confirmation_banner() -> None:
+    """Compact confirmation shown above the report after payment and generation succeed."""
     order_ref = get_order_reference()
     amount = st.session_state.get("payment_amount_display") or get_price_display()
     completed_at = st.session_state.get("payment_completed_at", "")
 
-    st.markdown(
-        f"""
-        <div class="pcs-payment-success">
-            <div class="pcs-payment-success-icon">✓</div>
-            <h2>Payment Successful</h2>
-            <p>Thank you for your purchase. Your personalized PCS Vector report is on the way.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        st.metric("Order reference", order_ref)
-    with col_b:
-        st.metric("Amount paid", amount)
-    with col_c:
-        st.metric("Status", "Confirmed")
-
+    caption = f"Order **{order_ref}** · **{amount}** paid"
     if completed_at:
-        st.caption(f"Payment completed {completed_at}")
+        caption += f" · {completed_at}"
 
-    st.markdown(
-        """
-        <div class="pcs-generating-note">
-            <strong>What happens next</strong><br>
-            We're building your 8-section strategic plan — housing, schools, spouse career,
-            finances, and a 30-day action checklist tailored to your move.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.success(f"Payment confirmed. {caption}", icon="✅")
 
 
 def generate_report_with_loading(generate_fn) -> str | None:
