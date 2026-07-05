@@ -11,9 +11,9 @@ from components.form_options import PRIORITY_CHOICES, PRIORITY_LABELS
 FORM_DEFAULTS: dict[str, Any] = {
     "rank_pay_grade": "E-5",
     "rank_title": "",
-    "current_installation_preset": "Fort Cavazos, TX",
+    "current_installation_preset": "Fort Cavazos (Fort Hood), TX",
     "current_installation_other": "",
-    "gaining_installation": "Fort Bragg, NC",
+    "gaining_installation": "Fort Liberty (Fort Bragg), NC",
     "gaining_installation_other": "",
     "move_window": "3–6 months",
     "move_flexibility": "Somewhat flexible (±2 weeks)",

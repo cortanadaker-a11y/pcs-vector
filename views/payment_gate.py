@@ -25,7 +25,7 @@ def render_payment_required() -> None:
         st.markdown(f"### PCS Vector Report — {price}")
         st.markdown(
             "- 8-section personalized PCS strategic plan  \n"
-            "- Fort Bragg & Fort Hood-specific guidance  \n"
+            "- Fort Liberty/Bragg, Cavazos/Hood & Fort Drum-specific guidance  \n"
             "- BAH and housing tradeoff analysis  \n"
             "- Spouse career, schools, and 30-day action plan  \n"
             "- Professional PDF export"

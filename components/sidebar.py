@@ -58,7 +58,7 @@ def render_sidebar() -> str:
                 with confidence.
 
                 - Personalized 8-section strategic report
-                - Optimized for Fort Bragg & Fort Hood
+                - Optimized for Fort Liberty/Bragg, Fort Cavazos/Hood & Fort Drum
                 - $25 per report (Stripe Checkout)
                 - Professional PDF download
                 """

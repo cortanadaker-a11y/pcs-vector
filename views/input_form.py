@@ -89,7 +89,7 @@ def _render_move_basics() -> None:
                 index=_option_index(
                     GAINING_INSTALLATIONS, get_form_value("gaining_installation")
                 ),
-                help="Best local data for Fort Bragg and Fort Hood.",
+                help="Best local data for Fort Liberty/Bragg, Fort Cavazos/Hood, and Fort Drum.",
             ),
         )
 
