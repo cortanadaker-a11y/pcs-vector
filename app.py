@@ -1,7 +1,7 @@
 """
 PCS Vector — Personalized PCS strategic plans for Army families.
 
-CONUS Army moves only. Optimized for Ft Bragg and Ft Drum.
+CONUS Army moves only. Optimized for Fort Bragg and Fort Hood.
 
 Payment flow:
   Home → Input Form → Stripe Checkout ($25) → Report (Grok + PDF)

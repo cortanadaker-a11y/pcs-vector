@@ -26,8 +26,8 @@ RANK_PAY_GRADES = [
 ]
 
 CURRENT_INSTALLATIONS = [
-    "Fort Liberty (Ft Bragg, NC)",
-    "Fort Drum, NY",
+    "Fort Bragg, NC",
+    "Fort Hood, TX",
     "Fort Cavazos, TX",
     "Joint Base Lewis-McChord, WA",
     "Fort Eisenhower, GA",
@@ -38,8 +38,8 @@ CURRENT_INSTALLATIONS = [
 ]
 
 GAINING_INSTALLATIONS = [
-    "Fort Liberty (Ft Bragg, NC)",
-    "Fort Drum, NY",
+    "Fort Bragg, NC",
+    "Fort Hood, TX",
     "Other CONUS installation",
 ]
 

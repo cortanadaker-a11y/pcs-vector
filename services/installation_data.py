@@ -57,7 +57,7 @@ _BAH_BRAGG: dict[str, int] = {
     "Other": 1653,
 }
 
-_BAH_DRUM: dict[str, int] = {
+_BAH_HOOD: dict[str, int] = {
     "E-1": 1332,
     "E-2": 1332,
     "E-3": 1332,
@@ -83,10 +83,10 @@ _BAH_DRUM: dict[str, int] = {
 }
 
 INSTALLATIONS: dict[str, InstallationProfile] = {
-    "Fort Liberty (Ft Bragg, NC)": InstallationProfile(
+    "Fort Bragg, NC": InstallationProfile(
         key="bragg",
-        display_name="Fort Liberty (Ft Bragg, NC)",
-        short_name="Fort Liberty",
+        display_name="Fort Bragg, NC",
+        short_name="Fort Bragg",
         bah_rates=_BAH_BRAGG,
         housing=HousingMarket(
             on_post_pros=(
@@ -120,42 +120,42 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         climate_note="Mild winters; summer humidity drives higher AC costs off-post.",
         commute_hotspots=("All-American Fwy", "Bragg Blvd", "Murchison Rd gate"),
     ),
-    "Fort Drum, NY": InstallationProfile(
-        key="drum",
-        display_name="Fort Drum, NY",
-        short_name="Fort Drum",
-        bah_rates=_BAH_DRUM,
+    "Fort Hood, TX": InstallationProfile(
+        key="hood",
+        display_name="Fort Hood, TX",
+        short_name="Fort Hood",
+        bah_rates=_BAH_HOOD,
         housing=HousingMarket(
             on_post_pros=(
-                "Predictable housing cost — helpful in a tight winter rental market",
-                "Snow removal and maintenance handled on-post",
-                "Close to unit areas during high-tempo seasons",
+                "Predictable housing cost in a competitive Central Texas rental market",
+                "Short commute to main cantonment and unit areas",
+                "Maintenance handled on-post — helpful during high-tempo cycles",
             ),
             on_post_cons=(
                 "Waitlists can spike before summer PCS season",
-                "Older floor plans in some villages",
-                "Limited off-post-equivalent amenities within walking distance",
+                "Older floor plans in some neighborhoods",
+                "Less flexibility on layout compared to off-post rentals",
             ),
             off_post_areas=(
-                "Evans Mills / Le Ray — shortest commute, moderate rents",
-                "Carthage — family-friendly, 15–20 min to post",
-                "Watertown — most inventory & services, verify commute tolerance",
+                "Killeen (east side) — most inventory, verify school zones",
+                "Harker Heights — family-friendly, 10–20 min to main gates",
+                "Copperas Cove — quieter, strong BAH value, 15–25 min commute",
             ),
-            avg_3br_rent_range=(1300, 1700),
-            utility_note="Budget higher winter heating ($200–$350/mo peak) off-post.",
+            avg_3br_rent_range=(1250, 1650),
+            utility_note="Plan $175–$275/mo for electric/water off-post in peak summer AC months.",
         ),
         school_districts=(
-            "Indian River Central School District (popular with military families)",
-            "Watertown City School District — more services, urban environment",
-            "Carthage area schools — quieter, check bus routes if off-post",
+            "Killeen Independent School District (largest footprint near post)",
+            "Copperas Cove Independent School District — popular with military families",
+            "Private options in Harker Heights / Killeen corridor if ratings are top priority",
         ),
         spouse_employment_notes=(
-            "Samaritan Medical Center, Jefferson County schools, and on-post NAF roles",
-            "Seasonal tourism and Fort Drum contracting cycles create bursts of hiring",
-            "Remote work works well; winter travel for in-person roles needs planning",
+            "Carl R. Darnall Army Medical Center, Killeen ISD, and on-post NAF roles",
+            "Retail and service hiring along Veterans Memorial Blvd and Market Heights",
+            "Remote work viable with good broadband in Harker Heights / Copperas Cove",
         ),
-        climate_note="Lake-effect snow and heating costs are real budget factors — factor into off-post choice.",
-        commute_hotspots=("Route 11", "Route 26", "California Rd gate"),
+        climate_note="Hot summers drive higher AC costs off-post; mild winters rarely spike heating bills.",
+        commute_hotspots=("US-190", "Trimmier Rd", "Clear Creek Rd gate"),
     ),
 }
 

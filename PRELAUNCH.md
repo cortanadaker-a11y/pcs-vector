@@ -42,8 +42,8 @@ Use this checklist before sharing PCS Vector publicly or switching Stripe to liv
 
 ## Report Quality
 
-- [ ] Test report for Fort Liberty (Ft Bragg) — local specifics present
-- [ ] Test report for Fort Drum — winter/heating/school notes present
+- [ ] Test report for Fort Bragg — local specifics present
+- [ ] Test report for Fort Hood — summer AC/utility/school notes present
 - [ ] PDF downloads correctly and all 8 sections render
 - [ ] Regenerate report works after payment verification
 - [ ] BAH/housing disclaimer visible (verify with finance office)
@@ -83,5 +83,5 @@ Use this checklist before sharing PCS Vector publicly or switching Stripe to liv
 - [ ] Custom Streamlit subdomain (if desired)
 - [ ] Stripe webhook for payment audit trail
 - [ ] Email delivery of PDF receipt
-- [ ] More installation profiles beyond Bragg/Drum
+- [ ] More installation profiles beyond Bragg/Hood
 - [ ] Analytics on conversion (form start → payment → report)

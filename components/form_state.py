@@ -13,7 +13,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "rank_title": "",
     "current_installation_preset": "Fort Cavazos, TX",
     "current_installation_other": "",
-    "gaining_installation": "Fort Liberty (Ft Bragg, NC)",
+    "gaining_installation": "Fort Bragg, NC",
     "gaining_installation_other": "",
     "move_window": "3–6 months",
     "move_flexibility": "Somewhat flexible (±2 weeks)",
