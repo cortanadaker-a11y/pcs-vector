@@ -9,6 +9,7 @@ from components.content import (
     VALUE_PROPS,
 )
 from components.faq import render_faq
+from components.sidebar import navigate_to
 from services.stripe_payment import get_price_display
 
 
@@ -166,8 +167,7 @@ def render_home() -> None:
         )
 
         if st.button("Start Your PCS Plan", type="primary", use_container_width=True):
-            st.session_state.page = "input"
-            st.rerun()
+            navigate_to("input")
 
         st.caption("Secure payment via Stripe · Not affiliated with the DoD")
 

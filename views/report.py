@@ -5,6 +5,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from components.sidebar import navigate_to
 from components.form_state import (
     budget_display,
     priority_summary,
@@ -249,10 +250,8 @@ def _render_footer_nav() -> None:
 
     with col_back:
         if st.button("← Edit Details", use_container_width=True):
-            st.session_state.page = "input"
-            st.rerun()
+            navigate_to("input")
 
     with col_home:
         if st.button("Back to Home", use_container_width=True):
-            st.session_state.page = "home"
-            st.rerun()
+            navigate_to("home")

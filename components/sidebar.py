@@ -11,6 +11,27 @@ PAGE_LABELS = {
 }
 
 
+def sync_nav_before_sidebar() -> None:
+    """Align sidebar widget state before it renders (must run before render_sidebar)."""
+    if "nav_page" not in st.session_state:
+        st.session_state.nav_page = st.session_state.page
+    if st.session_state.pop("_sync_nav_from_page", False):
+        st.session_state.nav_page = st.session_state.page
+
+
+def set_page(page: str) -> None:
+    """Set active page before sidebar renders (e.g. payment redirect)."""
+    st.session_state.page = page
+    st.session_state.nav_page = page
+
+
+def navigate_to(page: str) -> None:
+    """Navigate from a button after sidebar has already rendered."""
+    st.session_state.page = page
+    st.session_state._sync_nav_from_page = True
+    st.rerun()
+
+
 def render_sidebar() -> str:
     """Render sidebar navigation and return the selected page."""
     with st.sidebar:
@@ -20,13 +41,11 @@ def render_sidebar() -> str:
 
         st.divider()
 
-        # Use key="page" so sidebar stays in sync with programmatic navigation
-        # (e.g. "Start Your PCS Plan" sets st.session_state.page before rerun).
         st.radio(
             "Navigate",
             options=["home", "input", "report"],
             format_func=lambda p: PAGE_LABELS[p],
-            key="page",
+            key="nav_page",
             label_visibility="collapsed",
         )
 
@@ -48,4 +67,4 @@ def render_sidebar() -> str:
         st.divider()
         st.caption("CONUS Army moves only")
 
-    return st.session_state.page
+    return st.session_state.nav_page

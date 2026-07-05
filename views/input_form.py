@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+from components.sidebar import navigate_to
 from components.form_options import (
     BUDGET_MODES,
     BUDGET_PRESETS,
@@ -446,8 +447,7 @@ def render_input_form() -> None:
 
     with col_back:
         if st.button("← Back", use_container_width=True):
-            st.session_state.page = "home"
-            st.rerun()
+            navigate_to("home")
 
     with col_generate:
         if st.button(

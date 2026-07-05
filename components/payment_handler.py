@@ -15,6 +15,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from components.sidebar import set_page
 from services.stripe_payment import (
     StripePaymentError,
     format_order_reference,
@@ -72,7 +73,7 @@ def handle_payment_callback() -> None:
                 st.session_state.payment_cancelled = False
                 st.session_state.show_payment_success_screen = True
                 st.session_state.report_markdown = None
-                st.session_state.page = "report"
+                set_page("report")
                 _set_payment_message(None, "success")
             else:
                 st.session_state.payment_verified = False
@@ -80,16 +81,16 @@ def handle_payment_callback() -> None:
                     "Payment is still processing. Wait a moment and refresh, or try checkout again.",
                     "warning",
                 )
-                st.session_state.page = "input"
+                set_page("input")
         except StripePaymentError as exc:
             st.session_state.payment_verified = False
             _set_payment_message(str(exc), "error")
-            st.session_state.page = "input"
+            set_page("input")
 
     elif payment == "cancelled":
         st.session_state.payment_verified = False
         st.session_state.payment_cancelled = True
-        st.session_state.page = "input"
+        set_page("input")
         _set_payment_message(None, "warning")
 
     _clear_payment_query_params()

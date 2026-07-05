@@ -16,7 +16,7 @@ import streamlit as st
 from components.form_state import init_form_state
 from components.payment_handler import handle_payment_callback, init_payment_state
 from components.progress import render_progress_indicator
-from components.sidebar import render_sidebar
+from components.sidebar import render_sidebar, sync_nav_before_sidebar
 from components.startup_checks import render_config_warnings
 from components.styles import apply_styles
 
@@ -56,8 +56,12 @@ if "report_markdown" not in st.session_state:
 if "report_error" not in st.session_state:
     st.session_state.report_error = None
 
-render_sidebar()
+sync_nav_before_sidebar()
+sidebar_page = render_sidebar()
 render_config_warnings()
+
+if sidebar_page != st.session_state.page:
+    st.session_state.page = sidebar_page
 
 current_page = st.session_state.page
 
