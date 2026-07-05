@@ -10,7 +10,11 @@ Payment flow (Streamlit + hosted Checkout):
 
 from __future__ import annotations
 
+import logging
+
 import stripe
+
+logger = logging.getLogger(__name__)
 
 from services.form_persistence import (
     normalize_stripe_metadata,
@@ -62,6 +66,12 @@ def create_checkout_session(form_data: dict | None = None) -> tuple[str, str]:
         else {"product": "pcs_vector_report"}
     )
 
+    if form_data and not verify_packed_metadata(metadata, form_data):
+        raise StripePaymentError(
+            "Could not prepare your form answers for checkout. "
+            "Please try again."
+        )
+
     try:
         session = stripe.checkout.Session.create(
             mode="payment",
@@ -90,12 +100,17 @@ def create_checkout_session(form_data: dict | None = None) -> tuple[str, str]:
         raise StripePaymentError("Stripe returned an invalid checkout session.")
 
     if form_data:
-        stored = normalize_stripe_metadata(session.metadata)
-        if not verify_packed_metadata(stored, form_data):
-            raise StripePaymentError(
-                "Could not store your form answers on the checkout session. "
-                "Please try again — do not re-enter payment if Stripe already charged you."
-            )
+        try:
+            retrieved = stripe.checkout.Session.retrieve(session.id)
+            stored = normalize_stripe_metadata(retrieved.metadata)
+            if not verify_packed_metadata(stored, form_data):
+                logger.warning(
+                    "Stripe session %s metadata mismatch after retrieve; "
+                    "checkout will rely on session backup and minimal metadata.",
+                    session.id,
+                )
+        except stripe.error.StripeError as exc:
+            logger.warning("Could not verify stored checkout metadata: %s", exc)
 
     return session.url, session.id
 

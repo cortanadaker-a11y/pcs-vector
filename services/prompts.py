@@ -77,8 +77,13 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
     if form_data.get("rank_title"):
         rank = f"{rank} ({form_data['rank_title']})"
 
+    first_name = form_data.get("first_name", "").strip()
+    last_name = form_data.get("last_name", "").strip()
+    family_name = f"{first_name} {last_name}".strip()
+
     payload = {
         "generated_at": datetime.now().strftime("%B %d, %Y"),
+        "family_name": family_name,
         "move": {
             "rank_pay_grade": rank,
             "current_installation": resolved_current_installation(form_data),
@@ -115,5 +120,6 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "Generate a complete PCS Vector strategic plan for this family.\n\n"
         f"```json\n{json.dumps(payload, indent=2)}\n```\n\n"
         "Weight every section toward their stated priorities. "
+        f"Address the family personally{' as ' + family_name if family_name else ''} in the Executive Summary. "
         "Make Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon guidance highly specific when applicable."
     )

@@ -3,6 +3,7 @@
 import streamlit as st
 
 from components.progress import STEPS
+from components.scroll import request_scroll_to_top
 
 PAGE_LABELS = {
     "home": "Home",
@@ -29,6 +30,9 @@ def navigate_to(page: str) -> None:
     """Navigate from a button after sidebar has already rendered."""
     st.session_state.page = page
     st.session_state._sync_nav_from_page = True
+    if page == "input":
+        st.session_state.form_step = 0
+    request_scroll_to_top()
     st.rerun()
 
 

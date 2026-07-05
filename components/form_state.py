@@ -15,7 +15,11 @@ MULTISELECT_FORM_KEYS = (
     "concern_flags",
 )
 
+NUMBER_WIDGET_KEYS = ("num_children", "max_monthly_budget")
+
 FORM_DEFAULTS: dict[str, Any] = {
+    "first_name": "",
+    "last_name": "",
     "rank_pay_grade": "E-5",
     "rank_title": "",
     "current_installation_preset": "Fort Hood, TX",
@@ -68,10 +72,45 @@ def _multiselect_widget_key(form_key: str) -> str:
     return f"ms_{form_key}"
 
 
+def _number_widget_key(form_key: str) -> str:
+    return f"num_{form_key}"
+
+
 def clear_multiselect_widget_state() -> None:
     """Reset widget-bound multiselect keys (e.g. after restoring saved form data)."""
     for key in MULTISELECT_FORM_KEYS:
         st.session_state.pop(_multiselect_widget_key(key), None)
+
+
+def clear_number_widget_state() -> None:
+    """Reset widget-bound number inputs."""
+    for key in NUMBER_WIDGET_KEYS:
+        st.session_state.pop(_number_widget_key(key), None)
+
+
+def render_number_input(
+    label: str,
+    form_key: str,
+    *,
+    min_value: int,
+    max_value: int,
+    step: int = 1,
+) -> int:
+    """Render a number input bound to a stable widget key."""
+    widget_key = _number_widget_key(form_key)
+    if widget_key not in st.session_state:
+        st.session_state[widget_key] = int(get_form_value(form_key) or 0)
+
+    value = st.number_input(
+        label,
+        min_value=min_value,
+        max_value=max_value,
+        step=step,
+        key=widget_key,
+    )
+    int_value = int(value)
+    set_form_value(form_key, int_value)
+    return int_value
 
 
 def render_multiselect(
@@ -107,6 +146,7 @@ def apply_restored_form_data(form_data: dict[str, Any]) -> None:
     merged.update(form_data)
     st.session_state.form_data = merged
     clear_multiselect_widget_state()
+    clear_number_widget_state()
 
 
 def collect_form_from_widgets() -> dict[str, Any]:
@@ -192,6 +232,12 @@ def validate_form_step(step: int, data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
     if step == 0:
+        if not data.get("first_name", "").strip():
+            errors.append("Enter your first name.")
+
+        if not data.get("last_name", "").strip():
+            errors.append("Enter your last name.")
+
         if not data.get("rank_pay_grade"):
             errors.append("Select a pay grade.")
 
@@ -212,7 +258,7 @@ def validate_form_step(step: int, data: dict[str, Any]) -> list[str]:
         ).strip():
             errors.append("Describe your spouse's field when Other is selected.")
 
-        num_children = data.get("num_children", 0)
+        num_children = int(data.get("num_children") or 0)
         if num_children > 0 and not data.get("child_age_ranges"):
             errors.append("Select at least one child age range.")
 

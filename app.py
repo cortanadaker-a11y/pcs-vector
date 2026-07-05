@@ -18,6 +18,7 @@ from components.payment_handler import handle_payment_callback, init_payment_sta
 from components.progress import render_progress_indicator
 from components.sidebar import render_sidebar, sync_nav_before_sidebar
 from components.startup_checks import render_config_warnings
+from components.scroll import render_dropdown_scroll_fix, render_scroll_to_top
 from components.styles import apply_styles
 
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +41,7 @@ st.set_page_config(
 )
 
 apply_styles()
+render_dropdown_scroll_fix()
 
 if "page" not in st.session_state:
     st.session_state.page = "home"
@@ -66,6 +68,7 @@ if sidebar_page != st.session_state.page:
 current_page = st.session_state.page
 
 render_progress_indicator(current_page)
+render_scroll_to_top()
 
 if current_page == "home":
     render_home()

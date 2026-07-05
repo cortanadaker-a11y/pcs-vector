@@ -38,6 +38,10 @@ def _render_submitted_summary() -> None:
         rank_display = f"{rank_display} — {data['rank_title']}"
 
     with st.expander("Your submitted details", expanded=False):
+        family_name = f"{data.get('first_name', '').strip()} {data.get('last_name', '').strip()}".strip()
+        if family_name:
+            st.markdown(f"**Prepared for:** {family_name}")
+
         col1, col2 = st.columns(2)
 
         with col1:

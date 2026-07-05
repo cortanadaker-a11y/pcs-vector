@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+from components.scroll import request_scroll_to_top
 from components.sidebar import navigate_to
 from components.form_options import (
     BUDGET_MODES,
@@ -29,6 +30,7 @@ from components.form_state import (
     get_form_value,
     init_form_step,
     render_multiselect,
+    render_number_input,
     reset_multiselect,
     set_form_value,
     validate_form,
@@ -56,6 +58,26 @@ def _render_move_basics() -> None:
         "1. Move Basics",
         "Where you're coming from, where you're headed, and your timeline.",
     )
+
+    col_first, col_last = st.columns(2)
+    with col_first:
+        set_form_value(
+            "first_name",
+            st.text_input(
+                "First name",
+                value=get_form_value("first_name"),
+                placeholder="e.g., Sarah",
+            ),
+        )
+    with col_last:
+        set_form_value(
+            "last_name",
+            st.text_input(
+                "Last name",
+                value=get_form_value("last_name"),
+                placeholder="e.g., Martinez",
+            ),
+        )
 
     col_rank, col_title = st.columns([1, 2])
     with col_rank:
@@ -173,15 +195,12 @@ def _render_family_situation() -> None:
 
     col_children, col_ages = st.columns([1, 2])
     with col_children:
-        set_form_value(
+        render_number_input(
+            "Number of children",
             "num_children",
-            st.number_input(
-                "Number of children",
-                min_value=0,
-                max_value=12,
-                value=int(get_form_value("num_children")),
-                step=1,
-            ),
+            min_value=0,
+            max_value=12,
+            step=1,
         )
     with col_ages:
         if get_form_value("num_children") > 0:
@@ -265,15 +284,12 @@ def _render_housing_budget() -> None:
         elif preset == "$2,000+/mo":
             set_form_value("max_monthly_budget", 2200)
         else:
-            set_form_value(
+            render_number_input(
+                "Custom monthly cap ($)",
                 "max_monthly_budget",
-                st.number_input(
-                    "Custom monthly cap ($)",
-                    min_value=0,
-                    max_value=10000,
-                    value=int(get_form_value("max_monthly_budget") or 0),
-                    step=50,
-                ),
+                min_value=0,
+                max_value=10000,
+                step=50,
             )
     else:
         set_form_value("max_monthly_budget", 0)
@@ -473,6 +489,7 @@ def render_input_form() -> None:
                 navigate_to("home")
         elif st.button("← Previous section", use_container_width=True, key="form_nav_back"):
             st.session_state.form_step = step - 1
+            request_scroll_to_top()
             st.rerun()
 
     with col_next:
@@ -486,6 +503,7 @@ def render_input_form() -> None:
                         st.error(error)
                 else:
                     st.session_state.form_step = step + 1
+                    request_scroll_to_top()
                     st.rerun()
         elif st.button(
             f"Proceed to secure payment · {price}",

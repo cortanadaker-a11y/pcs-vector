@@ -17,6 +17,8 @@ MAX_METADATA_KEYS = 45  # leave room for product, fd_v, fd_n, fd_min/fm_*
 
 # Short keys keep the compressed payload small enough for Stripe metadata limits.
 FULL_TO_COMPACT: dict[str, str] = {
+    "first_name": "fn",
+    "last_name": "ln",
     "rank_pay_grade": "rg",
     "rank_title": "rt",
     "current_installation_preset": "cip",
@@ -226,11 +228,28 @@ def _read_min_backup(safe_metadata: dict[str, str]) -> str:
     return "".join(parts)
 
 
+def _values_equal(left: Any, right: Any) -> bool:
+    if left == right:
+        return True
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        if float(left).is_integer() and float(right).is_integer():
+            return int(left) == int(right)
+    return False
+
+
+def _compacts_equivalent(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    if set(left.keys()) != set(right.keys()):
+        logger.warning("Compact metadata key mismatch: %s", set(left.keys()) ^ set(right.keys()))
+        return False
+    return all(_values_equal(left[key], right[key]) for key in left)
+
+
 def verify_packed_metadata(metadata: dict[str, str], form_data: dict[str, Any]) -> bool:
     """Confirm packed metadata round-trips to submitted form data."""
     restored = unpack_form_data_from_stripe(metadata)
     if not restored or not restored.get("form_submitted"):
+        logger.warning("Packed metadata did not restore a submitted form.")
         return False
     submitted = compact_form_data(form_data)
     restored_compact = compact_form_data(restored)
-    return submitted == restored_compact
+    return _compacts_equivalent(submitted, restored_compact)

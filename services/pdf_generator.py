@@ -229,6 +229,7 @@ def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
     """Build label/value rows for the cover summary."""
     rows: list[list[Any]] = []
     fields = [
+        ("Prepared for", metadata.get("family_name", "")),
         ("Rank", metadata.get("rank", "")),
         ("Moving from", metadata.get("from_installation", "")),
         ("Moving to", metadata.get("to_installation", "")),
@@ -534,7 +535,12 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, str]:
     if form_data.get("rank_title"):
         rank = f"{rank} ({form_data['rank_title']})"
 
+    first = str(form_data.get("first_name", "")).strip()
+    last = str(form_data.get("last_name", "")).strip()
+    family_name = f"{first} {last}".strip()
+
     return {
+        "family_name": family_name,
         "rank": rank,
         "from_installation": resolved_current_installation(form_data),
         "to_installation": resolved_gaining_installation(form_data),
