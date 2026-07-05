@@ -10,7 +10,7 @@ Built with Streamlit, Stripe Checkout, Grok AI, and ReportLab PDF export.
 - Stripe Checkout payment gating
 - AI-generated 8-section PCS strategic plan
 - Professional PDF download
-- Optimized for Fort Liberty, Fort Cavazos, and Fort Drum
+- Optimized for Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon
 
 ## Quick start (local)
 

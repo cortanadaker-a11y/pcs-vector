@@ -89,7 +89,7 @@ def _render_move_basics() -> None:
                 index=_option_index(
                     GAINING_INSTALLATIONS, get_form_value("gaining_installation")
                 ),
-                help="Best local data for Fort Liberty, Fort Cavazos, and Fort Drum.",
+                help="Best local data for Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon.",
             ),
         )
 
@@ -109,7 +109,7 @@ def _render_move_basics() -> None:
             st.text_input(
                 "Other gaining installation",
                 value=get_form_value("gaining_installation_other"),
-                placeholder="e.g., Fort Eisenhower, GA",
+                placeholder="e.g., Fort Gordon, GA",
             ),
         )
 

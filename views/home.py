@@ -79,7 +79,7 @@ def _render_example_highlights() -> None:
         <div class="pcs-testimonial">
             <p>“We had orders to Bragg and no idea where to start with schools and BAH.
             This gave us a clear plan my husband and I could actually follow — worth every penny.”</p>
-            <span>— Army spouse, E-6 family · Fort Liberty PCS</span>
+            <span>— Army spouse, E-6 family · Fort Bragg PCS</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -157,7 +157,7 @@ def render_home() -> None:
                 <div class="pcs-price-sub">one-time · per report · no subscription</div>
                 <ul class="pcs-price-includes">
                     <li>Full 8-section personalized plan</li>
-                    <li>Fort Liberty, Fort Cavazos & Fort Drum local depth</li>
+                    <li>Fort Bragg, Fort Hood, Fort Drum & Fort Gordon local depth</li>
                     <li>Professional PDF download</li>
                     <li>Generated in minutes after payment</li>
                 </ul>

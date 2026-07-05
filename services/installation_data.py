@@ -64,7 +64,7 @@ _BAH_BRAGG: dict[str, int] = {
     "Other": 1653,
 }
 
-_BAH_CAVAZOS: dict[str, int] = {
+_BAH_HOOD: dict[str, int] = {
     "E-1": 1380,
     "E-2": 1380,
     "E-3": 1380,
@@ -114,12 +114,37 @@ _BAH_DRUM: dict[str, int] = {
     "Other": 1548,
 }
 
+_BAH_GORDON: dict[str, int] = {
+    "E-1": 1356,
+    "E-2": 1356,
+    "E-3": 1356,
+    "E-4": 1428,
+    "E-5": 1572,
+    "E-6": 1632,
+    "E-7": 1740,
+    "E-8": 1800,
+    "E-9": 1848,
+    "W-1": 1632,
+    "W-2": 1740,
+    "W-3": 1824,
+    "W-4": 1908,
+    "W-5": 1980,
+    "O-1": 1632,
+    "O-2": 1740,
+    "O-3": 1908,
+    "O-4": 2064,
+    "O-5": 2196,
+    "O-6": 2352,
+    "O-7+": 2532,
+    "Other": 1572,
+}
+
 INSTALLATIONS: dict[str, InstallationProfile] = {
-    "Fort Liberty, NC": InstallationProfile(
-        key="liberty",
-        display_name="Fort Liberty, NC",
-        short_name="Fort Liberty",
-        legacy_name="Fort Bragg",
+    "Fort Bragg, NC": InstallationProfile(
+        key="bragg",
+        display_name="Fort Bragg, NC",
+        short_name="Fort Bragg",
+        legacy_name="Fort Liberty",
         city="Fayetteville",
         state="NC",
         zip_code="28307",
@@ -159,18 +184,18 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         climate_note="Mild winters; summer humidity drives higher AC costs off-post.",
         commute_hotspots=("All-American Fwy", "Bragg Blvd", "Murchison Rd gate"),
     ),
-    "Fort Cavazos, TX": InstallationProfile(
-        key="cavazos",
-        display_name="Fort Cavazos, TX",
-        short_name="Fort Cavazos",
-        legacy_name="Fort Hood",
+    "Fort Hood, TX": InstallationProfile(
+        key="hood",
+        display_name="Fort Hood, TX",
+        short_name="Fort Hood",
+        legacy_name="Fort Cavazos",
         city="Killeen",
         state="TX",
         zip_code="76544",
         latitude=31.1349,
         longitude=-97.7756,
         nearby_zip_codes=("76541", "76548", "76522", "76542"),
-        bah_rates=_BAH_CAVAZOS,
+        bah_rates=_BAH_HOOD,
         housing=HousingMarket(
             on_post_pros=(
                 "Predictable housing cost in a competitive Central Texas rental market",
@@ -247,16 +272,60 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         climate_note="Lake-effect snow and heating costs are real budget factors — factor into off-post choice.",
         commute_hotspots=("Route 11", "Route 26", "California Rd gate"),
     ),
+    "Fort Gordon, GA": InstallationProfile(
+        key="gordon",
+        display_name="Fort Gordon, GA",
+        short_name="Fort Gordon",
+        legacy_name="Fort Eisenhower",
+        city="Augusta",
+        state="GA",
+        zip_code="30905",
+        latitude=33.4268,
+        longitude=-82.1460,
+        nearby_zip_codes=("30907", "30809", "30909", "30813"),
+        bah_rates=_BAH_GORDON,
+        housing=HousingMarket(
+            on_post_pros=(
+                "Predictable housing cost near a growing Augusta metro market",
+                "Short commute to cyber and signal school corridors",
+                "Maintenance handled on-post during high-tempo training cycles",
+            ),
+            on_post_cons=(
+                "Waitlists vary by bedroom count before summer PCS season",
+                "Older floor plans in some neighborhoods",
+                "Less inventory on-post than off-post in peak PCS windows",
+            ),
+            off_post_areas=(
+                "Evans / Martinez (30809) — popular with military families, 15–20 min commute",
+                "Grovetown (30813) — newer construction, verify gate drive time",
+                "West Augusta (30907) — more inventory and services, watch school zones",
+            ),
+            avg_3br_rent_range=(1350, 1750),
+            utility_note="Plan $150–$225/mo for electric/water off-post in summer months.",
+        ),
+        school_districts=(
+            "Columbia County Schools (Evans / Grovetown — verify zoning before lease)",
+            "Richmond County Schools (Augusta corridor — more services, varied ratings)",
+            "Private options in Martinez / west Augusta if school rating is top priority",
+        ),
+        spouse_employment_notes=(
+            "AU Health, Columbia County schools, and Augusta cyber/defense contractors hire steadily",
+            "Remote work viable with strong broadband in Evans and Grovetown",
+            "GA teaching license reciprocity available — start licensure packet early",
+        ),
+        climate_note="Hot, humid summers drive AC costs; mild winters with occasional ice on bridges.",
+        commute_hotspots=("Gordon Hwy", "Jimmie Dyess Pkwy", "Gate 1 / Gate 3 corridors"),
+    ),
 }
 
-# Map legacy or duplicate dropdown labels to current official installation keys.
+# Map renamed or legacy labels to traditional installation keys used in the app.
 INSTALLATION_ALIASES: dict[str, str] = {
-    "Fort Bragg, NC": "Fort Liberty, NC",
-    "Fort Liberty (Fort Bragg), NC": "Fort Liberty, NC",
-    "Fort Liberty (Ft Bragg, NC)": "Fort Liberty, NC",
-    "Fort Hood, TX": "Fort Cavazos, TX",
-    "Fort Cavazos (Fort Hood), TX": "Fort Cavazos, TX",
-    "Fort Gordon, GA": "Fort Eisenhower, GA",
+    "Fort Liberty, NC": "Fort Bragg, NC",
+    "Fort Liberty (Fort Bragg), NC": "Fort Bragg, NC",
+    "Fort Liberty (Ft Bragg, NC)": "Fort Bragg, NC",
+    "Fort Cavazos, TX": "Fort Hood, TX",
+    "Fort Cavazos (Fort Hood), TX": "Fort Hood, TX",
+    "Fort Eisenhower, GA": "Fort Gordon, GA",
     "Fort Benning, GA": "Fort Moore, GA",
 }
 

@@ -60,8 +60,8 @@ VALUE_PROPS = [
         "desc": "On-post waitlists, DITY tradeoffs, report dates, and family priorities — not generic moving advice.",
     },
     {
-        "title": "Fort Liberty, Cavazos & Drum depth",
-        "desc": "Local area expertise for Fort Liberty, Fort Cavazos, and Fort Drum.",
+        "title": "Fort Bragg, Hood, Drum & Gordon depth",
+        "desc": "Local area expertise for Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon.",
     },
 ]
 
@@ -101,7 +101,7 @@ FAQ_ITEMS = [
     },
     {
         "q": "Which installations are supported?",
-        "a": "CONUS Army moves with deepest coverage for Fort Liberty, Fort Cavazos, and Fort Drum. "
+        "a": "CONUS Army moves with deepest coverage for Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon. "
         "Other CONUS installations are supported with general PCS guidance.",
     },
     {
