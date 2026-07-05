@@ -42,8 +42,8 @@ Use this checklist before sharing PCS Vector publicly or switching Stripe to liv
 
 ## Report Quality
 
-- [ ] Test report for Fort Liberty (Bragg) — Fayetteville-area specifics present
-- [ ] Test report for Fort Cavazos (Hood) — Killeen-area AC/utility/school notes present
+- [ ] Test report for Fort Liberty — Fayetteville-area specifics present
+- [ ] Test report for Fort Cavazos — Killeen-area AC/utility/school notes present
 - [ ] Test report for Fort Drum — winter/heating/school notes present
 - [ ] PDF downloads correctly and all 8 sections render
 - [ ] Regenerate report works after payment verification
@@ -84,5 +84,5 @@ Use this checklist before sharing PCS Vector publicly or switching Stripe to liv
 - [ ] Custom Streamlit subdomain (if desired)
 - [ ] Stripe webhook for payment audit trail
 - [ ] Email delivery of PDF receipt
-- [ ] More installation profiles beyond Liberty/Bragg, Cavazos/Hood, and Drum
+- [ ] More installation profiles beyond Fort Liberty, Fort Cavazos, and Fort Drum
 - [ ] Analytics on conversion (form start → payment → report)

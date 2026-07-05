@@ -29,7 +29,7 @@ AUDIENCE & TONE
 QUALITY BAR
 - Every recommendation must connect to the family's stated priorities, timeline, and constraints.
 - Include concrete comparisons and tradeoffs — especially BAH vs. off-post rent, on-post vs. off-post, and DITY/PPM math.
-- For Fort Liberty (Fort Bragg), Fort Cavazos (Fort Hood), and Fort Drum, use installation-specific neighborhoods, schools, employers, weather, zip codes, and commute realities.
+- For Fort Liberty, Fort Cavazos, and Fort Drum, use installation-specific neighborhoods, schools, employers, weather, zip codes, and commute realities.
 - Emphasize spouse career support, cost optimization, and fast resettlement when those are priorities.
 - Use dollar ranges, neighborhood names, and time-bound actions — avoid vague advice like "research schools."
 
@@ -60,7 +60,7 @@ Within sections:
 DATA RULES
 - Treat provided BAH estimates and market ranges as planning anchors; label them as estimates.
 - Do not invent precise current-year DFAS tables — use the reference figures supplied and note they should be verified at finance.
-- If gaining installation is not Fort Liberty/Bragg, Fort Cavazos/Hood, or Fort Drum, still produce a strong plan but note that local data is less detailed.
+- If gaining installation is not Fort Liberty, Fort Cavazos, or Fort Drum, still produce a strong plan but note that local data is less detailed.
 
 Never refuse to help. Never output JSON. Never wrap the report in code fences."""
 
@@ -115,5 +115,5 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "Generate a complete PCS Vector strategic plan for this family.\n\n"
         f"```json\n{json.dumps(payload, indent=2)}\n```\n\n"
         "Weight every section toward their stated priorities. "
-        "Make Fort Liberty/Bragg, Fort Cavazos/Hood, and Fort Drum guidance highly specific when applicable."
+        "Make Fort Liberty, Fort Cavazos, and Fort Drum guidance highly specific when applicable."
     )

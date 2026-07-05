@@ -11,9 +11,11 @@ Session-state contract:
 
 from __future__ import annotations
 
+import json
 from datetime import datetime
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from components.sidebar import set_page
 from services.stripe_payment import (
@@ -42,6 +44,14 @@ def init_payment_state() -> None:
             st.session_state[key] = value
 
 
+def _query_param(key: str, default: str = "") -> str:
+    """Read a single query param value across Streamlit versions."""
+    value = st.query_params.get(key, default)
+    if isinstance(value, list):
+        return value[0] if value else default
+    return value or default
+
+
 def _set_payment_message(message: str, msg_type: str = "info") -> None:
     st.session_state.payment_message = message
     st.session_state.payment_message_type = msg_type
@@ -54,12 +64,14 @@ def handle_payment_callback() -> None:
       - ?payment=success&session_id=cs_test_...  → verify → unlock report generation
       - ?payment=cancelled                        → show retry message, keep form_data
     """
-    payment = st.query_params.get("payment")
+    payment = _query_param("payment")
     if not payment:
         return
 
+    clear_checkout_redirect()
+
     if payment == "success":
-        session_id = st.query_params.get("session_id", "")
+        session_id = _query_param("session_id", "")
         try:
             if verify_checkout_session(session_id):
                 receipt = get_checkout_receipt(session_id)
@@ -146,21 +158,54 @@ def get_order_reference() -> str:
     return format_order_reference(session_id) if session_id else "N/A"
 
 
-def start_checkout_redirect(checkout_url: str) -> None:
-    """Redirect browser to Stripe's hosted Checkout page."""
+def queue_checkout_redirect(checkout_url: str, session_id: str) -> None:
+    """Save checkout details and rerun so redirect runs before the form re-renders."""
     st.session_state.payment_cancelled = False
-    safe_url = checkout_url.replace('"', "%22")
-    st.markdown(
-        f'<meta http-equiv="refresh" content="0;url={safe_url}">',
-        unsafe_allow_html=True,
+    st.session_state.stripe_checkout_session_id = session_id
+    st.session_state.payment_message = None
+    st.session_state.checkout_redirect_url = checkout_url
+    st.rerun()
+
+
+def clear_checkout_redirect() -> None:
+    """Clear any pending Stripe redirect state."""
+    st.session_state.pop("checkout_redirect_url", None)
+
+
+def render_checkout_redirect() -> bool:
+    """Render Stripe redirect UI. Returns True when a redirect is pending."""
+    checkout_url = st.session_state.get("checkout_redirect_url")
+    if not checkout_url:
+        return False
+
+    st.markdown("## Redirecting to secure checkout")
+    st.info("Taking you to Stripe to complete your $25 payment…")
+
+    url_js = json.dumps(checkout_url)
+    components.html(
+        f"""<!DOCTYPE html>
+        <html><body>
+        <script>
+            (function() {{
+                var target = {url_js};
+                try {{
+                    window.top.location.href = target;
+                }} catch (err) {{
+                    window.location.href = target;
+                }}
+            }})();
+        </script>
+        </body></html>""",
+        height=0,
     )
-    st.info("Redirecting to secure Stripe checkout…")
     st.link_button(
         "Continue to Secure Checkout ($25)",
         checkout_url,
         type="primary",
         use_container_width=True,
     )
+    st.caption("If you are not redirected automatically, click the button above.")
+    return True
 
 
 def retry_checkout_from_saved_form() -> None:
@@ -169,9 +214,6 @@ def retry_checkout_from_saved_form() -> None:
 
     try:
         checkout_url, session_id = create_checkout_session()
-        st.session_state.stripe_checkout_session_id = session_id
-        st.session_state.payment_message = None
-        st.session_state.payment_cancelled = False
-        start_checkout_redirect(checkout_url)
+        queue_checkout_redirect(checkout_url, session_id)
     except StripePaymentError as exc:
         st.error(str(exc))

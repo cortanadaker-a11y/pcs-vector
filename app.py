@@ -1,7 +1,7 @@
 """
 PCS Vector — Personalized PCS strategic plans for Army families.
 
-CONUS Army moves only. Optimized for Fort Liberty (Bragg), Fort Cavazos (Hood), and Fort Drum.
+CONUS Army moves only. Optimized for Fort Liberty, Fort Cavazos, and Fort Drum.
 
 Payment flow:
   Home → Input Form → Stripe Checkout ($25) → Report (Grok + PDF)

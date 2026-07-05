@@ -23,7 +23,7 @@ from components.form_options import (
     VEHICLE_COUNTS,
 )
 from components.form_state import collect_form_from_widgets, get_form_value, set_form_value, validate_form
-from components.payment_handler import start_checkout_redirect
+from components.payment_handler import queue_checkout_redirect, render_checkout_redirect
 from views.payment_cancelled import render_payment_cancelled_banner
 from services.stripe_payment import StripePaymentError, create_checkout_session, get_price_display
 
@@ -89,7 +89,7 @@ def _render_move_basics() -> None:
                 index=_option_index(
                     GAINING_INSTALLATIONS, get_form_value("gaining_installation")
                 ),
-                help="Best local data for Fort Liberty/Bragg, Fort Cavazos/Hood, and Fort Drum.",
+                help="Best local data for Fort Liberty, Fort Cavazos, and Fort Drum.",
             ),
         )
 
@@ -398,6 +398,9 @@ def _render_specific_concerns() -> None:
 
 def render_input_form() -> None:
     """Render the full PCS input form."""
+    if render_checkout_redirect():
+        return
+
     st.markdown("## Tell us about your move")
     price = get_price_display()
     st.markdown(
@@ -472,8 +475,6 @@ def render_input_form() -> None:
 
                 try:
                     checkout_url, session_id = create_checkout_session()
-                    st.session_state.stripe_checkout_session_id = session_id
-                    st.session_state.payment_message = None
-                    start_checkout_redirect(checkout_url)
+                    queue_checkout_redirect(checkout_url, session_id)
                 except StripePaymentError as exc:
                     st.error(str(exc))

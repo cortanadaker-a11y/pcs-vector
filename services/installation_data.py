@@ -115,9 +115,9 @@ _BAH_DRUM: dict[str, int] = {
 }
 
 INSTALLATIONS: dict[str, InstallationProfile] = {
-    "Fort Liberty (Fort Bragg), NC": InstallationProfile(
-        key="bragg",
-        display_name="Fort Liberty (Fort Bragg), NC",
+    "Fort Liberty, NC": InstallationProfile(
+        key="liberty",
+        display_name="Fort Liberty, NC",
         short_name="Fort Liberty",
         legacy_name="Fort Bragg",
         city="Fayetteville",
@@ -159,9 +159,9 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         climate_note="Mild winters; summer humidity drives higher AC costs off-post.",
         commute_hotspots=("All-American Fwy", "Bragg Blvd", "Murchison Rd gate"),
     ),
-    "Fort Cavazos (Fort Hood), TX": InstallationProfile(
+    "Fort Cavazos, TX": InstallationProfile(
         key="cavazos",
-        display_name="Fort Cavazos (Fort Hood), TX",
+        display_name="Fort Cavazos, TX",
         short_name="Fort Cavazos",
         legacy_name="Fort Hood",
         city="Killeen",
@@ -249,13 +249,15 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
     ),
 }
 
-# Map legacy or duplicate dropdown labels to canonical installation keys.
+# Map legacy or duplicate dropdown labels to current official installation keys.
 INSTALLATION_ALIASES: dict[str, str] = {
-    "Fort Bragg, NC": "Fort Liberty (Fort Bragg), NC",
-    "Fort Liberty, NC": "Fort Liberty (Fort Bragg), NC",
-    "Fort Liberty (Ft Bragg, NC)": "Fort Liberty (Fort Bragg), NC",
-    "Fort Hood, TX": "Fort Cavazos (Fort Hood), TX",
-    "Fort Cavazos, TX": "Fort Cavazos (Fort Hood), TX",
+    "Fort Bragg, NC": "Fort Liberty, NC",
+    "Fort Liberty (Fort Bragg), NC": "Fort Liberty, NC",
+    "Fort Liberty (Ft Bragg, NC)": "Fort Liberty, NC",
+    "Fort Hood, TX": "Fort Cavazos, TX",
+    "Fort Cavazos (Fort Hood), TX": "Fort Cavazos, TX",
+    "Fort Gordon, GA": "Fort Eisenhower, GA",
+    "Fort Benning, GA": "Fort Moore, GA",
 }
 
 DEFAULT_INSTALLATION = InstallationProfile(
