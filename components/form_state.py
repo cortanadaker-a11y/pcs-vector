@@ -20,6 +20,7 @@ NUMBER_WIDGET_KEYS = ("num_children", "max_monthly_budget")
 FORM_DEFAULTS: dict[str, Any] = {
     "first_name": "",
     "last_name": "",
+    "email": "",
     "rank_pay_grade": "E-5",
     "rank_title": "",
     "current_installation_preset": "Fort Hood, TX",
@@ -56,6 +57,10 @@ def init_form_state() -> None:
     """Initialize form fields in session state if missing."""
     if "form_data" not in st.session_state:
         st.session_state.form_data = FORM_DEFAULTS.copy()
+    else:
+        # Backfill keys added in newer releases (e.g. email) for existing sessions.
+        for key, default in FORM_DEFAULTS.items():
+            st.session_state.form_data.setdefault(key, default)
 
 
 def get_form_value(key: str) -> Any:
@@ -237,6 +242,11 @@ def validate_form_step(step: int, data: dict[str, Any]) -> list[str]:
 
         if not data.get("last_name", "").strip():
             errors.append("Enter your last name.")
+
+        from services.email_delivery import normalize_email
+
+        if not normalize_email(data.get("email", "")):
+            errors.append("Enter a valid email — your report and PDF will be sent here.")
 
         if not data.get("rank_pay_grade"):
             errors.append("Select a pay grade.")

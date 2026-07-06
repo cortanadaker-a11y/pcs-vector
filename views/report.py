@@ -16,15 +16,20 @@ from components.form_state import (
     resolved_spouse_career,
 )
 from components.payment_handler import (
+    attempt_generate_from_order_reference,
     ensure_form_data_restored,
-    get_order_reference,
     is_payment_verified,
     require_payment,
 )
 from services.pdf_generator import PDFGenerationError, build_pdf_metadata, generate_pdf_report
 from services.report_generator import GrokAPIError, generate_report
 from views.payment_gate import render_payment_required
-from views.post_payment import generate_report_with_loading, render_payment_confirmation_banner
+from components.report_delivery import auto_email_pdf_after_generation, render_pdf_delivery_status
+from views.post_payment import (
+    generate_report_with_loading,
+    render_order_reference_recovery,
+    render_payment_confirmation_banner,
+)
 
 
 def _render_submitted_summary() -> None:
@@ -170,17 +175,26 @@ def render_report() -> None:
         return
 
     if is_payment_verified() and not form_submitted:
-        ensure_form_data_restored()
+        # Try all restore paths (including external stores) before showing recovery UI.
+        if ensure_form_data_restored():
+            form_data = st.session_state.get("form_data", {})
+            form_submitted = form_data.get("form_submitted")
+            if form_submitted:
+                st.session_state.form_restore_failed = False
+                st.rerun()
+
+        if not st.session_state.get("_auto_recovery_attempted"):
+            st.session_state._auto_recovery_attempted = True
+            if attempt_generate_from_order_reference():
+                st.rerun()
+
         form_data = st.session_state.get("form_data", {})
         form_submitted = form_data.get("form_submitted")
+        if not form_submitted:
+            st.session_state.form_restore_failed = True
 
     if is_payment_verified() and not form_submitted:
-        st.error(
-            "Your payment was confirmed, but we could not restore your form answers "
-            f"(order **{get_order_reference()}**). "
-            "Please contact support with your order reference. "
-            "You will not be charged again if you re-submit the form."
-        )
+        render_order_reference_recovery()
         _render_footer_nav()
         return
 
@@ -214,6 +228,9 @@ def render_report() -> None:
 
     pdf_bytes = _build_pdf_bytes(report)
     pdf_ready = bool(pdf_bytes)
+
+    if pdf_ready:
+        auto_email_pdf_after_generation(pdf_bytes, pdf_filename)
 
     col_pdf, col_md, col_regen = st.columns([1.2, 1, 1])
 
@@ -255,6 +272,9 @@ def render_report() -> None:
                 except GrokAPIError as exc:
                     st.session_state.report_error = str(exc)
                     st.error(str(exc))
+
+    if pdf_ready:
+        render_pdf_delivery_status(pdf_bytes, pdf_filename)
 
     st.markdown("<br>", unsafe_allow_html=True)
 

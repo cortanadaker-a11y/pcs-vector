@@ -19,6 +19,7 @@ MAX_METADATA_KEYS = 45  # leave room for product, fd_v, fd_n, fd_min/fm_*
 FULL_TO_COMPACT: dict[str, str] = {
     "first_name": "fn",
     "last_name": "ln",
+    "email": "em",
     "rank_pay_grade": "rg",
     "rank_title": "rt",
     "current_installation_preset": "cip",
@@ -182,6 +183,33 @@ def _collect_chunked_payload(safe_metadata: dict[str, str]) -> str | None:
     return "".join(encoded_parts)
 
 
+def finalize_restored_form(expanded: dict[str, Any]) -> dict[str, Any] | None:
+    """Accept restored payloads even when the submitted flag was dropped in transit."""
+    if expanded.get("form_submitted"):
+        return expanded
+
+    identity_keys = (
+        "first_name",
+        "fn",
+        "last_name",
+        "ln",
+        "email",
+        "em",
+        "gaining_installation",
+        "gi",
+        "rank_pay_grade",
+        "rg",
+    )
+    if any(expanded.get(key) for key in identity_keys):
+        expanded["form_submitted"] = True
+        return expanded
+    return None
+
+
+def _finalize_restored_form(expanded: dict[str, Any]) -> dict[str, Any] | None:
+    return finalize_restored_form(expanded)
+
+
 def unpack_form_data_from_stripe(metadata: Any) -> dict[str, Any] | None:
     """Restore form data previously stored on a Checkout session."""
     safe_metadata = normalize_stripe_metadata(metadata)
@@ -195,8 +223,9 @@ def unpack_form_data_from_stripe(metadata: Any) -> dict[str, Any] | None:
             compact = _decode_chunk_payload(encoded)
             if compact:
                 expanded = expand_form_data(compact)
-                if expanded.get("form_submitted"):
-                    return expanded
+                finalized = _finalize_restored_form(expanded)
+                if finalized:
+                    return finalized
     except (ValueError, json.JSONDecodeError, OSError, zlib.error, KeyError) as exc:
         logger.warning("Could not unpack chunked form metadata: %s", exc)
 
@@ -207,9 +236,10 @@ def unpack_form_data_from_stripe(metadata: Any) -> dict[str, Any] | None:
             compact = json.loads(minimal_raw)
             if isinstance(compact, dict):
                 expanded = expand_form_data(compact)
-                if expanded.get("form_submitted"):
+                finalized = _finalize_restored_form(expanded)
+                if finalized:
                     logger.info("Restored form data from Stripe minimal backup.")
-                    return expanded
+                    return finalized
         except (json.JSONDecodeError, TypeError, ValueError) as exc:
             logger.warning("Could not unpack minimal backup: %s", exc)
 

@@ -9,6 +9,7 @@ PAGE_LABELS = {
     "home": "Home",
     "input": "Input Form",
     "report": "Report",
+    "retrieve": "Retrieve Report",
 }
 
 
@@ -40,14 +41,14 @@ def render_sidebar() -> str:
     """Render sidebar navigation and return the selected page."""
     with st.sidebar:
         st.markdown("## PCS Vector")
-        st.caption("Personalized PCS strategic plans for Army families.")
-        st.caption("Built by a serving Army officer · $25/report")
+        st.caption("Your PCS game plan — ready before the boxes are packed.")
+        st.caption("Built by Soldiers for Soldiers and their families")
 
         st.divider()
 
         st.radio(
             "Navigate",
-            options=["home", "input", "report"],
+            options=["home", "input", "report", "retrieve"],
             format_func=lambda p: PAGE_LABELS[p],
             key="nav_page",
             label_visibility="collapsed",
@@ -64,7 +65,8 @@ def render_sidebar() -> str:
                 - Personalized 8-section strategic report
                 - Optimized for Fort Bragg, Fort Hood, Fort Drum & Fort Gordon
                 - $25 per report (Stripe Checkout)
-                - Professional PDF download
+                - PDF emailed automatically after payment
+                - Retrieve paid reports with your order reference
                 """
             )
 

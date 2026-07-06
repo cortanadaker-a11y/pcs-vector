@@ -79,6 +79,26 @@ def _render_move_basics() -> None:
             ),
         )
 
+    st.markdown(
+        """
+        <div class="pcs-email-block">
+            <p class="pcs-email-block-title">Report delivery email</p>
+            <p class="pcs-email-block-caption">Your report and PDF will be sent to this email.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    set_form_value(
+        "email",
+        st.text_input(
+            "Email address *",
+            value=get_form_value("email"),
+            placeholder="you@example.com",
+            help="Required. Your personalized PCS Vector report and PDF will be sent here after payment.",
+            key="form_email_input",
+        ),
+    )
+
     col_rank, col_title = st.columns([1, 2])
     with col_rank:
         set_form_value(
@@ -438,7 +458,7 @@ def render_input_form() -> None:
     price = get_price_display()
     st.markdown(
         f"Most families finish in **6–8 minutes**. After checkout (**{price}** one-time), "
-        "you'll receive your full 8-section plan and PDF download."
+        "you'll receive your full 8-section plan and PDF emailed to you."
     )
     st.caption(
         "Your answers stay in this browser session only — used to generate your report. "
@@ -520,6 +540,11 @@ def render_input_form() -> None:
             else:
                 form_data["form_submitted"] = True
                 st.session_state.form_data = form_data
+                from services.email_delivery import normalize_email
+
+                report_email = normalize_email(form_data.get("email", ""))
+                if report_email:
+                    st.session_state.delivery_email = report_email
                 st.session_state.report_markdown = None
                 st.session_state.report_error = None
                 st.session_state.payment_verified = False

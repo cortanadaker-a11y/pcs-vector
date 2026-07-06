@@ -7,3 +7,6 @@ __pycache__/
 .env
 .env.*
 *.log
+data/checkout_forms/
+data/checkout_drafts/
+data/order_index/

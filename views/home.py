@@ -34,11 +34,13 @@ def _render_how_it_works(price: str) -> None:
 def _render_trust_signals() -> None:
     st.markdown(
         """
+        <div class="pcs-trust-banner">
+            Built by Soldiers for Soldiers and their families
+        </div>
         <div class="pcs-trust-row">
-            <span class="pcs-trust-badge">Built by a serving Army officer</span>
-            <span class="pcs-trust-badge">Used by military families</span>
             <span class="pcs-trust-badge">Secure Stripe checkout</span>
-            <span class="pcs-trust-badge">Instant PDF download</span>
+            <span class="pcs-trust-badge">PDF emailed automatically</span>
+            <span class="pcs-trust-badge">8-section personalized plan</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -93,9 +95,10 @@ def render_home() -> None:
     st.markdown(
         f"""
         <div class="pcs-hero">
-            <div class="pcs-badge">CONUS Army PCS Planning</div>
-            <h1>Your PCS game plan — ready before the boxes are packed</h1>
-            <p>
+            <div class="pcs-brand-kicker">CONUS Army PCS Planning</div>
+            <div class="pcs-brand-title">PCS Vector</div>
+            <h1 class="pcs-hero-headline">Your PCS game plan — ready before the boxes are packed</h1>
+            <p class="pcs-hero-body">
                 Stop juggling Facebook threads and guesswork. PCS Vector turns your family's
                 situation into a clear, personalized strategic plan — housing, schools, spouse
                 career, finances, and a 30-day action checklist — for <strong>{price}</strong>.
@@ -158,7 +161,7 @@ def render_home() -> None:
                 <ul class="pcs-price-includes">
                     <li>Full 8-section personalized plan</li>
                     <li>Fort Bragg, Fort Hood, Fort Drum & Fort Gordon local depth</li>
-                    <li>Professional PDF download</li>
+                    <li>PDF emailed automatically to you</li>
                     <li>Generated in minutes after payment</li>
                 </ul>
             </div>
@@ -168,6 +171,9 @@ def render_home() -> None:
 
         if st.button("Start Your PCS Plan", type="primary", use_container_width=True):
             navigate_to("input")
+
+        if st.button("Already paid? Retrieve your report", use_container_width=True):
+            navigate_to("retrieve")
 
         st.caption("Secure payment via Stripe · Not affiliated with the DoD")
 

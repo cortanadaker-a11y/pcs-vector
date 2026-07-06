@@ -76,7 +76,7 @@ FAQ_ITEMS = [
     {
         "q": "What do I get for $25?",
         "a": "A personalized 8-section PCS strategic plan based on your family's inputs, "
-        "viewable in the app and downloadable as a professional PDF. One report per purchase.",
+        "viewable in the app and automatically emailed as a professional PDF. One report per purchase.",
     },
     {
         "q": "How long does the form take?",
@@ -87,6 +87,13 @@ FAQ_ITEMS = [
         "q": "When is my report generated?",
         "a": "After successful Stripe payment. You'll see a confirmation screen, then your "
         "report builds automatically (usually under a minute).",
+    },
+    {
+        "q": "How do I get my PDF?",
+        "a": "Enter your email on step 1 of the form. After payment, your personalized report "
+        "is generated and the PDF is **automatically emailed** to that address. You can also "
+        "download it on the report page. Save your order reference (PCS-XXXXXXXX) — use "
+        "**Retrieve Report** anytime if you lose your tab or switch browsers.",
     },
     {
         "q": "Is my data stored or shared?",
