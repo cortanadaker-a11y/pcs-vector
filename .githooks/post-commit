@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# After every local commit on main, push to GitHub so Streamlit Cloud beta stays current.
+set -euo pipefail
+
+BRANCH="$(git branch --show-current)"
+if [[ "$BRANCH" != "main" ]]; then
+  exit 0
+fi
+
+if [[ "${PCS_SKIP_AUTO_PUSH:-}" == "1" ]]; then
+  exit 0
+fi
+
+if ! git remote get-url origin >/dev/null 2>&1; then
+  exit 0
+fi
+
+echo "post-commit: pushing to origin/main for Streamlit Cloud…"
+git push origin main
