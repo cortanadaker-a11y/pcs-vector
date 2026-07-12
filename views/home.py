@@ -3,9 +3,12 @@
 import streamlit as st
 
 from components.content import (
+    CTA,
     DIY_VS_VECTOR,
     HERO,
     HOW_IT_WORKS_STEPS,
+    MOTIVATION_CLOSE,
+    MOTIVATION_RALLY,
     OUTCOME_BENEFITS,
     PAIN_POINTS,
     PRICING_INCLUDES,
@@ -34,11 +37,11 @@ def _cta_block(price: str, *, cta_id: str = "bottom") -> None:
         """,
         unsafe_allow_html=True,
     )
-    if st.button("Start Your PCS Plan", type="primary", use_container_width=True, key=f"cta_primary_{cta_id}"):
+    if st.button(CTA["primary"], type="primary", use_container_width=True, key=f"cta_primary_{cta_id}"):
         navigate_to("input")
     if st.button("Already paid? Retrieve your report", use_container_width=True, key=f"cta_retrieve_{cta_id}"):
         navigate_to("retrieve")
-    st.caption("Secure payment via Stripe · Independent tool · Not affiliated with DoD")
+    st.caption("Secure Stripe checkout · Built For Soldiers; By Soldiers")
 
 
 def _render_hero(price: str) -> None:
@@ -72,9 +75,21 @@ def _render_trust_signals() -> None:
     )
 
 
+def _render_rally(block: dict, *, css_class: str = "pcs-rally") -> None:
+    st.markdown(
+        f"""
+        <div class="{css_class}">
+            <h3>{block["headline"]}</h3>
+            <p class="pcs-rally-body">{block["body"]}</p>
+            <p class="pcs-rally-punch">{block.get("punch", "")}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _render_pain_section() -> None:
-    st.markdown("### The PCS decisions you can't afford to wing")
-    st.caption("Most families don't lack information — they lack a sequenced plan before deadlines hit.")
+    st.markdown("### The stakes are higher than another move")
     cols = st.columns(3)
     for col, pain in zip(cols, PAIN_POINTS):
         with col:
@@ -90,8 +105,7 @@ def _render_pain_section() -> None:
 
 
 def _render_outcomes() -> None:
-    st.markdown("### What you walk away with")
-    st.caption("Outcomes that matter to NCOs, officers, and spouses — not feature bullets.")
+    st.markdown("### What changes when you have a real plan")
     cols = st.columns(3)
     for col, benefit in zip(cols, OUTCOME_BENEFITS):
         with col:
@@ -108,7 +122,7 @@ def _render_outcomes() -> None:
 
 
 def _render_comparison() -> None:
-    st.markdown("### DIY research vs. one decision-grade plan")
+    st.markdown("### Stop piecing it together. Start executing.")
     rows = "".join(
         f"""
         <tr>
@@ -139,8 +153,7 @@ def _render_comparison() -> None:
 
 
 def _render_how_it_works(price: str) -> None:
-    st.markdown("### How it works")
-    st.caption("Four steps from stressed to structured — most families finish the form in one sitting.")
+    st.markdown("### Four steps. One plan. Done tonight.")
     steps_html = '<div class="pcs-flow">'
     for i, step in enumerate(HOW_IT_WORKS_STEPS):
         desc = step["desc"].replace("$25", price)
@@ -158,8 +171,7 @@ def _render_how_it_works(price: str) -> None:
 
 
 def _render_report_sections() -> None:
-    st.markdown("### Inside your 8-section strategic plan")
-    st.caption("Every report follows this structure — personalized to your rank, family, and gaining installation.")
+    st.markdown("### Your complete strategic plan — all eight sections")
 
     cols = st.columns(2)
     for i, section in enumerate(REPORT_SECTIONS):
@@ -179,8 +191,7 @@ def _render_report_sections() -> None:
 
 
 def _render_example_highlights() -> None:
-    st.markdown("### What the guidance sounds like")
-    st.caption("Illustrative lines from real report outputs — yours is built from your answers.")
+    st.markdown("### This is the kind of clarity you get")
 
     for quote in REPORT_HIGHLIGHTS:
         st.markdown(f'<div class="pcs-highlight">{quote}</div>', unsafe_allow_html=True)
@@ -207,6 +218,7 @@ def _render_why_25(price: str) -> None:
         """
         for p in WHY_25["points"]
     )
+    punch = MOTIVATION_RALLY.get("punch", "")
     st.markdown(
         f"""
         <div class="pcs-why-box">
@@ -214,6 +226,7 @@ def _render_why_25(price: str) -> None:
             <p class="pcs-why-intro">{WHY_25["intro"]}</p>
             {points_html}
             <p class="pcs-why-roi">{WHY_25["roi_line"]}</p>
+            <p class="pcs-why-punch">{punch}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -225,14 +238,14 @@ def _render_mid_cta(price: str) -> None:
         f"""
         <div class="pcs-mid-cta">
             <div class="pcs-mid-cta-text">
-                <strong>Ready to stop researching and start deciding?</strong>
-                <span>Your personalized plan — {price}, minutes after checkout.</span>
+                <strong>{MOTIVATION_CLOSE["headline"]}</strong>
+                <span>{MOTIVATION_CLOSE["body"].replace("$25", price)}</span>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    if st.button("Get My PCS Plan →", type="primary", use_container_width=True, key="mid_cta"):
+    if st.button(CTA["mid"], type="primary", use_container_width=True, key="mid_cta"):
         navigate_to("input")
 
 
@@ -240,21 +253,19 @@ def render_home() -> None:
     """Render the conversion-focused landing page."""
     price = get_price_display()
 
-    # 1. Hero + trust
     _render_hero(price)
     _render_trust_signals()
-    st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. Early CTA (above the fold follow-through)
     cta_top_l, cta_top_c, cta_top_r = st.columns([1, 2, 1])
     with cta_top_c:
-        if st.button("Start Your PCS Plan →", type="primary", use_container_width=True, key="hero_cta"):
+        if st.button(CTA["hero"], type="primary", use_container_width=True, key="hero_cta"):
             navigate_to("input")
-        st.caption(f"One-time {price} · 6–8 minute form · PDF emailed to you")
+        st.caption(CTA["caption"].replace("$25", price))
 
     st.markdown("<br>", unsafe_allow_html=True)
+    _render_rally(MOTIVATION_RALLY)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # 3. Pain → outcomes → comparison
     _render_pain_section()
     st.markdown("<br>", unsafe_allow_html=True)
     _render_outcomes()
@@ -262,21 +273,17 @@ def render_home() -> None:
     _render_comparison()
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 4. How it works
     _render_how_it_works(price)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 5. Mid-page CTA
     _render_mid_cta(price)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 6. Report structure + social proof
     _render_report_sections()
     st.markdown("<br>", unsafe_allow_html=True)
     _render_example_highlights()
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 7. Why $25 + final pricing CTA
     _render_why_25(price)
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -290,7 +297,7 @@ def render_home() -> None:
     st.markdown(
         """
         <div class="pcs-footer">
-            PCS Vector is an independent planning tool built for Army families.<br>
+            PCS Vector — Built For Soldiers; By Soldiers<br>
             Always verify BAH rates and entitlements with your finance office.
         </div>
         """,

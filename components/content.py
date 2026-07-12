@@ -5,27 +5,53 @@ from services.installation_data import SUPPORTED_INSTALLATIONS
 INSTALLATION_COUNT = len(SUPPORTED_INSTALLATIONS)
 
 HERO = {
-    "kicker": "Decision-grade PCS planning for Army families",
-    "headline": "Make the PCS decisions that protect your family — before they get expensive",
+    "kicker": "Your PCS. Your family. One clear plan.",
+    "headline": "Orders dropped — now give your family a plan worth following",
     "subheadline": (
-        "PCS Vector turns your family's situation into a clear strategic plan — "
-        "housing, schools, spouse career, finances, and a sequenced 30-day action path — "
-        "so you make better decisions faster, with less stress and fewer costly mistakes."
+        "PCS Vector builds a decision-grade strategic plan around your real priorities: "
+        "where to live, how to protect spouse income, which schools work, and what to do "
+        "in the first 30 days — so you're leading the move instead of reacting to it."
     ),
     "outcome_line": (
-        "Save hours of research · Reduce move-day panic · Protect spouse income and school stability"
+        "Walk in with confidence · Move as a team · Stop paying for guesswork"
     ),
 }
 
 TRUST_SIGNALS = {
-    "banner": "Built by a serving Army officer · Independent planning tool · Not affiliated with DoD",
+    "banner": "Built For Soldiers; By Soldiers",
     "badges": [
-        "Serving Army officer–built",
-        "Trusted by military families",
+        "By Soldiers, for families",
+        "22 CONUS installations",
         "Secure Stripe checkout",
-        "PDF emailed automatically",
-        f"{INSTALLATION_COUNT} CONUS installations",
+        "PDF emailed to you",
+        "Minutes, not weeks of research",
     ],
+}
+
+MOTIVATION_RALLY = {
+    "headline": "You already carry the mission. Your family shouldn't carry the chaos.",
+    "body": (
+        "Every PCS asks the same hard questions — and they all hit at once. "
+        "Where do we live? Can my spouse work? Are the kids in the right schools? "
+        "Do we have the cash to bridge the gap? PCS Vector answers them in one plan "
+        "you and your spouse can execute together."
+    ),
+    "punch": "This isn't more research. It's the plan you wish you had last PCS.",
+}
+
+MOTIVATION_CLOSE = {
+    "headline": "Your next PCS doesn't have to feel like another deployment for your family.",
+    "body": (
+        "Six to eight minutes of inputs. One clear strategic plan. "
+        "Share it with your spouse tonight and start making decisions tomorrow."
+    ),
+}
+
+CTA = {
+    "primary": "Build My Family's PCS Plan",
+    "hero": "Build My Family's PCS Plan →",
+    "mid": "I'm Ready — Build My Plan →",
+    "caption": "One-time payment · 6–8 minute form · Plan in your inbox minutes later",
 }
 
 PAIN_POINTS = [
@@ -45,28 +71,28 @@ PAIN_POINTS = [
 
 OUTCOME_BENEFITS = [
     {
-        "title": "Decisions, not data dumps",
+        "title": "Lead the move — don't chase it",
         "desc": (
-            "Get a senior-NCO-style strategic plan with clear recommendations, ranked alternatives, "
-            "and the one risk that collapses everything if you ignore it."
+            "Get a firm recommendation, ranked backups, and the one dependency that "
+            "breaks the plan if you ignore it. No more decision paralysis."
         ),
-        "icon": "◎",
+        "icon": "→",
     },
     {
-        "title": "Family stability first",
+        "title": "Move as a family unit",
         "desc": (
-            "Spouse career paths, school zoning, and childcare sequencing are woven together — "
-            "because those threads actually determine whether your PCS works."
+            "Spouse career, school zoning, and childcare are sequenced together in "
+            "a PDF you can hand your partner and say: this is our plan."
         ),
-        "icon": "◎",
+        "icon": "→",
     },
     {
-        "title": "Real math, real timelines",
+        "title": "Know the dollars and the deadlines",
         "desc": (
-            "2026 BAH figures, DITY/PPM estimates, cash-flow pressure, and installation-specific "
-            "gotchas — not blog-post generalities."
+            "2026 BAH math, DITY/PPM estimates, cash-flow pressure, and installation-specific "
+            "gotchas — the stuff that actually moves your bottom line."
         ),
-        "icon": "◎",
+        "icon": "→",
     },
 ]
 
@@ -78,29 +104,29 @@ DIY_VS_VECTOR = [
 ]
 
 WHY_25 = {
-    "headline": "Why $25 beats another week of research",
+    "headline": "Why $25 beats another week of spinning your wheels",
     "intro": (
-        "A PCS touches your housing budget, spouse's career, children's schools, and cash flow "
-        "for the next 2–3 years. One wrong lease, missed hiring window, or unbudgeted income gap "
-        "typically costs far more than this report."
+        "A PCS shapes your housing budget, spouse's career, kids' schools, and cash flow "
+        "for 2–3 years. One wrong lease or missed hiring window costs more than this report — "
+        "and the stress tax on your family is the part you can't invoice."
     ),
     "points": [
         {
-            "title": "Time you'll actually get back",
-            "desc": "Families spend 10–20+ hours piecing together housing, schools, and spouse leads. PCS Vector delivers a decision-ready plan in minutes after a 6–8 minute form.",
+            "title": "Reclaim your evenings",
+            "desc": "Stop losing 10–20 hours to tabs, threads, and half-answers. Answer a focused form and get a plan built for your family in minutes.",
         },
         {
-            "title": "Mistakes you'll likely avoid",
-            "desc": "Off-post leases in the wrong district, DITY choices that don't match family complexity, and spouse income gaps without a cash cushion — the report calls these out explicitly.",
+            "title": "Avoid the expensive defaults",
+            "desc": "Wrong school district, bad DITY choice, spouse income gap without a cushion — the report names these before you sign anything.",
         },
         {
-            "title": "Peace of mind before boxes ship",
-            "desc": "Walk into your PCS with a spouse-readable plan, commander brief line, and ranked next steps — not a browser full of half-answered tabs.",
+            "title": "Show up ready",
+            "desc": "Walk into your PCS with a spouse-readable plan, commander brief line, and ranked next steps — not anxiety and open browser tabs.",
         },
     ],
     "roi_line": (
-        "Most families report the plan pays for itself if it prevents one housing mistake "
-        "or shaves even a week off spouse unemployment."
+        "If this plan prevents one housing mistake or gets your spouse earning one week sooner, "
+        "it paid for itself many times over."
     ),
 }
 
@@ -163,9 +189,9 @@ REPORT_HIGHLIGHTS = [
 
 TESTIMONIAL = {
     "quote": (
-        "We had orders to Bragg and no idea where to start with schools and spouse employment. "
-        "This wasn't another checklist — it told us what to decide first and what would go wrong "
-        "if we waited. My husband and I finally had the same plan."
+        "We had orders to Bragg and no idea where to start. This wasn't another checklist — "
+        "it told us what to decide first and what would go wrong if we waited. "
+        "For the first time, my husband and I were on the same page before the movers showed up."
     ),
     "attribution": "Army spouse · E-6 family · Fort Bragg PCS",
 }

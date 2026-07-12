@@ -7,33 +7,34 @@ CUSTOM_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap');
 
     :root {
-        --pcs-ink: #0f1c2e;
-        --pcs-navy: #152a45;
-        --pcs-navy-light: #1e3a5f;
-        --pcs-slate: #3d4f63;
-        --pcs-muted: #64748b;
-        --pcs-bg: #f4f6f9;
+        --pcs-ink: #1c1c1a;
+        --pcs-navy: #2a4a3f;
+        --pcs-navy-light: #3d6556;
+        --pcs-slate: #454540;
+        --pcs-muted: #6b6b66;
+        --pcs-bg: #f4f2ee;
         --pcs-surface: #ffffff;
-        --pcs-accent: #b45309;
-        --pcs-accent-soft: #d97706;
-        --pcs-accent-hover: #92400e;
-        --pcs-gold: #c9a227;
-        --pcs-border: #dde4ed;
-        --pcs-success: #166534;
-        --pcs-shadow: 0 12px 40px rgba(15, 28, 46, 0.08);
+        --pcs-accent: #4a7c64;
+        --pcs-accent-soft: #5b8f72;
+        --pcs-accent-hover: #3d6652;
+        --pcs-gold: #9a8468;
+        --pcs-border: #e0ddd6;
+        --pcs-success: #2d6a4f;
+        --pcs-shadow: 0 12px 40px rgba(28, 28, 26, 0.07);
         --pcs-radius: 14px;
+        --pcs-hero-dark: #1a2e28;
     }
 
     .stApp {
-        background: radial-gradient(ellipse at top, #eef2f7 0%, var(--pcs-bg) 55%, #e8edf3 100%);
+        background: linear-gradient(180deg, #faf9f7 0%, var(--pcs-bg) 40%, #ebe8e2 100%);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         color: var(--pcs-ink);
     }
 
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f5f1 100%);
         border-right: 1px solid var(--pcs-border);
-        box-shadow: 4px 0 24px rgba(15, 28, 46, 0.04);
+        box-shadow: 4px 0 24px rgba(28, 28, 26, 0.04);
     }
 
     [data-testid="stSidebar"] .stMarkdown h2 {
@@ -60,13 +61,13 @@ CUSTOM_CSS = """
 
     /* ── Hero / brand ── */
     .pcs-hero {
-        background: linear-gradient(145deg, var(--pcs-ink) 0%, var(--pcs-navy) 48%, #1a3352 100%);
+        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 55%, #345947 100%);
         border-radius: 20px;
         padding: 2.75rem 2.25rem 2.5rem 2.25rem;
         color: white;
         margin-bottom: 1.25rem;
         box-shadow: var(--pcs-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         position: relative;
         overflow: hidden;
     }
@@ -78,7 +79,7 @@ CUSTOM_CSS = """
         right: -15%;
         width: 55%;
         height: 140%;
-        background: radial-gradient(circle, rgba(201, 162, 39, 0.12) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(91, 143, 114, 0.18) 0%, transparent 70%);
         pointer-events: none;
     }
 
@@ -123,7 +124,7 @@ CUSTOM_CSS = """
     .pcs-hero-outcomes {
         font-size: 0.88rem;
         font-weight: 600;
-        color: rgba(201, 162, 39, 0.95) !important;
+        color: rgba(181, 210, 192, 0.95) !important;
         letter-spacing: 0.02em;
         margin: 0 0 1.25rem 0;
         max-width: 40rem;
@@ -154,15 +155,49 @@ CUSTOM_CSS = """
     .pcs-trust-banner {
         display: block;
         text-align: center;
-        background: linear-gradient(90deg, rgba(21, 42, 69, 0.06) 0%, rgba(180, 83, 9, 0.08) 50%, rgba(21, 42, 69, 0.06) 100%);
-        border: 1px solid var(--pcs-border);
+        background: var(--pcs-surface);
+        border: 2px solid var(--pcs-navy);
         border-radius: 999px;
-        padding: 0.65rem 1.25rem;
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 2px 12px rgba(42, 74, 63, 0.08);
+    }
+
+    .pcs-rally {
+        background: var(--pcs-surface);
+        border: 1px solid var(--pcs-border);
+        border-left: 4px solid var(--pcs-accent-soft);
+        border-radius: var(--pcs-radius);
+        padding: 1.5rem 1.65rem;
+        box-shadow: 0 4px 20px rgba(28, 28, 26, 0.05);
+    }
+
+    .pcs-rally h3 {
+        color: var(--pcs-navy);
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 0 0 0.65rem 0;
+        line-height: 1.35;
+    }
+
+    .pcs-rally-body {
+        color: var(--pcs-slate);
+        font-size: 0.95rem;
+        line-height: 1.65;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .pcs-rally-punch {
+        color: var(--pcs-accent);
         font-size: 0.92rem;
         font-weight: 700;
-        color: var(--pcs-navy);
-        letter-spacing: 0.01em;
-        margin-bottom: 0.75rem;
+        margin: 0;
+        font-style: italic;
     }
 
     .pcs-trust-row {
@@ -240,7 +275,7 @@ CUSTOM_CSS = """
     }
 
     .pcs-outcome-card {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f6f3 100%);
         border: 1px solid var(--pcs-border);
         border-radius: var(--pcs-radius);
         padding: 1.35rem 1.25rem;
@@ -297,7 +332,7 @@ CUSTOM_CSS = """
 
     .pcs-comparison th:last-child {
         border-radius: 0 13px 0 0;
-        background: #1a3d5c;
+        background: var(--pcs-navy-light);
     }
 
     .pcs-comparison td {
@@ -325,16 +360,16 @@ CUSTOM_CSS = """
     .pcs-cmp-vector {
         color: var(--pcs-ink);
         font-weight: 600;
-        background: rgba(180, 83, 9, 0.04);
+        background: rgba(91, 143, 114, 0.08);
         width: 36%;
     }
 
     .pcs-why-box {
-        background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 45%, #ffffff 100%);
-        border: 1px solid #fcd34d;
+        background: linear-gradient(135deg, #f0f7f3 0%, #faf9f7 50%, #ffffff 100%);
+        border: 1px solid rgba(91, 143, 114, 0.35);
         border-radius: 18px;
         padding: 1.65rem 1.75rem;
-        box-shadow: 0 8px 28px rgba(180, 83, 9, 0.08);
+        box-shadow: 0 8px 28px rgba(42, 74, 63, 0.08);
     }
 
     .pcs-why-box h3 {
@@ -371,12 +406,20 @@ CUSTOM_CSS = """
     }
 
     .pcs-why-roi {
-        color: var(--pcs-accent-hover);
+        color: var(--pcs-accent);
         font-size: 0.9rem;
         font-weight: 700;
         margin: 0.75rem 0 0 0;
         padding-top: 0.75rem;
-        border-top: 1px solid rgba(252, 211, 77, 0.6);
+        border-top: 1px solid rgba(91, 143, 114, 0.25);
+    }
+
+    .pcs-why-punch {
+        color: var(--pcs-navy);
+        font-size: 0.88rem;
+        font-weight: 600;
+        font-style: italic;
+        margin: 0.65rem 0 0 0;
     }
 
     .pcs-mid-cta {
@@ -602,8 +645,8 @@ CUSTOM_CSS = """
     }
 
     .pcs-email-block {
-        background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
-        border: 1px solid #fcd34d;
+        background: linear-gradient(135deg, #f0f7f3 0%, #faf9f7 100%);
+        border: 1px solid rgba(91, 143, 114, 0.35);
         border-left: 4px solid var(--pcs-accent-soft);
         border-radius: 12px;
         padding: 1rem 1.1rem 0.35rem 1.1rem;
@@ -730,9 +773,9 @@ CUSTOM_CSS = """
     }
 
     .pcs-payment-cancelled {
-        background: #fff8f0;
-        border: 1px solid #f0d9c0;
-        border-left: 4px solid var(--pcs-accent);
+        background: #f7f5f1;
+        border: 1px solid var(--pcs-border);
+        border-left: 4px solid var(--pcs-gold);
         border-radius: 10px;
         padding: 1rem 1.25rem;
         color: var(--pcs-slate);
@@ -747,13 +790,15 @@ CUSTOM_CSS = """
         font-weight: 700;
         border-radius: 10px;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
-        box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);
+        box-shadow: 0 4px 14px rgba(74, 124, 100, 0.3);
+        color: #ffffff !important;
     }
 
     div[data-testid="stButton"] > button[kind="primary"]:hover {
         background: linear-gradient(135deg, var(--pcs-accent) 0%, var(--pcs-accent-hover) 100%);
         border: none;
         transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(61, 102, 82, 0.35);
     }
 
     h1, h2, h3 {
