@@ -388,6 +388,13 @@ CUSTOM_CSS = """
         margin: 0 0 1rem 0;
     }
 
+    .pcs-why-point-desc {
+        color: var(--pcs-slate);
+        font-size: 0.88rem;
+        line-height: 1.55;
+        margin: 0;
+    }
+
     .pcs-why-point {
         margin-bottom: 0.85rem;
         padding-left: 0.15rem;
@@ -398,13 +405,6 @@ CUSTOM_CSS = """
         color: var(--pcs-navy);
         font-size: 0.92rem;
         margin-bottom: 0.2rem;
-    }
-
-    .pcs-why-point p {
-        color: var(--pcs-slate);
-        font-size: 0.88rem;
-        line-height: 1.55;
-        margin: 0;
     }
 
     .pcs-why-roi {

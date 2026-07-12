@@ -210,27 +210,27 @@ def _render_example_highlights() -> None:
 
 
 def _render_why_25(price: str) -> None:
+    # Streamlit markdown breaks when multiple <p> tags are nested in one HTML block —
+    # use div-based markup throughout this section.
     points_html = "".join(
-        f"""
-        <div class="pcs-why-point">
-            <strong>{safe_html(p["title"])}</strong>
-            <p>{safe_html(p["desc"])}</p>
-        </div>
-        """
+        f'<div class="pcs-why-point">'
+        f'<strong>{safe_html(p["title"])}</strong>'
+        f'<div class="pcs-why-point-desc">{safe_html(p["desc"])}</div>'
+        f"</div>"
         for p in WHY_25["points"]
     )
     punch = MOTIVATION_RALLY.get("punch", "")
-    punch_html = f'<p class="pcs-why-punch">{safe_html(punch)}</p>' if punch else ""
+    punch_html = (
+        f'<div class="pcs-why-punch">{safe_html(punch)}</div>' if punch else ""
+    )
     st.markdown(
-        f"""
-        <div class="pcs-why-box">
-            <h3>{_with_price(WHY_25["headline"], price)}</h3>
-            <p class="pcs-why-intro">{safe_html(WHY_25["intro"])}</p>
-            {points_html}
-            <p class="pcs-why-roi">{safe_html(WHY_25["roi_line"])}</p>
-            {punch_html}
-        </div>
-        """,
+        f'<div class="pcs-why-box">'
+        f'<h3>{_with_price(WHY_25["headline"], price)}</h3>'
+        f'<div class="pcs-why-intro">{safe_html(WHY_25["intro"])}</div>'
+        f"{points_html}"
+        f'<div class="pcs-why-roi">{safe_html(WHY_25["roi_line"])}</div>'
+        f"{punch_html}"
+        f"</div>",
         unsafe_allow_html=True,
     )
 
