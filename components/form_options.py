@@ -1,5 +1,7 @@
 """Dropdown and option lists for the PCS input form."""
 
+from services.installation_data import SUPPORTED_INSTALLATIONS
+
 RANK_PAY_GRADES = [
     "E-1",
     "E-2",
@@ -25,25 +27,9 @@ RANK_PAY_GRADES = [
     "Other",
 ]
 
-CURRENT_INSTALLATIONS = [
-    "Fort Bragg, NC",
-    "Fort Hood, TX",
-    "Fort Drum, NY",
-    "Fort Gordon, GA",
-    "Joint Base Lewis-McChord, WA",
-    "Fort Campbell, KY",
-    "Fort Bliss, TX",
-    "Other installation",
-]
+CURRENT_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other installation"]
 
-GAINING_INSTALLATIONS = [
-    "Fort Bragg, NC",
-    "Fort Hood, TX",
-    "Fort Drum, NY",
-    "Fort Gordon, GA",
-    "Fort Bliss, TX",
-    "Other CONUS installation",
-]
+GAINING_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other CONUS installation"]
 
 MOVE_WINDOWS = [
     "Within 30 days",

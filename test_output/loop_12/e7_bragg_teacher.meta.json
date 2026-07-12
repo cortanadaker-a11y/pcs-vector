@@ -1,7 +1,7 @@
 {
   "scenario": "e7_bragg_teacher",
   "loop": 12,
-  "chars": 7338,
+  "chars": 7575,
   "sections": 8,
   "has_table": true,
   "expected_bah": 2094,
@@ -16,7 +16,7 @@
   "has_value_scorecard": false,
   "has_red_flags": true,
   "has_snapshot": false,
-  "has_90_day_watch": false,
+  "has_90_day_watch": true,
   "char_budget_ok": true,
   "has_bad_default": false,
   "has_spouse_share": false,
