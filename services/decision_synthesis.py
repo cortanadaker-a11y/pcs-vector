@@ -9,6 +9,20 @@ from services.installation_data import InstallationProfile
 # Week-by-week spouse employment fast-tracks keyed by installation + career field.
 SPOUSE_FAST_TRACK: dict[str, dict[str, dict[str, Any]]] = {
     "Fort Bragg, NC": {
+        "Federal / government civilian": {
+            "critical_path": "USAJOBS referral preservation → MSEP flag → interview pipeline",
+            "week_0_1": "Confirm USAJOBS referral status; notify HR of PCS orders; register MSEP.",
+            "week_2_3": "Apply to Fort Bragg and Cumberland County federal roles; parallel NAF backup.",
+            "week_4_6": "Interviews timed to on-post housing or short commute off-post.",
+            "week_6_10": "Federal offer or NAF bridge role — 8–14 week pipeline typical.",
+            "fastest_paycheck_path": "NAF admin role — 4–6 weeks while federal pipeline runs",
+            "leverage_programs": ["MSEP", "Hiring Our Heroes", "ACS Employment Readiness"],
+            "bottleneck": "Federal hiring freeze or lost referral — NAF is the income bridge, not optional.",
+            "what_this_means": (
+                "A 30-day PCS does not pause federal timelines — you must protect the referral "
+                "from losing station while locking on-post housing to shorten the commute variable."
+            ),
+        },
         "K-12 education / teaching": {
             "critical_path": (
                 "NC licensure packet → Cumberland lateral-entry → substitute pool → full contract"
@@ -60,6 +74,22 @@ SPOUSE_FAST_TRACK: dict[str, dict[str, dict[str, Any]]] = {
             ),
         },
     },
+    "Fort Benning, GA": {
+        "Student / continuing education": {
+            "critical_path": "MyCAA registration → on-post housing with strong internet → quiet study window",
+            "week_0_1": "Register MyCAA; apply on-post housing; verify master's program bandwidth requirements.",
+            "week_2_3": "If off-post required, test ISP speeds at lease addresses; set up dedicated study space.",
+            "week_4_6": "Stabilize routine — EFMP and school zoning must not disrupt study blocks.",
+            "week_6_10": "Confirm therapy and IEP continuity so spouse can protect semester deadlines.",
+            "fastest_paycheck_path": "N/A — focus is program continuity, not employment income",
+            "leverage_programs": ["MyCAA for certification costs", "ACS Family Advocacy", "EFMP Family Support"],
+            "bottleneck": "EFMP transfer delay or weak on-post internet forces off-post hunt that breaks study routine.",
+            "what_this_means": (
+                "This PCS is about protecting your spouse's semester and therapy schedule — "
+                "housing choice is a study-environment decision, not just a commute calculation."
+            ),
+        },
+    },
     "Fort Hood, TX": {
         "Remote / work-from-home professional": {
             "critical_path": "Zip-code fiber verification → lease with ISP install date → hotspot backup",
@@ -73,6 +103,54 @@ SPOUSE_FAST_TRACK: dict[str, dict[str, dict[str, Any]]] = {
             "what_this_means": (
                 "Your PCS critical path is internet activation, not job applications — "
                 "treat fiber confirmation like a reporting-date requirement."
+            ),
+        },
+    },
+    "Fort Campbell, KY": {
+        "Trades / skilled labor": {
+            "critical_path": "TN/KY license check → contractor pipeline → first paid job",
+            "week_0_1": "Verify TN or KY trade license reciprocity; register with ACS and local contractor registries.",
+            "week_2_3": "Apply to Clarksville-area contractors and on-post DPW subcontractor lists via MSEP.",
+            "week_4_6": "First paid job likely from service/retail bridge if contractor pipeline slow.",
+            "week_6_10": "Steady trades income if licensure and childcare locked in parallel.",
+            "fastest_paycheck_path": "Retail/service bridge — 2–4 weeks while contractor paperwork clears",
+            "leverage_programs": ["ACS Employment Readiness", "MSEP", "MyCAA for trade certifications"],
+            "bottleneck": "KY/TN line affects license jurisdiction — wrong state filing adds 2–4 weeks.",
+            "what_this_means": (
+                "School zoning and gate commute pick your neighborhood — trades income follows "
+                "where you can reliably get to job sites without burning 90 minutes on Madam Walker."
+            ),
+        },
+    },
+    "Joint Base Lewis-McChord, WA": {
+        "Healthcare / nursing": {
+            "critical_path": "WA endorsement → temp permit → Madigan NAF or MultiCare",
+            "week_0_1": "Submit WA endorsement packet from losing station; apply Madigan NAF and MultiCare via MSEP.",
+            "week_2_3": "Pursue temporary permit; NAF roles onboard faster than civilian hospital.",
+            "week_4_6": "First paycheck from NAF or temp-permit clinical role if childcare locked.",
+            "week_6_10": "Full endorsement clears; reassess commute after first rain-season month.",
+            "fastest_paycheck_path": "Madigan NAF with Military Spouse Preference — 4–6 weeks",
+            "leverage_programs": ["MSEP at Madigan", "MyCAA for CEUs", "ACS Spouse Employment"],
+            "bottleneck": "Tight rental market + CDC wait — spouse cannot interview far from locked housing.",
+            "what_this_means": (
+                "Housing and licensure are the same decision — a lease in Yelm to save rent "
+                "can cost six weeks of nursing income if Madigan commute fails in rain."
+            ),
+        },
+    },
+    "Fort Sill, OK": {
+        "Retail / hospitality / service": {
+            "critical_path": "Childcare lock → part-time bridge → full schedule",
+            "week_0_1": "Submit DD 2606; scout FCC in Lawton west; spouse applies to Lawton retail hubs.",
+            "week_2_3": "Part-time shifts at restaurants/retail while CDC slot processes.",
+            "week_4_6": "Expand hours once infant FCC coverage confirmed.",
+            "week_6_10": "Full schedule if childcare stable; audit tornado shelter in lease.",
+            "fastest_paycheck_path": "Part-time retail/hospitality — 2–3 weeks with flexible shifts",
+            "leverage_programs": ["ACS Employment Readiness", "MSEP at Comanche County Memorial"],
+            "bottleneck": "Infant CDC wait without FCC bridge blocks any spouse work outside the home.",
+            "what_this_means": (
+                "Your fastest resettlement is childcare-first — spouse income is a bonus that "
+                "only works once the infant has a seat, not before."
             ),
         },
     },
@@ -102,7 +180,7 @@ PRIMARY_STRATEGY: dict[str, str] = {
         "access and school zoning."
     ),
     "Minimizing total costs": (
-        "Prioritize {housing_path} to maximize BAH retention, execute {dity_mode} DITY for "
+        "Prioritize {housing_path} to maximize BAH surplus or on-post savings, execute {dity_mode} DITY for "
         "move profit, and cap rent at the low end of market to protect 6-month surplus."
     ),
     "Fastest possible resettlement": (
@@ -136,6 +214,26 @@ RISK_CHAINS: dict[str, tuple[str, ...]] = {
         "Evans lease without Columbia County zoning confirmation → school denial at registration",
         "TAVT surprise at DMV → $300–800 month-one hit erodes BAH surplus",
     ),
+    "Fort Campbell, KY": (
+        "TN/KY school zoning error → high school transfer denied mid-year → IEP continuity breaks",
+        "Madam Walker commute underestimated → spouse misses trades job-site windows",
+        "IEP not registered with district before lease → special ed services delayed 30+ days",
+    ),
+    "Joint Base Lewis-McChord, WA": (
+        "WA endorsement delayed → 6–8 week nursing income gap in high-rent market",
+        "Lease signed without mold/ventilation check → sick-kid cycle burns TLE days",
+        "DuPont inventory missed → forced to Yelm with 35-min rain commute → childcare mismatch",
+    ),
+    "Fort Sill, OK": (
+        "Infant CDC wait without FCC → spouse cannot take retail bridge shifts",
+        "Lease without tornado shelter disclosure → insurance gap after hail event",
+        "Housing hunt past day 10 → TLE exhausts before BAH aligns with low Lawton rent",
+    ),
+    "Fort Benning, GA": (
+        "EFMP transfer incomplete → on-post only option → spouse loses Columbus job market access",
+        "Phenix City AL lease without GA school confirmation → enrollment denied",
+        "Graduation-week traffic → missed EFMP appointments → medical continuity gap",
+    ),
 }
 
 HOUSING_ALTERNATIVES: dict[str, tuple[str, str]] = {
@@ -154,6 +252,22 @@ HOUSING_ALTERNATIVES: dict[str, tuple[str, str]] = {
     "Fort Gordon, GA": (
         "Grovetown (30813) — more inventory than Evans; verify Columbia County zoning",
         "On-post — shorter commute; school bus routes vary by village",
+    ),
+    "Fort Campbell, KY": (
+        "Hopkinsville, KY — lower rent, longer commute; verify Christian County schools for IEP",
+        "On-post DODEA — strongest IEP continuity if off-post zoning fails",
+    ),
+    "Joint Base Lewis-McChord, WA": (
+        "Yelm — lower rent, longer commute; good if Madigan NAF is the target employer",
+        "On-post — eliminates rain commute variable; waitlist risk in summer PCS",
+    ),
+    "Fort Sill, OK": (
+        "Cache — quieter, lower rent; verify tornado shelter in lease",
+        "On-post — fastest CDC path for infants; BAH absorbed",
+    ),
+    "Fort Benning, GA": (
+        "Columbus north (31909) — Muscogee schools and EFMP services strongest",
+        "On-post — best EFMP continuity; limited floor-plan choice",
     ),
 }
 

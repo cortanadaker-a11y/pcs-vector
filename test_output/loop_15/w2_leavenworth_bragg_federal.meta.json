@@ -1,0 +1,22 @@
+{
+  "scenario": "w2_leavenworth_bragg_federal",
+  "loop": 15,
+  "expected_bah": 2112,
+  "bah_cited": true,
+  "recommended_dity_mode": null,
+  "expected_cash_cushion": 14694,
+  "cash_cushion_cited": true,
+  "chars": 8091,
+  "sections": 8,
+  "has_table": true,
+  "leaked_tokens": [],
+  "leak_count": 0,
+  "has_what_this_means": false,
+  "has_value_scorecard": true,
+  "has_spouse_share": true,
+  "has_bad_default": true,
+  "has_roi": false,
+  "has_risk_chain": false,
+  "char_budget_ok": true,
+  "generated_at": "2026-07-12T15:26:00.922018"
+}

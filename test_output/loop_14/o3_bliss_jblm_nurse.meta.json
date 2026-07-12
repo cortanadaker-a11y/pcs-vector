@@ -1,0 +1,22 @@
+{
+  "scenario": "o3_bliss_jblm_nurse",
+  "loop": 14,
+  "expected_bah": 2586,
+  "bah_cited": true,
+  "recommended_dity_mode": "full",
+  "expected_cash_cushion": 2500,
+  "cash_cushion_cited": true,
+  "chars": 8105,
+  "sections": 8,
+  "has_table": true,
+  "leaked_tokens": [],
+  "leak_count": 0,
+  "has_what_this_means": false,
+  "has_value_scorecard": true,
+  "has_spouse_share": true,
+  "has_bad_default": true,
+  "has_roi": false,
+  "has_risk_chain": false,
+  "char_budget_ok": true,
+  "generated_at": "2026-07-12T15:25:39.623794"
+}

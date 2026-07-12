@@ -70,6 +70,13 @@ def build_cashflow_bridge(
         f"− ${dity_net:,} DITY offset − ${int(bah_monthly * 0.5):,} half-month BAH "
         f"= ${net_pressure:,} net 30-day pressure"
     )
+    plain_english = (
+        f"In the first 30 days, plan on roughly ${deposit:,} for deposit and move-in fees, "
+        f"about ${tle_est:,} for TLE lodging, and roughly ${spouse_gap:,} of spouse income gap "
+        f"before the first paycheck. Partial DITY (if you run it) offsets about ${dity_net:,}, "
+        f"and half a month of BAH timing (~${int(bah_monthly * 0.5):,}) helps — "
+        f"net pressure lands around **${net_pressure:,}**. Hold **${cushion:,}** liquid before you leave."
+    )
 
     return {
         "weeks_to_spouse_first_paycheck": {"low": weeks_range[0], "high": weeks_range[1]},
@@ -83,6 +90,7 @@ def build_cashflow_bridge(
         "estimated_30_day_cash_pressure_usd": net_pressure,
         "recommended_cash_cushion_usd": cushion,
         "cash_pressure_formula": formula,
+        "cash_pressure_plain_english": plain_english,
         "move_urgency": urgency,
         "insight": (
             f"Plan for {weeks_range[0]}–{weeks_range[1]} weeks before spouse income restarts "

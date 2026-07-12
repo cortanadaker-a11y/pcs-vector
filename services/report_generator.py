@@ -6,13 +6,14 @@ from typing import Any
 
 from services.grok_client import GrokAPIError, call_grok
 from services.prompts import SYSTEM_PROMPT, build_user_prompt
+from services.report_sanitizer import sanitize_report
 
 
 def generate_report(form_data: dict[str, Any]) -> str:
     """Generate a full markdown PCS report via the Grok API."""
     user_prompt = build_user_prompt(form_data)
     report = call_grok(SYSTEM_PROMPT, user_prompt)
-    return _normalize_report(report)
+    return _normalize_report(sanitize_report(report))
 
 
 def _normalize_report(report: str) -> str:

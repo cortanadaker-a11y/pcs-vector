@@ -26,6 +26,26 @@ WALK_AWAY_RED_FLAGS: dict[str, tuple[str, ...]] = {
         "Ignoring GA TAVT vehicle tax at registration — surprise $300–800 hit in month one.",
         "Choosing west Augusta for inventory without testing Gordon Hwy gate commute at 0630.",
     ),
+    "Fort Campbell, KY": (
+        "TN lease without written school-zone confirmation for IEP student — district transfer denied.",
+        "Ignoring Madam Walker rush — 35+ min commute burns trades job-site availability.",
+        "Signing KY lease without verifying which state spouse trade license must file in first.",
+    ),
+    "Joint Base Lewis-McChord, WA": (
+        "DuPont lease signed without mold/ventilation inspection — dehumidifier costs erase BAH surplus.",
+        "WA nursing endorsement started at in-processing instead of losing station — 4-week income slip.",
+        "Yelm lease for rent savings without testing rain-season I-5 commute to Madigan.",
+    ),
+    "Fort Sill, OK": (
+        "Lawton lease without tornado shelter or safe-room disclosure — insurance gap after hail.",
+        "Delaying DD 2606 until arrival — infant CDC wait extends past spouse's 6-week work target.",
+        "Skipping renter's hail rider in tornado alley — surprise deductible after first storm.",
+    ),
+    "Fort Benning, GA": (
+        "Phenix City AL lease without Muscogee County school confirmation — enrollment denied.",
+        "EFMP packet not transferred before housing lock — medical continuity gap forces on-post only.",
+        "Victory Drive lease without testing graduation-week gate delays at 0630.",
+    ),
 }
 
 SPOUSE_SALARY_RANGES: dict[str, dict[str, str]] = {
@@ -47,6 +67,22 @@ SPOUSE_SALARY_RANGES: dict[str, dict[str, str]] = {
         "K-12 education / teaching": "$46K–$58K/yr (Columbia County Schools — competitive)",
         "Healthcare / nursing": "$56K–$74K/yr (AU Health; cyber corridor less relevant for nursing)",
         "Remote / work-from-home professional": "Strong in Evans/Grovetown — defense contractor spillover",
+    },
+    "Fort Campbell, KY": {
+        "Trades / skilled labor": "$42K–$62K/yr (Clarksville contractors; OT common on TN side)",
+        "K-12 education / teaching": "$44K–$56K/yr (Clarksville-Montgomery County Schools)",
+    },
+    "Joint Base Lewis-McChord, WA": {
+        "Healthcare / nursing": "$68K–$92K/yr (Madigan NAF faster; MultiCare civilian higher)",
+        "Federal / government civilian": "$55K–$85K/yr (USAJOBS/MSEP — 8–14 week pipeline typical)",
+    },
+    "Fort Sill, OK": {
+        "Retail / hospitality / service": "$22K–$32K/yr part-time bridge; full-time $28K–$38K/yr",
+        "Trades / skilled labor": "$38K–$55K/yr (Lawton contractors; lower COL helps surplus)",
+    },
+    "Fort Benning, GA": {
+        "Student / continuing education": "MyCAA covers certs; online master's viable with on-post housing internet",
+        "Healthcare / nursing": "$52K–$70K/yr (Piedmont Columbus Regional; NAF roles faster)",
     },
 }
 
@@ -117,6 +153,26 @@ NINETY_DAY_WATCH: dict[str, tuple[str, ...]] = {
         "Day 45: School enrollment confirmed and bus route validated.",
         "Day 60: Spouse job pipeline check — cyber/healthcare hiring cycles move fast here.",
         "Day 90: TAVT/vehicle registration complete; no DMV penalties.",
+    ),
+    "Fort Campbell, KY": (
+        "Day 45: IEP services confirmed with district — if not, escalate EFMP school liaison.",
+        "Day 60: Reconcile TN vs KY tax and school choice — any mismatch forces mid-year move.",
+        "Day 90: Trades license active in correct state; spouse income matches plan.",
+    ),
+    "Joint Base Lewis-McChord, WA": (
+        "Day 45: WA nursing permit status — if not active, activate NAF bridge role.",
+        "Day 60: Mold/utility audit after first rainy month — reassess lease if ventilation fails.",
+        "Day 90: Childcare stable; spouse income and commute validated in rain season.",
+    ),
+    "Fort Sill, OK": (
+        "Day 45: Infant childcare confirmed — if not, spouse work timeline must reset.",
+        "Day 60: Renter's insurance and shelter clause validated before tornado season peak.",
+        "Day 90: Lawton rent surplus reconciled against actual utilities and insurance.",
+    ),
+    "Fort Benning, GA": (
+        "Day 45: EFMP services transferred — if gaps, on-post may be only safe path.",
+        "Day 60: Spouse online program bandwidth test — upgrade ISP if on-post Wi-Fi insufficient.",
+        "Day 90: IEP and therapy continuity confirmed for middle-schooler.",
     ),
 }
 
@@ -238,10 +294,16 @@ def build_value_context(
         f"hiring window, absorb a ${rent_high:,}/mo off-post mistake, and eat the full "
         f"${scorecard['avoided_wrong_lease_cost_usd']:,}+ wrong-lease cost before course-correcting."
     )
+    career_short = spouse_career_field.split("/")[0].strip().lower()
+    if spouse_career_field == "Student / continuing education":
+        spouse_job = "your coursework and program deadlines"
+    elif spouse_career_field == "Not currently working — seeking employment":
+        spouse_job = "getting hired on the timeline we set"
+    else:
+        spouse_job = career_short
     spouse_share = (
         f"We're targeting {gaining} with a locked plan for {primary_priority.lower()} — "
-        f"your job is {spouse_career_field.split('/')[0].strip().lower()} and mine is executing "
-        f"the timeline in section 5 so we're not guessing."
+        f"your focus is {spouse_job} and mine is executing the timeline in section 5 so we're not guessing."
     )
     return {
         "situation_snapshot": build_situation_snapshot(

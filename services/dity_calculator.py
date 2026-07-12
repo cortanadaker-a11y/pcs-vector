@@ -135,6 +135,16 @@ def build_dity_estimate(
             "partial wins on flexibility when nets are close."
         )
 
+    short_move_note = None
+    if miles < 500 and partial["estimated_net_usd"] == 0:
+        short_move_note = (
+            f"At {miles} miles, PPM net is often near zero after expenses — "
+            "government HHG may beat partial DITY on short CONUS hauls unless TMO shows positive net."
+        )
+        if recommended == "partial" and not wants_full:
+            recommended = "government"
+            reason = short_move_note
+
     return {
         "applicable": True,
         "authorized_weight_lbs": authorized,
@@ -143,6 +153,7 @@ def build_dity_estimate(
         "full_dity": full,
         "recommended_mode": recommended,
         "recommendation_reason": reason,
+        "short_move_note": short_move_note,
         "family_complexity_score": complexity,
         "family_complexity_note": complexity_note,
         "disclaimer": "Planning estimate only — confirm with transportation office PPM calculator before load-out.",

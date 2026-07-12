@@ -1,0 +1,22 @@
+{
+  "scenario": "e8_hood_benning_efmp",
+  "loop": 17,
+  "expected_bah": 2016,
+  "bah_cited": true,
+  "recommended_dity_mode": "full",
+  "expected_cash_cushion": 2500,
+  "cash_cushion_cited": true,
+  "chars": 7162,
+  "sections": 8,
+  "has_table": true,
+  "leaked_tokens": [],
+  "leak_count": 0,
+  "has_what_this_means": false,
+  "has_value_scorecard": true,
+  "has_spouse_share": true,
+  "has_bad_default": true,
+  "has_roi": false,
+  "has_risk_chain": false,
+  "char_budget_ok": true,
+  "generated_at": "2026-07-12T15:26:35.947970"
+}

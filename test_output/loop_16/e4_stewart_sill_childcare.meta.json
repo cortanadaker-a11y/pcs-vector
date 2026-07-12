@@ -1,0 +1,22 @@
+{
+  "scenario": "e4_stewart_sill_childcare",
+  "loop": 16,
+  "expected_bah": 1410,
+  "bah_cited": true,
+  "recommended_dity_mode": "partial",
+  "expected_cash_cushion": 8738,
+  "cash_cushion_cited": true,
+  "chars": 6950,
+  "sections": 8,
+  "has_table": true,
+  "leaked_tokens": [],
+  "leak_count": 0,
+  "has_what_this_means": false,
+  "has_value_scorecard": true,
+  "has_spouse_share": true,
+  "has_bad_default": true,
+  "has_roi": false,
+  "has_risk_chain": false,
+  "char_budget_ok": true,
+  "generated_at": "2026-07-12T15:26:15.769649"
+}

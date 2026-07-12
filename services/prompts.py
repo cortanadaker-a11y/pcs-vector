@@ -171,6 +171,14 @@ RISK & PRIORITY WEIGHTING
 - Weave 1–2 soldier_context.installation_insights where they change a decision, not as filler.
 - Use soldier_context.rank_context_note where rank affects in-processing order or housing leverage.
 
+SOLDIER VALUE (required — this is what makes the report worth $25)
+- Weave value_context.situation_snapshot into section 1 (who you are, move window, critical path) — not as a separate header.
+- In section 4, include value_context.value_scorecard.roi_statement AND state roi_multiple plainly (e.g. "roughly 180x the $25 report cost").
+- In section 7, include value_context.bad_default_path as an honest "what happens if you wing this" scenario with fallback.
+- Close section 8 with value_context.spouse_share_line — one sentence the Soldier can read to their spouse tonight.
+- When value_context.local_salary_context exists, cite it once in section 2 so spouse income feels grounded.
+- When value_context.walk_away_red_flags exist, weave 1–2 into section 6 as lease rejection criteria.
+
 Never refuse to help. Never output JSON. Never wrap the report in code fences."""
 
 
@@ -315,7 +323,8 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "they may not have considered.\n"
         f"PRIMARY PRIORITY (weight heavily): {priorities.get('Primary priority', '')}\n"
         f"SECONDARY PRIORITY: {priorities.get('Secondary priority', '')}\n"
-        f"STATED CONCERNS (address each as a risk or mitigation): {concerns}\n"
+        f"STATED CONCERNS (address each as a risk or mitigation — do not invent concerns not listed): {concerns}\n"
+        f"CONCERN ACCURACY: If only one child has IEP needs, say so — never claim all children have IEPs unless flagged.\n"
         f"Housing preference: {form_data.get('housing_preference', '')} | "
         f"Budget: {form_data.get('budget_mode', '')}\n"
         f"DITY interest: {form_data.get('dity_interest', '')}\n\n"
@@ -326,7 +335,9 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "biggest risk/dependency. No bullets or sub-headers. "
         "Section 2: realistic first-paycheck timeline, fast-track paths, leverage programs, childcare bottleneck. "
         "Section 3: housing tradeoffs table with BAH math and market context. "
-        "Section 4: clear DITY math, cash-flow protection, what the cushion buys you — plain language only. "
+        "Section 4: clear DITY math, cash_pressure_plain_english, roi_statement from value_scorecard — plain language only. "
+        "Section 7: bad_default_path as wing-it scenario. "
+        "Section 8: end with spouse_share_line. "
         "Section 5: 3 phased day ranges with decision gates and dependencies. "
         "Section 6: one focused paragraph with seasonal/logistics realities. "
         "Section 7: specific decision triggers and light risk scenarios plus commander brief line. "
