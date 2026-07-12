@@ -312,13 +312,14 @@ CUSTOM_CSS = """
         box-shadow: 0 4px 16px rgba(15, 28, 46, 0.04);
     }
 
-    .pcs-comparison {
+    .pcs-comparison-grid {
+        display: grid;
+        grid-template-columns: 28% 36% 36%;
         width: 100%;
-        border-collapse: collapse;
         font-size: 0.88rem;
     }
 
-    .pcs-comparison th {
+    .pcs-cmp-h {
         background: var(--pcs-navy);
         color: white;
         font-weight: 700;
@@ -326,42 +327,43 @@ CUSTOM_CSS = """
         text-align: left;
     }
 
-    .pcs-comparison th:first-child {
+    .pcs-cmp-h:first-child {
         border-radius: 13px 0 0 0;
     }
 
-    .pcs-comparison th:last-child {
+    .pcs-cmp-h-vector {
         border-radius: 0 13px 0 0;
         background: var(--pcs-navy-light);
     }
 
-    .pcs-comparison td {
+    .pcs-comparison-grid > .pcs-cmp-topic,
+    .pcs-comparison-grid > .pcs-cmp-diy,
+    .pcs-comparison-grid > .pcs-cmp-vector {
         padding: 0.8rem 1rem;
         border-bottom: 1px solid var(--pcs-border);
         vertical-align: top;
         line-height: 1.5;
     }
 
-    .pcs-comparison tr:last-child td {
+    .pcs-comparison-grid > .pcs-cmp-topic:nth-last-child(3),
+    .pcs-comparison-grid > .pcs-cmp-diy:nth-last-child(2),
+    .pcs-comparison-grid > .pcs-cmp-vector:last-child {
         border-bottom: none;
     }
 
     .pcs-cmp-topic {
         font-weight: 700;
         color: var(--pcs-navy);
-        width: 28%;
     }
 
     .pcs-cmp-diy {
         color: var(--pcs-muted);
-        width: 36%;
     }
 
     .pcs-cmp-vector {
         color: var(--pcs-ink);
         font-weight: 600;
         background: rgba(91, 143, 114, 0.08);
-        width: 36%;
     }
 
     .pcs-why-box {
@@ -625,8 +627,11 @@ CUSTOM_CSS = """
         .pcs-hero { padding: 2rem 1.35rem; }
         .pcs-flow-arrow { display: none; }
         .pcs-flow-step { min-width: 46%; max-width: 48%; }
-        .pcs-comparison { font-size: 0.8rem; }
-        .pcs-comparison th, .pcs-comparison td { padding: 0.6rem 0.65rem; }
+        .pcs-comparison-grid { font-size: 0.8rem; }
+        .pcs-comparison-grid > .pcs-cmp-h,
+        .pcs-comparison-grid > .pcs-cmp-topic,
+        .pcs-comparison-grid > .pcs-cmp-diy,
+        .pcs-comparison-grid > .pcs-cmp-vector { padding: 0.6rem 0.65rem; }
     }
 
     /* ── Form ── */

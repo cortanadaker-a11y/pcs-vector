@@ -23,15 +23,15 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-# Brand palette (matches PCS Vector web app)
-NAVY = colors.HexColor("#1e3a5f")
-NAVY_LIGHT = colors.HexColor("#2d5a8a")
-ACCENT = colors.HexColor("#c45c26")
-SLATE = colors.HexColor("#4a5568")
-MUTED = colors.HexColor("#718096")
-BORDER = colors.HexColor("#e2e8f0")
-TABLE_HEADER_BG = colors.HexColor("#eef2f7")
-TABLE_ALT_BG = colors.HexColor("#f7f9fc")
+# Brand palette (matches PCS Vector web app — forest / stone)
+NAVY = colors.HexColor("#2a4a3f")
+NAVY_LIGHT = colors.HexColor("#3d6556")
+ACCENT = colors.HexColor("#5b8f72")
+SLATE = colors.HexColor("#454540")
+MUTED = colors.HexColor("#6b6b66")
+BORDER = colors.HexColor("#e0ddd6")
+TABLE_HEADER_BG = colors.HexColor("#f0f7f3")
+TABLE_ALT_BG = colors.HexColor("#faf9f7")
 
 PAGE_WIDTH, PAGE_HEIGHT = letter
 MARGIN = 0.72 * inch
@@ -518,7 +518,7 @@ def _draw_page_frame(canvas, doc, report_date: str) -> None:
     canvas.drawCentredString(
         PAGE_WIDTH / 2,
         footer_y - 0.16 * inch,
-        "Independent planning tool — not affiliated with the U.S. Department of Defense",
+        "Built For Soldiers; By Soldiers",
     )
 
     canvas.restoreState()
