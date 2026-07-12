@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+from components.html_utils import safe_html
 from components.scroll import request_scroll_to_top
 from components.sidebar import navigate_to
 from components.form_options import (
@@ -34,6 +35,7 @@ from components.form_state import (
     render_number_input,
     reset_multiselect,
     set_form_value,
+    sync_rank_from_pay_grade,
     validate_form,
     validate_form_step,
 )
@@ -100,38 +102,33 @@ def _render_move_basics() -> None:
         ),
     )
 
-    col_rank, col_display = st.columns([1, 2])
-    with col_rank:
+    pay_grade = st.selectbox(
+        "Pay grade",
+        options=RANK_PAY_GRADES,
+        index=_option_index(RANK_PAY_GRADES, get_form_value("rank_pay_grade")),
+        help="Your rank is set automatically from pay grade.",
+        key="form_rank_pay_grade",
+    )
+    set_form_value("rank_pay_grade", pay_grade)
+
+    if pay_grade == "Other":
         set_form_value(
-            "rank_pay_grade",
-            st.selectbox(
-                "Pay grade",
-                options=RANK_PAY_GRADES,
-                index=_option_index(RANK_PAY_GRADES, get_form_value("rank_pay_grade")),
-                help="Your current pay grade. Rank auto-fills from this selection.",
+            "rank_title",
+            st.text_input(
+                "Rank / title",
+                value=get_form_value("rank_title"),
+                placeholder="e.g., Captain, Sergeant First Class",
+                help="Required when pay grade is Other.",
+                key="form_rank_title_other",
             ),
         )
-    pay_grade = get_form_value("rank_pay_grade")
-    with col_display:
-        if pay_grade == "Other":
-            set_form_value(
-                "rank_title",
-                st.text_input(
-                    "Rank / title",
-                    value=get_form_value("rank_title"),
-                    placeholder="e.g., Captain, Sergeant First Class",
-                    help="Required when pay grade is Other.",
-                ),
-            )
-        else:
-            auto_rank = rank_for_pay_grade(pay_grade)
-            set_form_value("rank_title", auto_rank)
-            st.text_input(
-                "Rank",
-                value=auto_rank,
-                disabled=True,
-                help="Auto-filled from your pay grade.",
-            )
+    else:
+        auto_rank = rank_for_pay_grade(pay_grade)
+        set_form_value("rank_title", auto_rank)
+        st.markdown(
+            f'<p class="pcs-rank-auto">Rank: <strong>{safe_html(auto_rank)}</strong></p>',
+            unsafe_allow_html=True,
+        )
 
     col_current, col_gaining = st.columns(2)
     with col_current:

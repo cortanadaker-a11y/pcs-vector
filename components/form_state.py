@@ -6,7 +6,7 @@ from typing import Any
 
 import streamlit as st
 
-from components.form_options import PRIORITY_CHOICES, PRIORITY_LABELS
+from components.form_options import PRIORITY_CHOICES, PRIORITY_LABELS, rank_for_pay_grade
 
 MULTISELECT_FORM_KEYS = (
     "child_age_ranges",
@@ -53,6 +53,15 @@ FORM_DEFAULTS: dict[str, Any] = {
 }
 
 
+def sync_rank_from_pay_grade(data: dict[str, Any] | None = None) -> None:
+    """Keep rank_title aligned with pay grade (no manual entry for standard grades)."""
+    if data is None:
+        data = st.session_state.get("form_data", {})
+    pay_grade = data.get("rank_pay_grade", "")
+    if pay_grade and pay_grade != "Other":
+        data["rank_title"] = rank_for_pay_grade(pay_grade)
+
+
 def init_form_state() -> None:
     """Initialize form fields in session state if missing."""
     if "form_data" not in st.session_state:
@@ -61,6 +70,7 @@ def init_form_state() -> None:
         # Backfill keys added in newer releases (e.g. email) for existing sessions.
         for key, default in FORM_DEFAULTS.items():
             st.session_state.form_data.setdefault(key, default)
+    sync_rank_from_pay_grade(st.session_state.form_data)
 
 
 def get_form_value(key: str) -> Any:

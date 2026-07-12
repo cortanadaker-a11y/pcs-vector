@@ -649,6 +649,17 @@ CUSTOM_CSS = """
         line-height: 1.5;
     }
 
+    .pcs-rank-auto {
+        color: var(--pcs-slate);
+        font-size: 0.9rem;
+        margin: -0.35rem 0 0.85rem 0;
+        line-height: 1.4;
+    }
+
+    .pcs-rank-auto strong {
+        color: var(--pcs-navy);
+    }
+
     .pcs-email-block {
         background: linear-gradient(135deg, #f0f7f3 0%, #faf9f7 100%);
         border: 1px solid rgba(91, 143, 114, 0.35);
