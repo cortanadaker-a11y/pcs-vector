@@ -116,8 +116,38 @@ CUSTOM_CSS = """
         font-size: 1.05rem;
         line-height: 1.65;
         color: rgba(255, 255, 255, 0.82) !important;
-        margin: 0;
+        margin: 0 0 1rem 0;
         max-width: 40rem;
+    }
+
+    .pcs-hero-outcomes {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: rgba(201, 162, 39, 0.95) !important;
+        letter-spacing: 0.02em;
+        margin: 0 0 1.25rem 0;
+        max-width: 40rem;
+    }
+
+    .pcs-hero-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem 1.25rem;
+        padding-top: 0.25rem;
+    }
+
+    .pcs-hero-stat {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .pcs-hero-stat strong {
+        color: #ffffff;
+        font-weight: 800;
     }
 
     /* ── Trust ── */
@@ -184,6 +214,192 @@ CUSTOM_CSS = """
         margin: 0;
     }
 
+    .pcs-pain-card {
+        background: var(--pcs-surface);
+        border: 1px solid var(--pcs-border);
+        border-top: 3px solid var(--pcs-accent-soft);
+        border-radius: var(--pcs-radius);
+        padding: 1.15rem 1.2rem;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(15, 28, 46, 0.04);
+    }
+
+    .pcs-pain-card h4 {
+        color: var(--pcs-navy);
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 0 0 0.45rem 0;
+        line-height: 1.35;
+    }
+
+    .pcs-pain-card p {
+        color: var(--pcs-slate);
+        font-size: 0.86rem;
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    .pcs-outcome-card {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid var(--pcs-border);
+        border-radius: var(--pcs-radius);
+        padding: 1.35rem 1.25rem;
+        height: 100%;
+        box-shadow: 0 4px 16px rgba(15, 28, 46, 0.04);
+    }
+
+    .pcs-outcome-icon {
+        color: var(--pcs-accent-soft);
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 0.35rem;
+    }
+
+    .pcs-outcome-card h3 {
+        color: var(--pcs-navy);
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 0.45rem 0;
+    }
+
+    .pcs-outcome-card p {
+        color: var(--pcs-slate);
+        font-size: 0.88rem;
+        line-height: 1.58;
+        margin: 0;
+    }
+
+    .pcs-comparison-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--pcs-border);
+        border-radius: var(--pcs-radius);
+        background: var(--pcs-surface);
+        box-shadow: 0 4px 16px rgba(15, 28, 46, 0.04);
+    }
+
+    .pcs-comparison {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+    }
+
+    .pcs-comparison th {
+        background: var(--pcs-navy);
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 1rem;
+        text-align: left;
+    }
+
+    .pcs-comparison th:first-child {
+        border-radius: 13px 0 0 0;
+    }
+
+    .pcs-comparison th:last-child {
+        border-radius: 0 13px 0 0;
+        background: #1a3d5c;
+    }
+
+    .pcs-comparison td {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid var(--pcs-border);
+        vertical-align: top;
+        line-height: 1.5;
+    }
+
+    .pcs-comparison tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pcs-cmp-topic {
+        font-weight: 700;
+        color: var(--pcs-navy);
+        width: 28%;
+    }
+
+    .pcs-cmp-diy {
+        color: var(--pcs-muted);
+        width: 36%;
+    }
+
+    .pcs-cmp-vector {
+        color: var(--pcs-ink);
+        font-weight: 600;
+        background: rgba(180, 83, 9, 0.04);
+        width: 36%;
+    }
+
+    .pcs-why-box {
+        background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 45%, #ffffff 100%);
+        border: 1px solid #fcd34d;
+        border-radius: 18px;
+        padding: 1.65rem 1.75rem;
+        box-shadow: 0 8px 28px rgba(180, 83, 9, 0.08);
+    }
+
+    .pcs-why-box h3 {
+        color: var(--pcs-navy);
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin: 0 0 0.65rem 0;
+    }
+
+    .pcs-why-intro {
+        color: var(--pcs-slate);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0 0 1rem 0;
+    }
+
+    .pcs-why-point {
+        margin-bottom: 0.85rem;
+        padding-left: 0.15rem;
+    }
+
+    .pcs-why-point strong {
+        display: block;
+        color: var(--pcs-navy);
+        font-size: 0.92rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .pcs-why-point p {
+        color: var(--pcs-slate);
+        font-size: 0.88rem;
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    .pcs-why-roi {
+        color: var(--pcs-accent-hover);
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin: 0.75rem 0 0 0;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(252, 211, 77, 0.6);
+    }
+
+    .pcs-mid-cta {
+        background: linear-gradient(135deg, var(--pcs-navy) 0%, var(--pcs-navy-light) 100%);
+        border-radius: 16px;
+        padding: 1.35rem 1.5rem;
+        text-align: center;
+        box-shadow: var(--pcs-shadow);
+        margin-bottom: 0.5rem;
+    }
+
+    .pcs-mid-cta-text strong {
+        display: block;
+        color: #ffffff;
+        font-size: 1.05rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .pcs-mid-cta-text span {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.88rem;
+    }
+
     .pcs-badge {
         display: inline-block;
         background: rgba(255, 255, 255, 0.12);
@@ -217,7 +433,15 @@ CUSTOM_CSS = """
     .pcs-price-sub {
         color: var(--pcs-muted);
         font-size: 0.88rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .pcs-price-guarantee {
+        color: var(--pcs-accent-hover);
+        font-size: 0.8rem;
+        font-weight: 700;
         margin-bottom: 1rem;
+        letter-spacing: 0.01em;
     }
 
     .pcs-price-includes {
@@ -350,6 +574,16 @@ CUSTOM_CSS = """
         font-size: 1.2rem;
         padding-top: 0.55rem;
         flex-shrink: 0;
+    }
+
+    @media (max-width: 720px) {
+        .pcs-brand-title { font-size: 2.25rem; }
+        .pcs-hero-headline { font-size: 1.28rem !important; }
+        .pcs-hero { padding: 2rem 1.35rem; }
+        .pcs-flow-arrow { display: none; }
+        .pcs-flow-step { min-width: 46%; max-width: 48%; }
+        .pcs-comparison { font-size: 0.8rem; }
+        .pcs-comparison th, .pcs-comparison td { padding: 0.6rem 0.65rem; }
     }
 
     /* ── Form ── */

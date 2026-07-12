@@ -41,8 +41,8 @@ def render_sidebar() -> str:
     """Render sidebar navigation and return the selected page."""
     with st.sidebar:
         st.markdown("## PCS Vector")
-        st.caption("Your PCS game plan — ready before the boxes are packed.")
-        st.caption("Built by Soldiers for Soldiers and their families")
+        st.caption("Decision-grade PCS planning for Army families.")
+        st.caption("Built by a serving Army officer · Independent tool")
 
         st.divider()
 
@@ -59,14 +59,15 @@ def render_sidebar() -> str:
         with st.expander("About this service", expanded=False):
             st.markdown(
                 """
-                **PCS Vector** helps CONUS Army families plan their move
-                with confidence.
+                **PCS Vector** turns your family's PCS inputs into a
+                personalized strategic plan — housing, schools, spouse career,
+                finances, and sequenced next steps.
 
-                - Personalized 8-section strategic report
-                - Optimized for Fort Bragg, Fort Hood, Fort Drum & Fort Gordon
-                - $25 per report (Stripe Checkout)
-                - PDF emailed automatically after payment
-                - Retrieve paid reports with your order reference
+                - 8-section decision-grade report
+                - 22 major CONUS Army installations
+                - $25 one-time (Stripe Checkout)
+                - PDF emailed automatically
+                - Retrieve anytime with your order reference
                 """
             )
 
