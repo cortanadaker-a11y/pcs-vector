@@ -39,6 +39,7 @@ from components.form_state import (
     validate_form,
     validate_form_step,
 )
+from components.content import CTA
 from components.payment_handler import queue_checkout_redirect, render_checkout_redirect
 from views.payment_cancelled import render_payment_cancelled_banner
 from services.stripe_payment import StripePaymentError, create_checkout_session, get_price_display
@@ -501,6 +502,10 @@ def render_input_form() -> None:
         st.markdown("<br>", unsafe_allow_html=True)
         with st.container(border=True):
             _render_specific_concerns()
+        st.markdown(
+            f'<div class="pcs-pay-reassurance">{safe_html(CTA["form_pay_reassurance"])}</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown('<div class="pcs-form-nav">', unsafe_allow_html=True)
     st.markdown(

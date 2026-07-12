@@ -9,6 +9,7 @@ from components.payment_handler import (
     get_order_reference,
     sync_payment_receipt,
 )
+from components.loading_ui import render_generation_loading_panel
 from components.sidebar import navigate_to
 from services.stripe_payment import get_price_display
 
@@ -78,28 +79,19 @@ def render_order_reference_recovery() -> None:
             navigate_to("retrieve")
 
 
-def generate_report_with_loading(generate_fn) -> str | None:
-    """Run Grok report generation inside a visible loading status block."""
-    with st.status(
-        "Generating your personalized PCS Vector report…",
-        expanded=True,
-    ) as status:
-        st.write("Reviewing your move details and priorities…")
-        st.write("Analyzing housing, BAH, and local neighborhoods…")
-        st.write("Building spouse career and school recommendations…")
-        st.write("Finalizing your action plan and timeline…")
-        try:
-            report = generate_fn()
-            status.update(
-                label="Report ready!",
-                state="complete",
-                expanded=False,
-            )
-            return report
-        except Exception as exc:
-            status.update(
-                label="Report generation failed",
-                state="error",
-                expanded=True,
-            )
-            raise exc
+def generate_report_with_loading(generate_fn, *, form_data: dict | None = None) -> str | None:
+    """Run Grok report generation with a premium loading panel."""
+    render_generation_loading_panel(form_data)
+    placeholder = st.empty()
+    with placeholder.container():
+        with st.status("Generating your personalized plan…", expanded=False) as status:
+            st.caption("Hang tight — we're tailoring all eight sections to your family.")
+            try:
+                report = generate_fn()
+                status.update(label="Your plan is ready", state="complete", expanded=False)
+                return report
+            except Exception as exc:
+                status.update(label="Report generation failed", state="error", expanded=True)
+                raise exc
+            finally:
+                placeholder.empty()

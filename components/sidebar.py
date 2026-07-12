@@ -61,7 +61,7 @@ def render_sidebar() -> str:
                 """
                 **PCS Vector** turns your family's PCS inputs into a
                 personalized strategic plan — housing, schools, spouse career,
-                finances, and sequenced next steps.
+                finances, and time-bound next steps.
 
                 - 8-section decision-grade report
                 - 22 major CONUS Army installations

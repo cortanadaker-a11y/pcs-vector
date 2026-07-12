@@ -16,6 +16,12 @@ _REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"soldier_context\.\w+", re.I), ""),
     (re.compile(r"\bLeverage_programs\b"), "ACS and military spouse programs"),
     (re.compile(r"\bleverage_programs\b"), "ACS and military spouse programs"),
+    (re.compile(r"\bcritical path\b", re.I), "main priority"),
+    (re.compile(r"\bparallel-tracking\b", re.I), "running in parallel"),
+    (re.compile(r"\bsequenced task\b", re.I), "timed sequence"),
+    (re.compile(r"\bsequenced process\b", re.I), "step-by-step plan"),
+    (re.compile(r"\bsequencing\b", re.I), "timing"),
+    (re.compile(r"\bsequenced\b", re.I), "timed"),
     (re.compile(r"  +"), " "),
 )
 

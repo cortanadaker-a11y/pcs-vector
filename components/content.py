@@ -6,16 +6,21 @@ INSTALLATION_COUNT = len(SUPPORTED_INSTALLATIONS)
 
 HERO = {
     "kicker": "Your PCS. Your family. One clear plan.",
-    "headline": "Orders dropped — now give your family a plan worth following",
+    "headline": "Stop guessing your PCS — get a plan your whole family can follow",
     "subheadline": (
-        "PCS Vector builds a decision-grade strategic plan around your real priorities: "
-        "where to live, how to protect spouse income, which schools work, and what to do "
-        "in the first 30 days — so you're leading the move instead of reacting to it."
+        "PCS Vector turns your real inputs into a personalized strategic plan: where to live, "
+        "how to protect spouse income, which schools work, and what to tackle in the first "
+        "30 days — written like advice from a senior NCO who's done this move."
     ),
     "outcome_line": (
-        "Walk in with confidence · Move as a team · Stop paying for guesswork"
+        "Built for E-5 through W-3 families · 6–8 minute intake · Plan in your inbox tonight"
     ),
 }
+
+AUDIENCE_STRIP = (
+    "For Soldiers and families juggling spouse careers, school zones, BAH math, and a hard report date — "
+    "not another generic checklist."
+)
 
 TRUST_SIGNALS = {
     "banner": "Built For Soldiers; By Soldiers",
@@ -52,6 +57,10 @@ CTA = {
     "hero": "Build My Family's PCS Plan →",
     "mid": "I'm Ready — Build My Plan →",
     "caption": "One-time payment · 6–8 minute form · Plan in your inbox minutes later",
+    "form_pay_reassurance": (
+        "You'll review everything on the next screen, then pay once through Stripe. "
+        "No subscription. Your report generates immediately after payment."
+    ),
 }
 
 PAIN_POINTS = [
@@ -61,7 +70,7 @@ PAIN_POINTS = [
     },
     {
         "title": "The income gap nobody budgets for",
-        "desc": "Spouse licensure, childcare waitlists, and deposit timing stack up fast — generic checklists don't sequence them.",
+        "desc": "Spouse licensure, childcare waitlists, and deposit timing stack up fast — generic checklists never connect them to your actual timeline.",
     },
     {
         "title": "The timeline that won't wait",
@@ -81,8 +90,8 @@ OUTCOME_BENEFITS = [
     {
         "title": "Move as a family unit",
         "desc": (
-            "Spouse career, school zoning, and childcare are sequenced together in "
-            "a PDF you can hand your partner and say: this is our plan."
+            "Spouse career, school zoning, and childcare land in one PDF you can "
+            "hand your partner and say: this is our plan."
         ),
         "icon": "→",
     },
@@ -98,7 +107,7 @@ OUTCOME_BENEFITS = [
 
 DIY_VS_VECTOR = [
     {"label": "Facebook groups & Reddit threads", "diy": "Hours of conflicting opinions", "vector": "One synthesized plan for your family"},
-    {"label": "Generic PCS checklists", "diy": "Tasks without dependencies", "vector": "Decision gates and sequenced actions"},
+    {"label": "Generic PCS checklists", "diy": "Tasks without dependencies", "vector": "Decision gates and timed action phases"},
     {"label": "Housing sites alone", "diy": "Rent vs BAH once", "vector": "6-month surplus, utilities, and school-zone tradeoffs"},
     {"label": "Spouse job boards", "diy": "Apply and hope", "vector": "Licensure timeline, fast-tracks, and military spouse leverage"},
 ]
@@ -154,7 +163,7 @@ REPORT_SECTIONS = [
     {
         "num": 5,
         "title": "First 30 Days Action Plan",
-        "desc": "Phased Soldier and Spouse tasks with decision gates — parallel execution, not a generic checklist.",
+        "desc": "Phased Soldier and Spouse tasks with clear decision gates — not a generic checklist.",
     },
     {
         "num": 6,
@@ -181,10 +190,74 @@ HOW_IT_WORKS_STEPS = [
 ]
 
 REPORT_HIGHLIGHTS = [
-    "“Lock off-post in Hope Mills before arrival — $644 BAH surplus with Cumberland County school access.”",
-    "“Run partial DITY: $2,179 net on 7,000 lbs — lower risk than full truck with kids and pets.”",
-    "“Spouse: substitute pool + lateral-entry in parallel — 4-week licensure delay costs $3,600.”",
-    "“If childcare isn't locked by day 21, the entire employment timeline slips — submit DD 2606 day one.”",
+    "“I'd lock off-post in Hope Mills before you arrive — $644 BAH surplus and Cumberland County school access.”",
+    "“Run partial DITY here: about $2,179 net on 7,000 lbs — less risk than a full truck with kids and pets.”",
+    "“Your spouse should hit the substitute pool while lateral-entry clears — a four-week licensure delay costs $3,600.”",
+    "“If childcare isn't locked by day 21, the employment timeline slips — get DD 2606 in day one.”",
+]
+
+SPOUSE_SHARE_TEASE = (
+    "Every report ends with a spouse-share line you can forward as-is — "
+    "so you're both working the same plan, not re-explaining it at the kitchen table."
+)
+
+REPORT_PREVIEW = {
+    "headline": "Preview your report before you pay",
+    "subhead": (
+        "Every plan follows this eight-section structure — written for your family, "
+        "your installation, and your priorities. Here's what the finished product looks like."
+    ),
+    "sample_meta": "Sample · E-5 family · Fort Riley → Fort Campbell · minimizing total costs",
+    "blur_note": "Your report uses your actual BAH, zip codes, spouse career field, and move window.",
+    "visible_sections": [
+        {
+            "num": "1",
+            "title": "Executive Summary & Recommended Strategy",
+            "lines": [
+                "Marcus, I'd lock off-post in Clarksville (37042) before you report — "
+                "it hits your school-quality priority and keeps you under the $2,200 monthly cap.",
+                "Hopkinsville is the backup if inventory tightens; on-post DODEA if zoning slips.",
+                "The biggest risk is signing without written school-zone confirmation — "
+                "miss that and you could be rezoning mid-year at your own expense.",
+            ],
+        },
+        {
+            "num": "3",
+            "title": "Housing Strategy & Cost Tradeoffs",
+            "lines": [],
+            "table": [
+                {"label": "On-post", "value": "$0 (BAH absorbed)", "note": "Shortest commute"},
+                {"label": "Clarksville low", "value": "+$708/mo surplus", "note": "Verify zoning first"},
+                {"label": "Clarksville high", "value": "+$308/mo surplus", "note": "Faster summer turnover"},
+            ],
+        },
+        {
+            "num": "5",
+            "title": "First 30 Days Action Plan",
+            "lines": [
+                "Days 1–5 · Gate: If school zoning letters are requested by day 5 — "
+                "otherwise you risk signing a lease that blocks enrollment.",
+                "Days 6–15 · Gate: If lease includes written school-zone confirmation by day 15 — "
+                "otherwise shift to on-post backup.",
+            ],
+        },
+    ],
+    "blurred_sections": [
+        {"num": "2", "title": "Spouse Career & Childcare Plan"},
+        {"num": "4", "title": "Financial Opportunities & DITY/PPM"},
+        {"num": "6", "title": "Schools, Pets & Logistics Notes"},
+        {"num": "7", "title": "Timeline & Key Decisions"},
+        {"num": "8", "title": "Prioritized Next Steps"},
+    ],
+}
+
+REPORT_GENERATION_STEPS = [
+    {"id": "inputs", "label": "Reviewing your move details and priorities"},
+    {"id": "housing", "label": "Analyzing housing, BAH, and local neighborhoods"},
+    {"id": "spouse", "label": "Building spouse career and childcare recommendations"},
+    {"id": "finance", "label": "Running cash-flow and DITY/PPM math"},
+    {"id": "timeline", "label": "Drafting your 30-day action plan and decision gates"},
+    {"id": "finalize", "label": "Polishing your executive summary and next steps"},
 ]
 
 TESTIMONIAL = {
@@ -208,7 +281,7 @@ FAQ_ITEMS = [
     {
         "q": "What do I get for $25?",
         "a": "A personalized 8-section PCS strategic plan written in a direct, senior-advisor tone — "
-        "not a generic checklist. You get clear recommendations, risk analysis, and sequenced next steps "
+        "not a generic checklist. You get clear recommendations, risk analysis, and time-bound next steps "
         "based on your family's inputs. View it in the app and receive a professional PDF by email. "
         "One report per purchase.",
     },

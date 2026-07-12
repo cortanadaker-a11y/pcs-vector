@@ -3,6 +3,7 @@
 import streamlit as st
 
 from components.content import (
+    AUDIENCE_STRIP,
     CTA,
     DIY_VS_VECTOR,
     HERO,
@@ -14,11 +15,13 @@ from components.content import (
     PRICING_INCLUDES,
     REPORT_HIGHLIGHTS,
     REPORT_SECTIONS,
+    SPOUSE_SHARE_TEASE,
     TESTIMONIAL,
     TRUST_SIGNALS,
     WHY_25,
 )
 from components.faq import render_faq
+from components.report_preview import render_report_preview
 from components.html_utils import safe_html, safe_markdown
 from components.sidebar import navigate_to
 from services.stripe_payment import get_price_display
@@ -78,6 +81,7 @@ def _render_trust_signals() -> None:
         f"""
         <div class="pcs-trust-banner">{safe_html(TRUST_SIGNALS["banner"])}</div>
         <div class="pcs-trust-row">{badges}</div>
+        <div class="pcs-audience-strip">{safe_html(AUDIENCE_STRIP)}</div>
         """,
         unsafe_allow_html=True,
     )
@@ -193,6 +197,7 @@ def _render_report_sections() -> None:
 
 def _render_example_highlights() -> None:
     st.markdown("### This is the kind of clarity you get")
+    st.caption(safe_markdown(SPOUSE_SHARE_TEASE))
 
     for quote in REPORT_HIGHLIGHTS:
         st.markdown(f'<div class="pcs-highlight">{safe_html(quote)}</div>', unsafe_allow_html=True)
@@ -276,6 +281,9 @@ def render_home() -> None:
     st.markdown("<br>", unsafe_allow_html=True)
 
     _render_how_it_works(price)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    render_report_preview()
     st.markdown("<br>", unsafe_allow_html=True)
 
     _render_mid_cta(price)

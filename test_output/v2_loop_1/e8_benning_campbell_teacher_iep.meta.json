@@ -1,0 +1,17 @@
+{
+  "chars": 7056,
+  "char_ok": true,
+  "sections": 8,
+  "has_spouse_share": true,
+  "has_upside": false,
+  "has_gate": true,
+  "has_you": true,
+  "banned_hits": [],
+  "template_opener": false,
+  "both_children_iep": false,
+  "onpost_surplus_bug": false,
+  "generic_commander": true,
+  "leaks": 0,
+  "checklist_paste": false,
+  "scenario": "e8_benning_campbell_teacher_iep"
+}

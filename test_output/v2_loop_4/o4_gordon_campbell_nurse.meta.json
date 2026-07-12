@@ -1,0 +1,17 @@
+{
+  "chars": 6193,
+  "char_ok": true,
+  "sections": 8,
+  "has_spouse_share": true,
+  "has_upside": false,
+  "has_gate": true,
+  "has_you": true,
+  "banned_hits": [],
+  "template_opener": false,
+  "both_children_iep": false,
+  "onpost_surplus_bug": false,
+  "generic_commander": false,
+  "leaks": 0,
+  "checklist_paste": false,
+  "scenario": "o4_gordon_campbell_nurse"
+}

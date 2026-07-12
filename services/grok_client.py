@@ -41,7 +41,7 @@ def call_grok(system_prompt: str, user_prompt: str) -> str:
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.4,
-        "max_completion_tokens": 6000,
+        "max_completion_tokens": 8000,
     }
 
     try:
