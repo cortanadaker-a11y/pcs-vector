@@ -1,0 +1,7 @@
+{
+  "scenario": "e5_hood_remote",
+  "loop": 3,
+  "chars": 5962,
+  "sections": 8,
+  "has_table": true
+}

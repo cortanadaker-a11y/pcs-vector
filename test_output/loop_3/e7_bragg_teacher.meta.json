@@ -1,0 +1,7 @@
+{
+  "scenario": "e7_bragg_teacher",
+  "loop": 3,
+  "chars": 6613,
+  "sections": 8,
+  "has_table": true
+}

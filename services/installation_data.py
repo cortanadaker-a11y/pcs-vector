@@ -34,6 +34,9 @@ class InstallationProfile:
     housing: HousingMarket
     school_districts: tuple[str, ...]
     spouse_employment_notes: tuple[str, ...]
+    childcare_notes: tuple[str, ...]
+    spouse_programs: tuple[str, ...]
+    vehicle_registration_note: str
     climate_note: str
     commute_hotspots: tuple[str, ...]
 
@@ -179,8 +182,18 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         spouse_employment_notes=(
             "Cape Fear Valley Health, Cumberland County Schools, and retail along Skibo Rd hire steadily",
             "Remote work viable with good broadband in Hope Mills / Fayetteville suburbs",
-            "NC teaching license reciprocity available — start licensure packet early",
+            "NC teaching license reciprocity available — start licensure packet early (4–8 weeks typical)",
         ),
+        childcare_notes=(
+            "Fort Bragg CDC waitlists: 30–90 days for school-age; infant/toddler slots often 60–120 days",
+            "Family Child Care (FCC) homes in Hope Mills/Spring Lake often have 2–4 week openings",
+            "Submit CDC request (DD Form 2606) same day orders drop; ask ACS for current wait times",
+        ),
+        spouse_programs=(
+            "MSEP and My Career Advancement Account (MyCAA) for licensure/certification costs",
+            "Hiring Our Heroes fellowship and ACS spouse employment workshops at Soldier Support Center",
+        ),
+        vehicle_registration_note="NC DMV: register within 30 days of establishing residency; bring title, insurance, and military orders.",
         climate_note="Mild winters; summer humidity drives higher AC costs off-post.",
         commute_hotspots=("All-American Fwy", "Bragg Blvd", "Murchison Rd gate"),
     ),
@@ -223,8 +236,18 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         spouse_employment_notes=(
             "Carl R. Darnall Army Medical Center, Killeen ISD, and on-post NAF roles",
             "Retail and service hiring along Veterans Memorial Blvd and Market Heights",
-            "Remote work viable with good broadband in Harker Heights / Copperas Cove",
+            "Remote work viable with good broadband in Harker Heights / Copperas Cove (200+ Mbps common)",
         ),
+        childcare_notes=(
+            "Fort Hood CDC waitlists: 45–90 days for infants; school-age often 30–60 days in summer PCS surge",
+            "FCC providers in Harker Heights and Copperas Cove are the fastest backup",
+            "Submit CDC paperwork at in-processing; priority categories apply for dual-military and deployed sponsors",
+        ),
+        spouse_programs=(
+            "ACS Employment Readiness Program and Fort Hood Spouse Employment Center",
+            "MSEP partners include CRDAMC and Killeen ISD for expedited hiring",
+        ),
+        vehicle_registration_note="Texas: register within 30 days; no state income tax but property tax applies to vehicles in some counties.",
         climate_note="Hot summers drive higher AC costs off-post; mild winters rarely spike heating bills.",
         commute_hotspots=("US-190", "Trimmier Rd", "Clear Creek Rd gate"),
     ),
@@ -266,9 +289,19 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         ),
         spouse_employment_notes=(
             "Samaritan Medical Center, Jefferson County schools, and on-post NAF roles",
-            "Seasonal tourism and Fort Drum contracting cycles create bursts of hiring",
+            "NY nursing endorsement: 4–8 weeks typical; temporary permit possible in 2–3 weeks",
             "Remote work works well; winter travel for in-person roles needs planning",
         ),
+        childcare_notes=(
+            "Fort Drum CDC infant/toddler waitlists routinely 3–6 months — submit DD 2606 immediately",
+            "FCC homes in Evans Mills/Le Ray often have 2–4 week openings as parallel track",
+            "Peak summer PCS surge can add 30+ days to any childcare slot",
+        ),
+        spouse_programs=(
+            "ACS Spouse Employment and Fort Drum Military Spouse Preference for on-post NAF roles",
+            "MyCAA covers nursing CEU/certification costs where eligible",
+        ),
+        vehicle_registration_note="NY DMV: register within 30 days; emissions/safety inspection required — post auto skills center can assist.",
         climate_note="Lake-effect snow and heating costs are real budget factors — factor into off-post choice.",
         commute_hotspots=("Route 11", "Route 26", "California Rd gate"),
     ),
@@ -311,8 +344,18 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         spouse_employment_notes=(
             "AU Health, Columbia County schools, and Augusta cyber/defense contractors hire steadily",
             "Remote work viable with strong broadband in Evans and Grovetown",
-            "GA teaching license reciprocity available — start licensure packet early",
+            "GA teaching/nursing license reciprocity available — start packet early (4–6 weeks typical)",
         ),
+        childcare_notes=(
+            "Fort Gordon CDC waitlists: 30–75 days depending on age group; summer PCS surge tightens slots",
+            "FCC providers in Evans/Martinez corridor are fastest backup for toddlers",
+            "Submit CDC request at in-processing; dual-military families may qualify for priority",
+        ),
+        spouse_programs=(
+            "ACS Employment Readiness and Augusta cyber corridor MSEP hiring events",
+            "MyCAA for spouse licensure and certification in healthcare/education fields",
+        ),
+        vehicle_registration_note="GA DMV: register within 30 days; TAVT (title ad valorem tax) applies to new residents registering vehicles.",
         climate_note="Hot, humid summers drive AC costs; mild winters with occasional ice on bridges.",
         commute_hotspots=("Gordon Hwy", "Jimmie Dyess Pkwy", "Gate 1 / Gate 3 corridors"),
     ),
@@ -361,9 +404,63 @@ DEFAULT_INSTALLATION = InstallationProfile(
     spouse_employment_notes=(
         "Check local hospital systems, school districts, and remote-work feasibility",
     ),
+    childcare_notes=(
+        "Contact installation ACS for current CDC waitlist estimates",
+        "FCC homes are typically the fastest backup for infants and toddlers",
+    ),
+    spouse_programs=(
+        "ACS Employment Readiness Program and MSEP at most installations",
+        "MyCAA for eligible spouse licensure and certification costs",
+    ),
+    vehicle_registration_note="Register vehicles within 30 days of establishing residency in the new state.",
     climate_note="Local weather affects utility costs and commute reliability.",
     commute_hotspots=("Main gate corridors at peak duty hours",),
 )
+
+
+# Approximate CONUS driving distances for DITY/PPM planning (miles, one-way).
+MOVE_ROUTE_MILES: dict[tuple[str, str], int] = {
+    ("Fort Hood, TX", "Fort Bragg, NC"): 1180,
+    ("Fort Bragg, NC", "Fort Hood, TX"): 1180,
+    ("Fort Gordon, GA", "Fort Drum, NY"): 980,
+    ("Fort Drum, NY", "Fort Gordon, GA"): 980,
+    ("Fort Bragg, NC", "Fort Drum, NY"): 780,
+    ("Fort Drum, NY", "Fort Bragg, NC"): 780,
+    ("Fort Hood, TX", "Fort Drum, NY"): 1580,
+    ("Fort Gordon, GA", "Fort Bragg, NC"): 320,
+    ("Fort Bragg, NC", "Fort Gordon, GA"): 320,
+    ("Fort Hood, TX", "Fort Gordon, GA"): 860,
+    ("Fort Gordon, GA", "Fort Hood, TX"): 860,
+}
+
+
+def build_move_context(current_label: str, gaining_label: str) -> dict:
+    """Return move-distance context for DITY/TLE planning."""
+    current = INSTALLATION_ALIASES.get(current_label, current_label)
+    gaining = INSTALLATION_ALIASES.get(gaining_label, gaining_label)
+    miles = MOVE_ROUTE_MILES.get((current, gaining))
+    if miles is None:
+        return {
+            "origin": current_label,
+            "destination": gaining_label,
+            "approximate_miles_one_way": None,
+            "dity_planning_note": (
+                "Verify distance with TMO; for CONUS moves over 500 miles, "
+                "full or partial DITY often nets $1,500–5,000 after expenses."
+            ),
+        }
+    driving_days = max(2, round(miles / 500))
+    return {
+        "origin": current_label,
+        "destination": gaining_label,
+        "approximate_miles_one_way": miles,
+        "estimated_driving_days": driving_days,
+        "dity_planning_note": (
+            f"~{miles} miles one-way ({driving_days} driving days). "
+            "Partial DITY (HHG only) often nets $1,200–3,000; full DITY can add "
+            "$1,500–4,000 if weight allowance is maximized — verify with TMO."
+        ),
+    }
 
 
 def resolve_installation(gaining_label: str) -> InstallationProfile:
@@ -403,6 +500,15 @@ def build_installation_context(profile: InstallationProfile, pay_grade: str) -> 
         "utility_note": profile.housing.utility_note,
         "school_districts": list(profile.school_districts),
         "spouse_employment_leads": list(profile.spouse_employment_notes),
+        "childcare_waitlist_notes": list(profile.childcare_notes),
+        "military_spouse_programs": list(profile.spouse_programs),
+        "vehicle_registration_note": profile.vehicle_registration_note,
         "climate_and_cost_note": profile.climate_note,
         "commute_hotspots": list(profile.commute_hotspots),
+        "housing_table_guidance": {
+            "on_post_out_of_pocket_rent_usd": 0,
+            "on_post_note": "Assigned government housing — BAH is absorbed; no monthly rent payment.",
+            "use_rent_low_for_surplus_calc": bah - rent_low,
+            "use_rent_high_for_shortfall_calc": bah - rent_high,
+        },
     }

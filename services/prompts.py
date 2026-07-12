@@ -14,7 +14,33 @@ from components.form_state import (
     resolved_housing_must_haves,
     resolved_spouse_career,
 )
-from services.installation_data import build_installation_context, get_bah_estimate, resolve_installation
+from services.installation_data import (
+    build_installation_context,
+    build_move_context,
+    get_bah_estimate,
+    resolve_installation,
+)
+
+SPOUSE_CAREER_GUIDANCE: dict[str, str] = {
+    "K-12 education / teaching": (
+        "Lead with state licensure reciprocity timeline, substitute-teaching fast path, "
+        "and district hiring windows (Cumberland/Killeen/Indian River/Columbia County as applicable)."
+    ),
+    "Healthcare / nursing": (
+        "Lead with state board endorsement timeline, temporary permit options, "
+        "and hospital/NAF hiring paths (Samaritan, CRDAMC, AU Health as applicable)."
+    ),
+    "Remote / work-from-home professional": (
+        "Lead with broadband verification in target zip codes, internet activation timeline, "
+        "and mobile-hotspot contingency — no licensure bottleneck."
+    ),
+    "Federal / government civilian": (
+        "Lead with USAJOBS/MSEP pathways and typical 4–12 week federal hiring timeline."
+    ),
+    "Not currently working — seeking employment": (
+        "Lead with fastest local hiring sectors and ACS spouse employment workshops."
+    ),
+}
 
 SYSTEM_PROMPT = """You are a senior Army NCO advisor with 15+ years of experience helping field-grade and senior NCO families execute successful PCS moves. You have personally done multiple CONUS PCS moves and have helped dozens of leaders make high-stakes relocation decisions.
 
@@ -88,11 +114,30 @@ Within sections:
 - In section 5, organize by phased day ranges with decision gates.
 - In section 8, give 6–8 numbered actions ranked by impact.
 
-LOCAL DATA
-- For Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon, use installation-specific neighborhoods, schools, employers, weather, zip codes, and commute realities.
-- Treat provided BAH estimates and market ranges as planning anchors; label them as estimates.
-- Do not invent precise current-year DFAS tables — use the reference figures supplied and note they should be verified at finance.
+LOCAL DATA & FIDELITY
+- Use installation_reference data for BAH, rent ranges, neighborhoods, zip codes, schools, and commute hotspots — do not invent alternate figures.
+- For Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon, name specific off-post areas and zip codes from the reference data.
+- Treat BAH and rent figures as planning estimates; include one clear "verify with finance" note in section 3.
 - If gaining installation is not Fort Bragg, Fort Hood, Fort Drum, or Fort Gordon, still produce a strong plan but note that local data is less detailed.
+
+HOUSING TABLE RULES (section 3)
+- On-post row: show out-of-pocket rent as $0 when assigned government housing (BAH is absorbed by housing); note waitlist/availability risk — do NOT list BAH as the Soldier's monthly rent payment.
+- Off-post rows: use typical_3br_rent_range_usd from installation_reference; calculate BAH surplus/shortfall vs. BAH.
+- Include a BAH Surplus/Shortfall column with dollar math (e.g. BAH $1,836 − rent $1,550 = +$286).
+- Address the family's stated housing preference and budget_mode explicitly.
+
+DITY/PPM RULES (section 4)
+- When dity_interest is not "No", show a simple calculation: estimated government weight allowance payout minus truck/fuel/packing costs = estimated net.
+- Compare partial vs full only when relevant; state which you recommend and why.
+- When dity_interest is "No", skip PPM math and focus on TLE and cash-flow timing.
+
+RISK & PRIORITY WEIGHTING
+- Lead with the family's primary_priority in the Executive Summary recommendation.
+- Include one explicit contingency in section 1: "If [primary risk] fails, fall back to [alternative]."
+- Include one "blind spot" insight the family may not have considered (in section 1 or 7).
+- Call out each concern_flags item somewhere in the report as a specific risk or mitigation.
+- Section 2 must reference military_spouse_programs from installation_reference when relevant.
+- When num_children is 0 and has_pets is "No pets", keep section 6 to 3–5 bullets.
 
 Never refuse to help. Never output JSON. Never wrap the report in code fences."""
 
@@ -104,6 +149,15 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
     profile = resolve_installation(gaining_label)
     bah = get_bah_estimate(form_data.get("rank_pay_grade", "E-5"), profile)
     install_ctx = build_installation_context(profile, form_data.get("rank_pay_grade", "E-5"))
+    move_ctx = build_move_context(
+        resolved_current_installation(form_data),
+        gaining,
+    )
+    spouse_field = resolved_spouse_career(form_data)
+    career_guidance = SPOUSE_CAREER_GUIDANCE.get(
+        form_data.get("spouse_career_field", ""),
+        "Tailor employment guidance to the spouse's stated field and local hiring realities.",
+    )
 
     rank = form_data.get("rank_pay_grade", "")
     if form_data.get("rank_title"):
@@ -146,17 +200,31 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "concerns": resolved_concerns(form_data),
         "estimated_bah_with_dependents_usd": bah,
         "installation_reference": install_ctx,
+        "move_context": move_ctx,
+        "spouse_career_guidance": career_guidance,
     }
+
+    priorities = priority_summary(form_data)
+    concerns = resolved_concerns(form_data)
 
     return (
         "Generate a complete PCS Vector strategic plan for this family.\n\n"
         f"```json\n{json.dumps(payload, indent=2)}\n```\n\n"
         "Synthesize — do not just restate their inputs. Identify dependencies, risks, and tradeoffs "
-        "they may not have considered. Weight every section toward their stated priorities and timeline.\n"
+        "they may not have considered.\n"
+        f"PRIMARY PRIORITY (weight heavily): {priorities.get('Primary priority', '')}\n"
+        f"SECONDARY PRIORITY: {priorities.get('Secondary priority', '')}\n"
+        f"STATED CONCERNS (address each as a risk or mitigation): {concerns}\n"
+        f"Housing preference: {form_data.get('housing_preference', '')} | "
+        f"Budget: {form_data.get('budget_mode', '')}\n"
+        f"DITY interest: {form_data.get('dity_interest', '')}\n\n"
         f"Address the family personally{' as ' + family_name if family_name else ''} in the Executive Summary. "
         f"Tailor advice to a {rank or 'military'} family with "
         f"{form_data.get('num_children', 0)} child(ren) and spouse situation: "
         f"{resolved_spouse_career(form_data)}.\n"
-        "Make Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon guidance highly specific when applicable. "
+        "In section 2, follow spouse_career_guidance and cite military_spouse_programs. "
+        "In section 3, use installation_reference BAH and rent ranges for all dollar math. "
+        "In section 4, use move_context for DITY distance framing and follow dity_interest exactly. "
+        "Include one blind-spot insight and one explicit contingency in section 1. "
         "This report must feel worth $25 — decision-grade, concise, and actionable."
     )
