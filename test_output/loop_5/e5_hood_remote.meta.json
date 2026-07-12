@@ -1,0 +1,12 @@
+{
+  "scenario": "e5_hood_remote",
+  "loop": 5,
+  "chars": 6273,
+  "sections": 8,
+  "has_table": true,
+  "expected_bah": 1695,
+  "bah_cited": true,
+  "recommended_dity_mode": null,
+  "dity_formula_cited": null,
+  "expected_dity_net_partial": null
+}

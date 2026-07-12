@@ -12,6 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from services.bah_rates import get_bah_monthly
+from services.dity_calculator import build_dity_estimate
+from services.installation_data import build_move_context, resolve_installation
 from services.report_generator import generate_report  # noqa: E402
 
 SCENARIOS: dict[str, dict] = {
@@ -136,12 +139,42 @@ def main() -> None:
             report = generate_report(form)
             path = out_dir / f"{key}.md"
             path.write_text(report, encoding="utf-8")
+            gaining = form.get("gaining_installation", "")
+            pay_grade = form.get("rank_pay_grade", "E-5")
+            bah = get_bah_monthly(gaining, pay_grade)
+            move = build_move_context(
+                form.get("current_installation_preset", ""),
+                gaining,
+            )
+            dity = build_dity_estimate(
+                pay_grade,
+                move.get("approximate_miles_one_way"),
+                dity_interest=form.get("dity_interest", ""),
+                num_vehicles=form.get("num_vehicles", "1"),
+                num_children=int(form.get("num_children") or 0),
+                has_pets=form.get("has_pets") == "Yes — we have pets",
+            )
             meta = {
                 "scenario": key,
                 "loop": args.loop,
                 "chars": len(report),
                 "sections": report.count("## "),
                 "has_table": "|" in report and "---" in report,
+                "expected_bah": bah,
+                "bah_cited": (
+                    (str(bah) in report or f"{bah:,}" in report) if bah else None
+                ),
+                "recommended_dity_mode": dity.get("recommended_mode"),
+                "dity_formula_cited": (
+                    "lbs" in report.lower() and "expenses" in report.lower()
+                    if dity.get("applicable")
+                    else None
+                ),
+                "expected_dity_net_partial": (
+                    dity.get("partial_dity", {}).get("estimated_net_usd")
+                    if dity.get("applicable")
+                    else None
+                ),
             }
             (out_dir / f"{key}.meta.json").write_text(json.dumps(meta, indent=2))
             print(f"  OK — {meta['chars']} chars, {meta['sections']} sections, table={meta['has_table']}")

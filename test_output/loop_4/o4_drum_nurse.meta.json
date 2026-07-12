@@ -1,0 +1,11 @@
+{
+  "scenario": "o4_drum_nurse",
+  "loop": 4,
+  "chars": 5672,
+  "sections": 8,
+  "has_table": true,
+  "expected_bah": 2655,
+  "bah_cited": false,
+  "dity_formula_cited": true,
+  "expected_dity_net_partial": 2058
+}

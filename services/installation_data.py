@@ -470,13 +470,37 @@ def resolve_installation(gaining_label: str) -> InstallationProfile:
 
 
 def get_bah_estimate(pay_grade: str, profile: InstallationProfile) -> int:
-    """Return estimated monthly BAH with dependents."""
+    """Return monthly BAH with dependents (2026 DTMO rates when available)."""
+    from services.bah_rates import get_bah_monthly
+
+    live = get_bah_monthly(profile.display_name, pay_grade)
+    if live is not None:
+        return live
     return profile.bah_rates.get(pay_grade, profile.bah_rates.get("E-5", 1600))
+
+
+def get_bah_reference(pay_grade: str, profile: InstallationProfile) -> dict:
+    """Return BAH metadata including source and effective date."""
+    from services.bah_rates import get_bah_rate
+
+    ref = get_bah_rate(profile.display_name, pay_grade, with_dependents=True)
+    if ref.get("found"):
+        return ref
+    amount = profile.bah_rates.get(pay_grade, profile.bah_rates.get("E-5", 1600))
+    return {
+        "monthly_usd": amount,
+        "mha": profile.display_name,
+        "effective_date": "planning-fallback",
+        "source": "PCS Vector static fallback (update bah_2026.json)",
+        "with_dependents": True,
+        "found": True,
+    }
 
 
 def build_installation_context(profile: InstallationProfile, pay_grade: str) -> dict:
     """Serialize installation reference data for the Grok prompt."""
-    bah = get_bah_estimate(pay_grade, profile)
+    bah_ref = get_bah_reference(pay_grade, profile)
+    bah = bah_ref["monthly_usd"]
     rent_low, rent_high = profile.housing.avg_3br_rent_range
     return {
         "installation": profile.display_name,
@@ -491,6 +515,7 @@ def build_installation_context(profile: InstallationProfile, pay_grade: str) -> 
             "nearby_zip_codes": list(profile.nearby_zip_codes),
         },
         "estimated_bah_with_dependents_usd": bah,
+        "bah_reference": bah_ref,
         "typical_3br_rent_range_usd": {"low": rent_low, "high": rent_high},
         "bah_surplus_if_rent_at_low": bah - rent_low,
         "bah_gap_if_rent_at_high": bah - rent_high,

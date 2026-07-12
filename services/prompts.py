@@ -14,10 +14,12 @@ from components.form_state import (
     resolved_housing_must_haves,
     resolved_spouse_career,
 )
+from services.dity_calculator import build_dity_estimate
 from services.installation_data import (
     build_installation_context,
     build_move_context,
     get_bah_estimate,
+    get_bah_reference,
     resolve_installation,
 )
 
@@ -115,21 +117,25 @@ Within sections:
 - In section 8, give 6–8 numbered actions ranked by impact.
 
 LOCAL DATA & FIDELITY
-- Use installation_reference data for BAH, rent ranges, neighborhoods, zip codes, schools, and commute hotspots — do not invent alternate figures.
+- Use bah_reference.monthly_usd from installation_reference for ALL BAH dollar math — do not use outdated or invented BAH figures.
+- Cite the effective_date (2026-01-01) once in section 3 when stating BAH.
+- Use installation_reference data for rent ranges, neighborhoods, zip codes, schools, and commute hotspots — do not invent alternate figures.
 - For Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon, name specific off-post areas and zip codes from the reference data.
-- Treat BAH and rent figures as planning estimates; include one clear "verify with finance" note in section 3.
+- Include one clear "verify with finance" note in section 3.
 - If gaining installation is not Fort Bragg, Fort Hood, Fort Drum, or Fort Gordon, still produce a strong plan but note that local data is less detailed.
 
 HOUSING TABLE RULES (section 3)
-- On-post row: show out-of-pocket rent as $0 when assigned government housing (BAH is absorbed by housing); note waitlist/availability risk — do NOT list BAH as the Soldier's monthly rent payment.
+- On-post row: show out-of-pocket rent as $0 when assigned government housing (BAH is absorbed by housing); note waitlist/availability risk — do NOT list BAH as rent payment or say BAH is "retained" as cash.
 - Off-post rows: use typical_3br_rent_range_usd from installation_reference; calculate BAH surplus/shortfall vs. BAH.
 - Include a BAH Surplus/Shortfall column with dollar math (e.g. BAH $1,836 − rent $1,550 = +$286).
 - Address the family's stated housing preference and budget_mode explicitly.
 
 DITY/PPM RULES (section 4)
-- When dity_interest is not "No", show a simple calculation: estimated government weight allowance payout minus truck/fuel/packing costs = estimated net.
-- Compare partial vs full only when relevant; state which you recommend and why.
-- When dity_interest is "No", skip PPM math and focus on TLE and cash-flow timing.
+- When dity_estimate.applicable is true, include a markdown table: Mode | Weight | Formula | Est. Net.
+- Reproduce the precomputed formula strings from partial_dity and full_dity exactly.
+- State recommended_mode and recommendation_reason from dity_estimate — do not override with full DITY when recommended_mode is partial.
+- If family_complexity_note is present, cite it when explaining the recommendation.
+- When dity_interest is "No", skip PPM math and focus on TLE and cash-flow timing per dity_estimate note.
 
 RISK & PRIORITY WEIGHTING
 - Lead with the family's primary_priority in the Executive Summary recommendation.
@@ -147,11 +153,21 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
     gaining_label = form_data.get("gaining_installation", "")
     gaining = resolved_gaining_installation(form_data)
     profile = resolve_installation(gaining_label)
-    bah = get_bah_estimate(form_data.get("rank_pay_grade", "E-5"), profile)
-    install_ctx = build_installation_context(profile, form_data.get("rank_pay_grade", "E-5"))
+    pay_grade = form_data.get("rank_pay_grade", "E-5")
+    bah = get_bah_estimate(pay_grade, profile)
+    bah_ref = get_bah_reference(pay_grade, profile)
+    install_ctx = build_installation_context(profile, pay_grade)
     move_ctx = build_move_context(
         resolved_current_installation(form_data),
         gaining,
+    )
+    dity_ctx = build_dity_estimate(
+        pay_grade,
+        move_ctx.get("approximate_miles_one_way"),
+        dity_interest=form_data.get("dity_interest", ""),
+        num_vehicles=form_data.get("num_vehicles", "1"),
+        num_children=int(form_data.get("num_children") or 0),
+        has_pets=form_data.get("has_pets") == "Yes — we have pets",
     )
     spouse_field = resolved_spouse_career(form_data)
     career_guidance = SPOUSE_CAREER_GUIDANCE.get(
@@ -199,8 +215,10 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         },
         "concerns": resolved_concerns(form_data),
         "estimated_bah_with_dependents_usd": bah,
+        "bah_reference": bah_ref,
         "installation_reference": install_ctx,
         "move_context": move_ctx,
+        "dity_estimate": dity_ctx,
         "spouse_career_guidance": career_guidance,
     }
 
@@ -223,8 +241,8 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         f"{form_data.get('num_children', 0)} child(ren) and spouse situation: "
         f"{resolved_spouse_career(form_data)}.\n"
         "In section 2, follow spouse_career_guidance and cite military_spouse_programs. "
-        "In section 3, use installation_reference BAH and rent ranges for all dollar math. "
-        "In section 4, use move_context for DITY distance framing and follow dity_interest exactly. "
+        "In section 3, use bah_reference.monthly_usd and installation_reference rent ranges for all dollar math. "
+        "In section 4, use dity_estimate formulas and recommended_mode when applicable. "
         "Include one blind-spot insight and one explicit contingency in section 1. "
         "This report must feel worth $25 — decision-grade, concise, and actionable."
     )
