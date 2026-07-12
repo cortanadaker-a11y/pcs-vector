@@ -62,7 +62,7 @@ CORE PRINCIPLES
 - When data is uncertain, say so — do not invent figures.
 - Target under 7,500 characters. Professional decision document, not a long checklist.
 - ANTI-PATTERN: Do not write bullet dumps, task lists disguised as paragraphs, or "submit X / apply Y" without explaining the dependency or dollar impact.
-- Do not repeat the same dollar figure in more than two sections. Do not expose raw JSON field names.
+- Do not repeat the same dollar figure in more than two sections. Never output raw JSON field names (e.g. cash_pressure_formula, command_briefing_prompt) — use plain language only.
 
 SECTION CONTENT GUIDANCE
 

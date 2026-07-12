@@ -142,6 +142,31 @@ _BAH_GORDON: dict[str, int] = {
     "Other": 1572,
 }
 
+_BAH_BLISS: dict[str, int] = {
+    "E-1": 1665,
+    "E-2": 1665,
+    "E-3": 1665,
+    "E-4": 1665,
+    "E-5": 1809,
+    "E-6": 2148,
+    "E-7": 2172,
+    "E-8": 2187,
+    "E-9": 2241,
+    "W-1": 2169,
+    "W-2": 2178,
+    "W-3": 2205,
+    "W-4": 2256,
+    "W-5": 2334,
+    "O-1": 1857,
+    "O-2": 2145,
+    "O-3": 2202,
+    "O-4": 2352,
+    "O-5": 2466,
+    "O-6": 2484,
+    "O-7+": 2496,
+    "Other": 1809,
+}
+
 INSTALLATIONS: dict[str, InstallationProfile] = {
     "Fort Bragg, NC": InstallationProfile(
         key="bragg",
@@ -359,6 +384,65 @@ INSTALLATIONS: dict[str, InstallationProfile] = {
         climate_note="Hot, humid summers drive AC costs; mild winters with occasional ice on bridges.",
         commute_hotspots=("Gordon Hwy", "Jimmie Dyess Pkwy", "Gate 1 / Gate 3 corridors"),
     ),
+    "Fort Bliss, TX": InstallationProfile(
+        key="bliss",
+        display_name="Fort Bliss, TX",
+        short_name="Fort Bliss",
+        legacy_name="Fort Bliss",
+        city="El Paso",
+        state="TX",
+        zip_code="79916",
+        latitude=31.8130,
+        longitude=-106.4220,
+        nearby_zip_codes=("79925", "79928", "79938", "79934"),
+        bah_rates=_BAH_BLISS,
+        housing=HousingMarket(
+            on_post_pros=(
+                "No rent out-of-pocket when assigned — strong value in El Paso market",
+                "Short commute to main post and WBAMC corridor",
+                "Utilities often included; desert climate reduces surprise heating bills",
+            ),
+            on_post_cons=(
+                "Waitlists spike before summer PCS — call housing day orders drop",
+                "Older neighborhoods on main post; newer villages farther from gates",
+                "Less floor-plan choice than off-post inventory",
+            ),
+            off_post_areas=(
+                "Northeast El Paso (79925) — 10–20 min to main gates, strong school options",
+                "Horizon City / East El Paso (79928) — newer builds, fenced yards common",
+                "West El Paso / Sunland Park corridor (79922) — verify commute to unit area",
+            ),
+            avg_3br_rent_range=(1250, 1650),
+            utility_note="Plan $120–$200/mo electric in summer; water is modest in desert climate.",
+        ),
+        school_districts=(
+            "El Paso ISD (largest footprint near main post)",
+            "Socorro ISD (Horizon City / east side — popular with military families)",
+            "Ysleta ISD (southeast corridor — verify zoning before lease)",
+        ),
+        spouse_employment_notes=(
+            "William Beaumont Army Medical Center and Fort Bliss NAF health roles hire steadily",
+            "El Paso Children's Hospital and Las Palmas Del Sol hire nurses with TX endorsement",
+            "Federal civilian roles at Bliss and border agencies post on USAJOBS year-round",
+        ),
+        childcare_notes=(
+            "Fort Bliss CDC waitlists: 30–90 days school-age; infant/toddler often 60–120 days",
+            "FCC homes in Northeast El Paso and Horizon City often open in 2–4 weeks",
+            "Submit DD Form 2606 before departure — summer PCS surge adds 30+ days if delayed",
+        ),
+        spouse_programs=(
+            "ACS Employment Readiness and Fort Bliss Spouse Employment Center",
+            "MSEP partners include WBAMC and EPISD for expedited hiring",
+            "MyCAA for spouse licensure and certification in healthcare/education fields",
+        ),
+        vehicle_registration_note=(
+            "Texas: register within 30 days; no state income tax but vehicle property tax applies."
+        ),
+        climate_note=(
+            "Desert heat drives summer AC costs; monsoon season (Jul–Sep) can disrupt commutes."
+        ),
+        commute_hotspots=("US-54", "Loop 375", "Cassidy Rd / Spur 601 gates"),
+    ),
 }
 
 # Map renamed or legacy labels to traditional installation keys used in the app.
@@ -431,6 +515,8 @@ MOVE_ROUTE_MILES: dict[tuple[str, str], int] = {
     ("Fort Bragg, NC", "Fort Gordon, GA"): 320,
     ("Fort Hood, TX", "Fort Gordon, GA"): 860,
     ("Fort Gordon, GA", "Fort Hood, TX"): 860,
+    ("Fort Bragg, NC", "Fort Bliss, TX"): 1680,
+    ("Fort Bliss, TX", "Fort Bragg, NC"): 1680,
 }
 
 

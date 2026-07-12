@@ -41,6 +41,7 @@ GAINING_INSTALLATIONS = [
     "Fort Hood, TX",
     "Fort Drum, NY",
     "Fort Gordon, GA",
+    "Fort Bliss, TX",
     "Other CONUS installation",
 ]
 
