@@ -27,6 +27,35 @@ RANK_PAY_GRADES = [
     "Other",
 ]
 
+PAY_GRADE_TO_RANK: dict[str, str] = {
+    "E-1": "Private",
+    "E-2": "Private",
+    "E-3": "Private First Class",
+    "E-4": "Specialist",
+    "E-5": "Sergeant",
+    "E-6": "Staff Sergeant",
+    "E-7": "Sergeant First Class",
+    "E-8": "Master Sergeant",
+    "E-9": "Sergeant Major",
+    "W-1": "Warrant Officer 1",
+    "W-2": "Chief Warrant Officer 2",
+    "W-3": "Chief Warrant Officer 3",
+    "W-4": "Chief Warrant Officer 4",
+    "W-5": "Chief Warrant Officer 5",
+    "O-1": "Second Lieutenant",
+    "O-2": "First Lieutenant",
+    "O-3": "Captain",
+    "O-4": "Major",
+    "O-5": "Lieutenant Colonel",
+    "O-6": "Colonel",
+    "O-7+": "General Officer",
+}
+
+
+def rank_for_pay_grade(pay_grade: str) -> str:
+    """Return the standard rank title for a pay grade."""
+    return PAY_GRADE_TO_RANK.get(pay_grade, "")
+
 CURRENT_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other installation"]
 
 GAINING_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other CONUS installation"]

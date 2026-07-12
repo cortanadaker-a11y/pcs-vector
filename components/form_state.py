@@ -22,7 +22,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "last_name": "",
     "email": "",
     "rank_pay_grade": "E-5",
-    "rank_title": "",
+    "rank_title": "Sergeant",
     "current_installation_preset": "Fort Hood, TX",
     "current_installation_other": "",
     "gaining_installation": "Fort Bragg, NC",

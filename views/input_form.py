@@ -21,6 +21,7 @@ from components.form_options import (
     PET_TYPES,
     PRIORITY_CHOICES,
     RANK_PAY_GRADES,
+    rank_for_pay_grade,
     SPOUSE_CAREER_FIELDS,
     VEHICLE_COUNTS,
 )
@@ -99,7 +100,7 @@ def _render_move_basics() -> None:
         ),
     )
 
-    col_rank, col_title = st.columns([1, 2])
+    col_rank, col_display = st.columns([1, 2])
     with col_rank:
         set_form_value(
             "rank_pay_grade",
@@ -107,19 +108,30 @@ def _render_move_basics() -> None:
                 "Pay grade",
                 options=RANK_PAY_GRADES,
                 index=_option_index(RANK_PAY_GRADES, get_form_value("rank_pay_grade")),
-                help="Your current pay grade. Choose Other if not listed.",
+                help="Your current pay grade. Rank auto-fills from this selection.",
             ),
         )
-    with col_title:
-        set_form_value(
-            "rank_title",
+    pay_grade = get_form_value("rank_pay_grade")
+    with col_display:
+        if pay_grade == "Other":
+            set_form_value(
+                "rank_title",
+                st.text_input(
+                    "Rank / title",
+                    value=get_form_value("rank_title"),
+                    placeholder="e.g., Captain, Sergeant First Class",
+                    help="Required when pay grade is Other.",
+                ),
+            )
+        else:
+            auto_rank = rank_for_pay_grade(pay_grade)
+            set_form_value("rank_title", auto_rank)
             st.text_input(
-                "Rank / title",
-                value=get_form_value("rank_title"),
-                placeholder="e.g., Captain, Sergeant First Class",
-                help="Optional for most grades; required if you selected Other.",
-            ),
-        )
+                "Rank",
+                value=auto_rank,
+                disabled=True,
+                help="Auto-filled from your pay grade.",
+            )
 
     col_current, col_gaining = st.columns(2)
     with col_current:
