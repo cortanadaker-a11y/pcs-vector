@@ -190,6 +190,13 @@ def main() -> None:
                     (str(cushion) in report or f"{cushion:,}" in report) if cushion else None
                 ),
                 "expected_cash_cushion": cushion,
+                "has_value_scorecard": "value scorecard" in report.lower() or "6-month" in report.lower(),
+                "has_red_flags": "red flag" in report.lower() or "walk-away" in report.lower(),
+                "has_snapshot": "snapshot" in report.lower() or "pcs snapshot" in report.lower(),
+                "has_90_day_watch": "90-day" in report.lower() or "90 day" in report.lower(),
+                "char_budget_ok": len(report) <= 8500,
+                "has_bad_default": "bad default" in report.lower() or "winging" in report.lower(),
+                "has_spouse_share": "show your spouse" in report.lower() or "spouse share" in report.lower(),
                 "dity_formula_cited": (
                     "lbs" in report.lower() and "expenses" in report.lower()
                     if dity.get("applicable")

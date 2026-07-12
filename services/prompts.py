@@ -24,6 +24,7 @@ from services.installation_data import (
     resolve_installation,
 )
 from services.soldier_insights import build_child_context, build_soldier_context
+from services.value_synthesis import build_value_context
 
 SPOUSE_CAREER_GUIDANCE: dict[str, str] = {
     "K-12 education / teaching": (
@@ -59,7 +60,9 @@ CORE REQUIREMENTS
 - Avoid fluff, generic checklists, or overly optimistic language. Be honest about bottlenecks and risks.
 - Always protect the Soldier's family stability and spouse's career momentum as major decision factors.
 - When data is uncertain, note it clearly instead of guessing.
-- Keep the report relatively concise — quality over quantity.
+- Keep the report concise — target under 7,500 characters total. Every sentence must earn the $25.
+- Do not repeat the same dollar figure in more than two sections. Do not expose raw JSON field names (e.g. roi_multiple).
+- Do not restate the DITY recommendation after the table — one sentence max.
 - The final product should feel like a decision document the Soldier could show their spouse or use with command.
 
 TONE
@@ -72,12 +75,17 @@ TONE
 SECTION CONTENT GUIDANCE
 
 ## 1. Executive Summary & Recommended Strategy
+Open with **Your PCS Snapshot** (reproduce value_context.situation_snapshot in 3 sentences — personalized, not generic).
 Give one clear primary recommendation plus 1–2 ranked alternatives. Include the key reasoning and the main risk/dependency.
+Include **Why This Beats a Free Checklist** (one sentence from value_context.why_not_free_checklist).
+Include **Bad Default Path** (one sentence from value_context.bad_default_path) — what winging it costs.
 End section 1 with a **Soldier's Bottom Line** (2 sentences max): what decision must happen this week and what happens if they delay.
 
 ## 2. Spouse Career & Childcare Plan
 Go beyond basic job leads. Include realistic timelines to first paycheck (use family_cashflow_bridge.weeks_to_spouse_first_paycheck), fast-track options, military spouse programs, and specific bottlenecks (e.g. licensure wait times, childcare waitlists).
 State the dollar impact of a 4-week spouse income delay using family_cashflow_bridge figures — soldiers need to feel the cost of waiting.
+If value_context.local_salary_context is present, cite it as realistic earning potential at the gaining installation.
+Name the top 2 employers from value_context.top_employer_targets with specific application timing.
 
 ## 3. Housing Strategy & Cost Tradeoffs
 Use a clean comparison table when possible. Always show BAH surplus/shortfall with realistic numbers. Include current market realities (inventory, negotiation leverage, which areas are moving fastest).
@@ -85,6 +93,7 @@ Use a clean comparison table when possible. Always show BAH surplus/shortfall wi
 ## 4. Financial Opportunities & DITY/PPM Considerations
 Give clear math on partial vs full DITY/PPM when relevant. Include TLE strategy and any other quick cost-saving or cash-flow moves.
 Include a **30-Day Cash-Flow Bridge** using family_cashflow_bridge figures EXACTLY — reproduce cash_pressure_formula verbatim and state recommended_cash_cushion_usd. Do not recalculate these numbers.
+Include **6-Month Value Scorecard** — reproduce value_context.value_scorecard.roi_statement verbatim and state roi_multiple (e.g. "~40x return on a $25 report").
 
 ## 5. Getting Settled Fast – First 30 Days Action Plan
 Make this dependency-aware. Use phases with clear decision gates (e.g. "If you complete X by day 10, then Y becomes possible"). Prioritize the highest-leverage actions.
@@ -93,13 +102,16 @@ Split into **Soldier Tasks** and **Spouse Tasks** bullet lists so the family can
 ## 6. Schools, Pets & Logistics Notes
 Keep this tight but add current gotchas (school zoning verification, vehicle registration realities in the new state, summer utility spikes, etc.).
 When children are present, cite soldier_context.school_enrollment_note with specific registration timing.
+Include **Walk-Away Red Flags** (3 bullets from value_context.walk_away_red_flags) — leases, landlords, or neighborhoods to reject.
 
 ## 7. Recommended Timeline & Key Decisions
 Include clear decision points and what triggers each one. Add light risk scenarios where relevant.
 Include one **Command Conversation** bullet adapted from soldier_context.command_briefing_prompt — give the Soldier exact words for a 30-second commander update.
+Include **90-Day Watch List** (3 bullets from value_context.ninety_day_watch) — what to verify after the chaos fades.
 
 ## 8. Prioritized Next Steps
 Limit to 6–8 high-impact actions. Make them specific and time-bound. Rank them by impact.
+End with **Show Your Spouse** (one sentence from value_context.spouse_share_line) — the line they text or read aloud to align the family.
 
 FORMAT (STRICT)
 Return ONLY valid markdown. No preamble, no closing commentary outside the report.
@@ -215,6 +227,27 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
     last_name = form_data.get("last_name", "").strip()
     family_name = f"{first_name} {last_name}".strip()
 
+    dity_net = 0
+    if dity_ctx.get("applicable"):
+        mode = dity_ctx.get("recommended_mode", "partial")
+        dity_net = int(dity_ctx.get(f"{mode}_dity", {}).get("estimated_net_usd", 0) or 0)
+    value_ctx = build_value_context(
+        installation=profile.display_name,
+        spouse_career_field=form_data.get("spouse_career_field", ""),
+        family_name=family_name,
+        rank=rank,
+        current=resolved_current_installation(form_data),
+        gaining=gaining,
+        num_children=num_children,
+        primary_priority=form_data.get("primary_priority", ""),
+        move_window=form_data.get("move_window", ""),
+        housing_preference=form_data.get("housing_preference", ""),
+        bah_monthly=bah,
+        rent_low=rent_low,
+        rent_high=rent_high,
+        dity_net=dity_net,
+    )
+
     payload = {
         "generated_at": datetime.now().strftime("%B %d, %Y"),
         "family_name": family_name,
@@ -254,6 +287,7 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "family_cashflow_bridge": cashflow_ctx,
         "soldier_context": soldier_ctx,
         "child_age_insights": child_ctx,
+        "value_context": value_ctx,
         "spouse_career_guidance": career_guidance,
     }
 
@@ -284,5 +318,9 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "In section 7, include the Command Conversation from soldier_context. "
         "End section 1 with Soldier's Bottom Line. Use soldier_context.installation_insights for local gotchas. "
         "Include one blind-spot insight and one explicit contingency in section 1. "
-        "Write for a Soldier who will read this on their phone between formations — insightful, not generic."
+        "Open section 1 with Your PCS Snapshot from value_context. Include 6-Month Value Scorecard in section 4. "
+        "Include Walk-Away Red Flags in section 6. Cite local_salary_context in section 2 if present. "
+        "Write for a Soldier who will read this on their phone between formations — insightful, not generic. "
+        "Include Bad Default Path in section 1 and Show Your Spouse line at end of section 8. "
+        "Stay under 7,500 characters — cut repetition, not insight. Every section must earn the $25."
     )

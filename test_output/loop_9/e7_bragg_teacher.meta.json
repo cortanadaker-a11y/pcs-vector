@@ -1,0 +1,23 @@
+{
+  "scenario": "e7_bragg_teacher",
+  "loop": 9,
+  "chars": 8625,
+  "sections": 8,
+  "has_table": true,
+  "expected_bah": 2094,
+  "bah_cited": true,
+  "recommended_dity_mode": "partial",
+  "has_bottom_line": true,
+  "has_cashflow_bridge": true,
+  "has_command_brief": true,
+  "has_soldier_spouse_split": true,
+  "cash_cushion_cited": true,
+  "expected_cash_cushion": 10574,
+  "has_value_scorecard": true,
+  "has_red_flags": true,
+  "has_snapshot": true,
+  "has_90_day_watch": true,
+  "char_budget_ok": false,
+  "dity_formula_cited": true,
+  "expected_dity_net_partial": 2179
+}
