@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 from services.bah_rates import get_bah_monthly
 from services.dity_calculator import build_dity_estimate
+from services.family_cashflow import build_cashflow_bridge
 from services.installation_data import build_move_context, resolve_installation
 from services.report_generator import generate_report  # noqa: E402
 
@@ -154,6 +155,20 @@ def main() -> None:
                 num_children=int(form.get("num_children") or 0),
                 has_pets=form.get("has_pets") == "Yes — we have pets",
             )
+            prof = resolve_installation(gaining)
+            rl, rh = prof.housing.avg_3br_rent_range
+            cf = build_cashflow_bridge(
+                spouse_career_field=form.get("spouse_career_field", ""),
+                bah_monthly=bah or 0,
+                rent_low=rl,
+                rent_high=rh,
+                move_window=form.get("move_window", ""),
+                dity_estimate=dity,
+                num_children=int(form.get("num_children") or 0),
+                has_pets=form.get("has_pets") == "Yes — we have pets",
+                max_monthly_budget=int(form.get("max_monthly_budget") or 0),
+            )
+            cushion = cf.get("recommended_cash_cushion_usd")
             meta = {
                 "scenario": key,
                 "loop": args.loop,
@@ -165,6 +180,16 @@ def main() -> None:
                     (str(bah) in report or f"{bah:,}" in report) if bah else None
                 ),
                 "recommended_dity_mode": dity.get("recommended_mode"),
+                "has_bottom_line": "bottom line" in report.lower(),
+                "has_cashflow_bridge": "cash-flow" in report.lower() or "cash flow" in report.lower(),
+                "has_command_brief": "command" in report.lower(),
+                "has_soldier_spouse_split": (
+                    "soldier task" in report.lower() and "spouse task" in report.lower()
+                ),
+                "cash_cushion_cited": (
+                    (str(cushion) in report or f"{cushion:,}" in report) if cushion else None
+                ),
+                "expected_cash_cushion": cushion,
                 "dity_formula_cited": (
                     "lbs" in report.lower() and "expenses" in report.lower()
                     if dity.get("applicable")

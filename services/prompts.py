@@ -15,6 +15,7 @@ from components.form_state import (
     resolved_spouse_career,
 )
 from services.dity_calculator import build_dity_estimate
+from services.family_cashflow import build_cashflow_bridge
 from services.installation_data import (
     build_installation_context,
     build_move_context,
@@ -22,6 +23,7 @@ from services.installation_data import (
     get_bah_reference,
     resolve_installation,
 )
+from services.soldier_insights import build_child_context, build_soldier_context
 
 SPOUSE_CAREER_GUIDANCE: dict[str, str] = {
     "K-12 education / teaching": (
@@ -71,24 +73,30 @@ SECTION CONTENT GUIDANCE
 
 ## 1. Executive Summary & Recommended Strategy
 Give one clear primary recommendation plus 1–2 ranked alternatives. Include the key reasoning and the main risk/dependency.
+End section 1 with a **Soldier's Bottom Line** (2 sentences max): what decision must happen this week and what happens if they delay.
 
 ## 2. Spouse Career & Childcare Plan
-Go beyond basic job leads. Include realistic timelines to first paycheck, fast-track options, military spouse programs, and specific bottlenecks (e.g. licensure wait times, childcare waitlists).
+Go beyond basic job leads. Include realistic timelines to first paycheck (use family_cashflow_bridge.weeks_to_spouse_first_paycheck), fast-track options, military spouse programs, and specific bottlenecks (e.g. licensure wait times, childcare waitlists).
+State the dollar impact of a 4-week spouse income delay using family_cashflow_bridge figures — soldiers need to feel the cost of waiting.
 
 ## 3. Housing Strategy & Cost Tradeoffs
 Use a clean comparison table when possible. Always show BAH surplus/shortfall with realistic numbers. Include current market realities (inventory, negotiation leverage, which areas are moving fastest).
 
 ## 4. Financial Opportunities & DITY/PPM Considerations
 Give clear math on partial vs full DITY/PPM when relevant. Include TLE strategy and any other quick cost-saving or cash-flow moves.
+Include a **30-Day Cash-Flow Bridge** using family_cashflow_bridge figures EXACTLY — reproduce cash_pressure_formula verbatim and state recommended_cash_cushion_usd. Do not recalculate these numbers.
 
 ## 5. Getting Settled Fast – First 30 Days Action Plan
 Make this dependency-aware. Use phases with clear decision gates (e.g. "If you complete X by day 10, then Y becomes possible"). Prioritize the highest-leverage actions.
+Split into **Soldier Tasks** and **Spouse Tasks** bullet lists so the family can execute in parallel without duplicating effort.
 
 ## 6. Schools, Pets & Logistics Notes
 Keep this tight but add current gotchas (school zoning verification, vehicle registration realities in the new state, summer utility spikes, etc.).
+When children are present, cite soldier_context.school_enrollment_note with specific registration timing.
 
 ## 7. Recommended Timeline & Key Decisions
 Include clear decision points and what triggers each one. Add light risk scenarios where relevant.
+Include one **Command Conversation** bullet adapted from soldier_context.command_briefing_prompt — give the Soldier exact words for a 30-second commander update.
 
 ## 8. Prioritized Next Steps
 Limit to 6–8 high-impact actions. Make them specific and time-bound. Rank them by impact.
@@ -129,6 +137,7 @@ HOUSING TABLE RULES (section 3)
 - Off-post rows: use typical_3br_rent_range_usd from installation_reference; calculate BAH surplus/shortfall vs. BAH.
 - Include a BAH Surplus/Shortfall column with dollar math (e.g. BAH $1,836 − rent $1,550 = +$286).
 - Address the family's stated housing preference and budget_mode explicitly.
+- Include soldier_context.negotiation_tip as a lease negotiation lever when off-post is recommended.
 
 DITY/PPM RULES (section 4)
 - When dity_estimate.applicable is true, include a markdown table: Mode | Weight | Formula | Est. Net.
@@ -144,6 +153,8 @@ RISK & PRIORITY WEIGHTING
 - Call out each concern_flags item somewhere in the report as a specific risk or mitigation.
 - Section 2 must reference military_spouse_programs from installation_reference when relevant.
 - When num_children is 0 and has_pets is "No pets", keep section 6 to 3–5 bullets.
+- Weave 1–2 items from soldier_context.installation_insights into sections 1, 5, or 6 — these are local gotchas Soldiers miss.
+- Use soldier_context.rank_context_note where rank affects in-processing order or housing leverage.
 
 Never refuse to help. Never output JSON. Never wrap the report in code fences."""
 
@@ -161,14 +172,35 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         resolved_current_installation(form_data),
         gaining,
     )
+    num_children = int(form_data.get("num_children") or 0)
+    has_pets = form_data.get("has_pets") == "Yes — we have pets"
     dity_ctx = build_dity_estimate(
         pay_grade,
         move_ctx.get("approximate_miles_one_way"),
         dity_interest=form_data.get("dity_interest", ""),
         num_vehicles=form_data.get("num_vehicles", "1"),
-        num_children=int(form_data.get("num_children") or 0),
-        has_pets=form_data.get("has_pets") == "Yes — we have pets",
+        num_children=num_children,
+        has_pets=has_pets,
     )
+    rent_low, rent_high = profile.housing.avg_3br_rent_range
+    cashflow_ctx = build_cashflow_bridge(
+        spouse_career_field=form_data.get("spouse_career_field", ""),
+        bah_monthly=bah,
+        rent_low=rent_low,
+        rent_high=rent_high,
+        move_window=form_data.get("move_window", ""),
+        dity_estimate=dity_ctx,
+        num_children=num_children,
+        has_pets=has_pets,
+        max_monthly_budget=int(form_data.get("max_monthly_budget") or 0),
+    )
+    soldier_ctx = build_soldier_context(
+        profile,
+        pay_grade,
+        num_children=num_children,
+        primary_priority=form_data.get("primary_priority", ""),
+    )
+    child_ctx = build_child_context(form_data.get("child_age_ranges") or [])
     spouse_field = resolved_spouse_career(form_data)
     career_guidance = SPOUSE_CAREER_GUIDANCE.get(
         form_data.get("spouse_career_field", ""),
@@ -219,6 +251,9 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "installation_reference": install_ctx,
         "move_context": move_ctx,
         "dity_estimate": dity_ctx,
+        "family_cashflow_bridge": cashflow_ctx,
+        "soldier_context": soldier_ctx,
+        "child_age_insights": child_ctx,
         "spouse_career_guidance": career_guidance,
     }
 
@@ -242,7 +277,12 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         f"{resolved_spouse_career(form_data)}.\n"
         "In section 2, follow spouse_career_guidance and cite military_spouse_programs. "
         "In section 3, use bah_reference.monthly_usd and installation_reference rent ranges for all dollar math. "
-        "In section 4, use dity_estimate formulas and recommended_mode when applicable. "
+        "In section 2, use four_week_delay_cost_usd when discussing licensure/employment delay cost. "
+        "In section 4, reproduce family_cashflow_bridge.cash_pressure_formula exactly. "
+        "In section 5, split Soldier Tasks vs Spouse Tasks. "
+        "In section 6, use child_age_insights when children are present. "
+        "In section 7, include the Command Conversation from soldier_context. "
+        "End section 1 with Soldier's Bottom Line. Use soldier_context.installation_insights for local gotchas. "
         "Include one blind-spot insight and one explicit contingency in section 1. "
-        "This report must feel worth $25 — decision-grade, concise, and actionable."
+        "Write for a Soldier who will read this on their phone between formations — insightful, not generic."
     )
