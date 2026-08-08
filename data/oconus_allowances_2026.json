@@ -1,0 +1,361 @@
+{
+  "effective_date": "2026-01-01",
+  "source": "Planning figures aligned to DTMO OHA/OCOLA locality patterns (indices and typical rent ceilings). OHA pays actual rent up to the locality max; COLA varies with pay, YOS, and dependents. Always verify on LES / DTMO calculators before financial decisions.",
+  "notes": {
+    "OHA": "Foreign OCONUS only. Reimburses rent up to max + utility/recurring maintenance allowance. Not a fixed BAH-style payment.",
+    "COLA": "Overseas COLA is non-taxable and offsets higher goods/services costs. Amount depends on location index, base pay, YOS, and dependents.",
+    "HI_PR_AK": "Hawaii, Puerto Rico, and Alaska use BAH (not OHA) plus applicable COLA — rates live in bah_2026.json for BAH portion."
+  },
+  "locations": {
+    "Camp Humphreys, South Korea": {
+      "housing_system": "OHA",
+      "country": "South Korea",
+      "locality": "Pyeongtaek / Humphreys",
+      "cola_index": 110,
+      "currency_note": "OHA ceilings set in KRW; USD figures are planning conversions at ~1,350 KRW/USD.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1650, "E-2": 1650, "E-3": 1650, "E-4": 1650, "E-5": 1950,
+          "E-6": 2250, "E-7": 2400, "E-8": 2550, "E-9": 2700,
+          "W-1": 2280, "W-2": 2430, "W-3": 2550, "W-4": 2700, "W-5": 2850,
+          "O-1": 1980, "O-2": 2250, "O-3": 2550, "O-4": 2850, "O-5": 3000,
+          "O-6": 3120, "O-7+": 3200, "Other": 1950
+        },
+        "without_dependents": {
+          "E-1": 1350, "E-2": 1350, "E-3": 1350, "E-4": 1350, "E-5": 1580,
+          "E-6": 1800, "E-7": 1950, "E-8": 2100, "E-9": 2250,
+          "W-1": 1830, "W-2": 1980, "W-3": 2100, "W-4": 2220, "W-5": 2350,
+          "O-1": 1600, "O-2": 1820, "O-3": 2100, "O-4": 2350, "O-5": 2500,
+          "O-6": 2600, "O-7+": 2680, "Other": 1580
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 420, "without_dependents": 320 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 280, "E-2": 290, "E-3": 310, "E-4": 340, "E-5": 420,
+          "E-6": 480, "E-7": 520, "E-8": 560, "E-9": 600,
+          "W-1": 490, "W-2": 520, "W-3": 560, "W-4": 590, "W-5": 620,
+          "O-1": 380, "O-2": 460, "O-3": 560, "O-4": 640, "O-5": 700,
+          "O-6": 740, "O-7+": 780, "Other": 420
+        },
+        "without_dependents": {
+          "E-1": 180, "E-2": 190, "E-3": 200, "E-4": 220, "E-5": 280,
+          "E-6": 320, "E-7": 350, "E-8": 380, "E-9": 410,
+          "W-1": 330, "W-2": 350, "W-3": 380, "W-4": 400, "W-5": 420,
+          "O-1": 250, "O-2": 310, "O-3": 380, "O-4": 430, "O-5": 470,
+          "O-6": 500, "O-7+": 530, "Other": 280
+        }
+      }
+    },
+    "Camp Casey, South Korea": {
+      "housing_system": "OHA",
+      "country": "South Korea",
+      "locality": "Dongducheon / Casey corridor",
+      "cola_index": 108,
+      "currency_note": "Many tours unaccompanied; OHA applies when authorized off-post. USD planning conversions.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1500, "E-2": 1500, "E-3": 1500, "E-4": 1500, "E-5": 1750,
+          "E-6": 2000, "E-7": 2150, "E-8": 2300, "E-9": 2450,
+          "W-1": 2020, "W-2": 2180, "W-3": 2300, "W-4": 2450, "W-5": 2580,
+          "O-1": 1780, "O-2": 2000, "O-3": 2300, "O-4": 2550, "O-5": 2700,
+          "O-6": 2800, "O-7+": 2880, "Other": 1750
+        },
+        "without_dependents": {
+          "E-1": 1200, "E-2": 1200, "E-3": 1200, "E-4": 1200, "E-5": 1400,
+          "E-6": 1600, "E-7": 1720, "E-8": 1850, "E-9": 1980,
+          "W-1": 1620, "W-2": 1750, "W-3": 1880, "W-4": 2000, "W-5": 2120,
+          "O-1": 1420, "O-2": 1600, "O-3": 1880, "O-4": 2100, "O-5": 2220,
+          "O-6": 2320, "O-7+": 2400, "Other": 1400
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 380, "without_dependents": 290 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 250, "E-2": 260, "E-3": 280, "E-4": 310, "E-5": 380,
+          "E-6": 430, "E-7": 470, "E-8": 510, "E-9": 550,
+          "W-1": 440, "W-2": 470, "W-3": 510, "W-4": 540, "W-5": 570,
+          "O-1": 340, "O-2": 420, "O-3": 510, "O-4": 580, "O-5": 640,
+          "O-6": 680, "O-7+": 720, "Other": 380
+        },
+        "without_dependents": {
+          "E-1": 160, "E-2": 170, "E-3": 180, "E-4": 200, "E-5": 250,
+          "E-6": 290, "E-7": 320, "E-8": 350, "E-9": 380,
+          "W-1": 300, "W-2": 320, "W-3": 350, "W-4": 370, "W-5": 390,
+          "O-1": 230, "O-2": 280, "O-3": 350, "O-4": 400, "O-5": 430,
+          "O-6": 460, "O-7+": 490, "Other": 250
+        }
+      }
+    },
+    "Camp Zama, Japan": {
+      "housing_system": "OHA",
+      "country": "Japan",
+      "locality": "Zama / Sagamihara (Kanto)",
+      "cola_index": 112,
+      "currency_note": "OHA ceilings in JPY; USD planning at ~150 JPY/USD. Yen swings change COLA/OHA purchasing power.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1800, "E-2": 1800, "E-3": 1800, "E-4": 1800, "E-5": 2200,
+          "E-6": 2550, "E-7": 2750, "E-8": 2950, "E-9": 3150,
+          "W-1": 2580, "W-2": 2780, "W-3": 2980, "W-4": 3180, "W-5": 3350,
+          "O-1": 2250, "O-2": 2550, "O-3": 2980, "O-4": 3350, "O-5": 3550,
+          "O-6": 3680, "O-7+": 3800, "Other": 2200
+        },
+        "without_dependents": {
+          "E-1": 1450, "E-2": 1450, "E-3": 1450, "E-4": 1450, "E-5": 1750,
+          "E-6": 2000, "E-7": 2200, "E-8": 2380, "E-9": 2550,
+          "W-1": 2050, "W-2": 2220, "W-3": 2400, "W-4": 2550, "W-5": 2700,
+          "O-1": 1800, "O-2": 2050, "O-3": 2400, "O-4": 2700, "O-5": 2880,
+          "O-6": 3000, "O-7+": 3100, "Other": 1750
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 450, "without_dependents": 340 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 220, "E-2": 230, "E-3": 250, "E-4": 280, "E-5": 350,
+          "E-6": 400, "E-7": 440, "E-8": 480, "E-9": 520,
+          "W-1": 410, "W-2": 440, "W-3": 480, "W-4": 510, "W-5": 540,
+          "O-1": 320, "O-2": 390, "O-3": 480, "O-4": 550, "O-5": 600,
+          "O-6": 640, "O-7+": 680, "Other": 350
+        },
+        "without_dependents": {
+          "E-1": 140, "E-2": 150, "E-3": 160, "E-4": 180, "E-5": 230,
+          "E-6": 270, "E-7": 300, "E-8": 330, "E-9": 360,
+          "W-1": 280, "W-2": 300, "W-3": 330, "W-4": 350, "W-5": 370,
+          "O-1": 210, "O-2": 260, "O-3": 330, "O-4": 370, "O-5": 410,
+          "O-6": 440, "O-7+": 470, "Other": 230
+        }
+      }
+    },
+    "USAG Bavaria, Germany": {
+      "housing_system": "OHA",
+      "country": "Germany",
+      "locality": "Grafenwoehr / Vilseck / Hohenfels",
+      "cola_index": 120,
+      "currency_note": "OHA ceilings in EUR; USD planning at ~1.08 USD/EUR.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1400, "E-2": 1400, "E-3": 1400, "E-4": 1400, "E-5": 1650,
+          "E-6": 1900, "E-7": 2050, "E-8": 2200, "E-9": 2350,
+          "W-1": 1920, "W-2": 2080, "W-3": 2220, "W-4": 2380, "W-5": 2520,
+          "O-1": 1680, "O-2": 1900, "O-3": 2220, "O-4": 2500, "O-5": 2650,
+          "O-6": 2750, "O-7+": 2850, "Other": 1650
+        },
+        "without_dependents": {
+          "E-1": 1100, "E-2": 1100, "E-3": 1100, "E-4": 1100, "E-5": 1300,
+          "E-6": 1500, "E-7": 1620, "E-8": 1750, "E-9": 1880,
+          "W-1": 1520, "W-2": 1650, "W-3": 1780, "W-4": 1900, "W-5": 2020,
+          "O-1": 1320, "O-2": 1500, "O-3": 1780, "O-4": 2000, "O-5": 2120,
+          "O-6": 2220, "O-7+": 2300, "Other": 1300
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 480, "without_dependents": 360 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 420, "E-2": 440, "E-3": 470, "E-4": 520, "E-5": 650,
+          "E-6": 740, "E-7": 800, "E-8": 860, "E-9": 920,
+          "W-1": 750, "W-2": 800, "W-3": 860, "W-4": 910, "W-5": 960,
+          "O-1": 580, "O-2": 720, "O-3": 860, "O-4": 980, "O-5": 1080,
+          "O-6": 1140, "O-7+": 1200, "Other": 650
+        },
+        "without_dependents": {
+          "E-1": 270, "E-2": 280, "E-3": 300, "E-4": 340, "E-5": 430,
+          "E-6": 490, "E-7": 540, "E-8": 580, "E-9": 620,
+          "W-1": 500, "W-2": 540, "W-3": 580, "W-4": 610, "W-5": 640,
+          "O-1": 390, "O-2": 480, "O-3": 580, "O-4": 660, "O-5": 720,
+          "O-6": 760, "O-7+": 800, "Other": 430
+        }
+      }
+    },
+    "USAG Rheinland-Pfalz, Germany": {
+      "housing_system": "OHA",
+      "country": "Germany",
+      "locality": "Kaiserslautern / Baumholder / Landstuhl (KMC)",
+      "cola_index": 132,
+      "currency_note": "OHA in EUR; KMC is a higher-cost German military community.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1550, "E-2": 1550, "E-3": 1550, "E-4": 1550, "E-5": 1850,
+          "E-6": 2150, "E-7": 2320, "E-8": 2500, "E-9": 2680,
+          "W-1": 2180, "W-2": 2350, "W-3": 2520, "W-4": 2700, "W-5": 2880,
+          "O-1": 1880, "O-2": 2150, "O-3": 2520, "O-4": 2850, "O-5": 3020,
+          "O-6": 3150, "O-7+": 3250, "Other": 1850
+        },
+        "without_dependents": {
+          "E-1": 1250, "E-2": 1250, "E-3": 1250, "E-4": 1250, "E-5": 1480,
+          "E-6": 1700, "E-7": 1850, "E-8": 2000, "E-9": 2150,
+          "W-1": 1720, "W-2": 1880, "W-3": 2020, "W-4": 2180, "W-5": 2320,
+          "O-1": 1500, "O-2": 1700, "O-3": 2020, "O-4": 2300, "O-5": 2450,
+          "O-6": 2550, "O-7+": 2650, "Other": 1480
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 500, "without_dependents": 380 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 520, "E-2": 540, "E-3": 580, "E-4": 640, "E-5": 800,
+          "E-6": 910, "E-7": 990, "E-8": 1070, "E-9": 1150,
+          "W-1": 920, "W-2": 990, "W-3": 1070, "W-4": 1130, "W-5": 1190,
+          "O-1": 720, "O-2": 880, "O-3": 1070, "O-4": 1220, "O-5": 1340,
+          "O-6": 1420, "O-7+": 1500, "Other": 800
+        },
+        "without_dependents": {
+          "E-1": 340, "E-2": 350, "E-3": 380, "E-4": 420, "E-5": 530,
+          "E-6": 610, "E-7": 670, "E-8": 720, "E-9": 770,
+          "W-1": 620, "W-2": 670, "W-3": 720, "W-4": 760, "W-5": 800,
+          "O-1": 480, "O-2": 590, "O-3": 720, "O-4": 820, "O-5": 900,
+          "O-6": 950, "O-7+": 1000, "Other": 530
+        }
+      }
+    },
+    "USAG Wiesbaden, Germany": {
+      "housing_system": "OHA",
+      "country": "Germany",
+      "locality": "Wiesbaden",
+      "cola_index": 140,
+      "currency_note": "Higher COLA index than Bavaria; competitive city housing.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1650, "E-2": 1650, "E-3": 1650, "E-4": 1650, "E-5": 2000,
+          "E-6": 2350, "E-7": 2550, "E-8": 2750, "E-9": 2950,
+          "W-1": 2380, "W-2": 2580, "W-3": 2780, "W-4": 2980, "W-5": 3180,
+          "O-1": 2050, "O-2": 2350, "O-3": 2780, "O-4": 3150, "O-5": 3350,
+          "O-6": 3480, "O-7+": 3600, "Other": 2000
+        },
+        "without_dependents": {
+          "E-1": 1320, "E-2": 1320, "E-3": 1320, "E-4": 1320, "E-5": 1600,
+          "E-6": 1850, "E-7": 2020, "E-8": 2200, "E-9": 2350,
+          "W-1": 1880, "W-2": 2050, "W-3": 2220, "W-4": 2400, "W-5": 2550,
+          "O-1": 1620, "O-2": 1850, "O-3": 2220, "O-4": 2520, "O-5": 2700,
+          "O-6": 2820, "O-7+": 2920, "Other": 1600
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 520, "without_dependents": 390 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 580, "E-2": 600, "E-3": 640, "E-4": 710, "E-5": 890,
+          "E-6": 1020, "E-7": 1110, "E-8": 1200, "E-9": 1290,
+          "W-1": 1030, "W-2": 1110, "W-3": 1200, "W-4": 1270, "W-5": 1340,
+          "O-1": 800, "O-2": 980, "O-3": 1200, "O-4": 1370, "O-5": 1500,
+          "O-6": 1590, "O-7+": 1680, "Other": 890
+        },
+        "without_dependents": {
+          "E-1": 380, "E-2": 390, "E-3": 420, "E-4": 470, "E-5": 590,
+          "E-6": 680, "E-7": 740, "E-8": 800, "E-9": 860,
+          "W-1": 690, "W-2": 740, "W-3": 800, "W-4": 850, "W-5": 900,
+          "O-1": 540, "O-2": 660, "O-3": 800, "O-4": 920, "O-5": 1010,
+          "O-6": 1070, "O-7+": 1130, "Other": 590
+        }
+      }
+    },
+    "USAG Italy, Italy": {
+      "housing_system": "OHA",
+      "country": "Italy",
+      "locality": "Vicenza / Caserma Ederle",
+      "cola_index": 128,
+      "currency_note": "OHA in EUR; Italian private leases often require multi-month deposits.",
+      "oha_rent_max_usd": {
+        "with_dependents": {
+          "E-1": 1450, "E-2": 1450, "E-3": 1450, "E-4": 1450, "E-5": 1750,
+          "E-6": 2050, "E-7": 2220, "E-8": 2400, "E-9": 2580,
+          "W-1": 2080, "W-2": 2250, "W-3": 2420, "W-4": 2600, "W-5": 2780,
+          "O-1": 1780, "O-2": 2050, "O-3": 2420, "O-4": 2750, "O-5": 2920,
+          "O-6": 3050, "O-7+": 3150, "Other": 1750
+        },
+        "without_dependents": {
+          "E-1": 1150, "E-2": 1150, "E-3": 1150, "E-4": 1150, "E-5": 1400,
+          "E-6": 1620, "E-7": 1780, "E-8": 1920, "E-9": 2080,
+          "W-1": 1650, "W-2": 1800, "W-3": 1950, "W-4": 2100, "W-5": 2250,
+          "O-1": 1420, "O-2": 1620, "O-3": 1950, "O-4": 2220, "O-5": 2380,
+          "O-6": 2480, "O-7+": 2580, "Other": 1400
+        }
+      },
+      "oha_utility_usd": { "with_dependents": 460, "without_dependents": 350 },
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 480, "E-2": 500, "E-3": 540, "E-4": 600, "E-5": 740,
+          "E-6": 840, "E-7": 910, "E-8": 980, "E-9": 1050,
+          "W-1": 850, "W-2": 910, "W-3": 980, "W-4": 1040, "W-5": 1100,
+          "O-1": 660, "O-2": 810, "O-3": 980, "O-4": 1120, "O-5": 1230,
+          "O-6": 1300, "O-7+": 1370, "Other": 740
+        },
+        "without_dependents": {
+          "E-1": 310, "E-2": 320, "E-3": 350, "E-4": 390, "E-5": 490,
+          "E-6": 560, "E-7": 610, "E-8": 660, "E-9": 710,
+          "W-1": 570, "W-2": 610, "W-3": 660, "W-4": 700, "W-5": 740,
+          "O-1": 440, "O-2": 540, "O-3": 660, "O-4": 750, "O-5": 820,
+          "O-6": 870, "O-7+": 920, "Other": 490
+        }
+      }
+    },
+    "Schofield Barracks, HI": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA",
+      "locality": "Oahu / Honolulu County",
+      "cola_index": 118,
+      "currency_note": "Hawaii uses BAH (see bah_2026.json) plus non-foreign OCONUS COLA — not OHA.",
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 450, "E-2": 470, "E-3": 500, "E-4": 560, "E-5": 700,
+          "E-6": 800, "E-7": 870, "E-8": 940, "E-9": 1010,
+          "W-1": 810, "W-2": 870, "W-3": 940, "W-4": 1000, "W-5": 1060,
+          "O-1": 630, "O-2": 770, "O-3": 940, "O-4": 1080, "O-5": 1180,
+          "O-6": 1250, "O-7+": 1320, "Other": 700
+        },
+        "without_dependents": {
+          "E-1": 290, "E-2": 300, "E-3": 320, "E-4": 360, "E-5": 460,
+          "E-6": 530, "E-7": 580, "E-8": 630, "E-9": 680,
+          "W-1": 540, "W-2": 580, "W-3": 630, "W-4": 670, "W-5": 710,
+          "O-1": 420, "O-2": 510, "O-3": 630, "O-4": 720, "O-5": 790,
+          "O-6": 840, "O-7+": 890, "Other": 460
+        }
+      }
+    },
+    "Fort Shafter, HI": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA",
+      "locality": "Oahu / Honolulu County",
+      "cola_index": 118,
+      "currency_note": "Same Oahu BAH MHA as Schofield plus HI COLA.",
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 450, "E-2": 470, "E-3": 500, "E-4": 560, "E-5": 700,
+          "E-6": 800, "E-7": 870, "E-8": 940, "E-9": 1010,
+          "W-1": 810, "W-2": 870, "W-3": 940, "W-4": 1000, "W-5": 1060,
+          "O-1": 630, "O-2": 770, "O-3": 940, "O-4": 1080, "O-5": 1180,
+          "O-6": 1250, "O-7+": 1320, "Other": 700
+        },
+        "without_dependents": {
+          "E-1": 290, "E-2": 300, "E-3": 320, "E-4": 360, "E-5": 460,
+          "E-6": 530, "E-7": 580, "E-8": 630, "E-9": 680,
+          "W-1": 540, "W-2": 580, "W-3": 630, "W-4": 670, "W-5": 710,
+          "O-1": 420, "O-2": 510, "O-3": 630, "O-4": 720, "O-5": 790,
+          "O-6": 840, "O-7+": 890, "Other": 460
+        }
+      }
+    },
+    "Fort Buchanan, PR": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA",
+      "locality": "San Juan metro / Guaynabo",
+      "cola_index": 112,
+      "currency_note": "Puerto Rico uses BAH (not OHA) plus non-foreign OCONUS COLA.",
+      "bah_note": "BAH rates for PR should be verified in bah_2026.json when available; COLA below is planning.",
+      "cola_monthly_usd": {
+        "with_dependents": {
+          "E-1": 300, "E-2": 310, "E-3": 330, "E-4": 370, "E-5": 460,
+          "E-6": 520, "E-7": 570, "E-8": 620, "E-9": 670,
+          "W-1": 530, "W-2": 570, "W-3": 620, "W-4": 660, "W-5": 700,
+          "O-1": 410, "O-2": 500, "O-3": 620, "O-4": 710, "O-5": 780,
+          "O-6": 830, "O-7+": 880, "Other": 460
+        },
+        "without_dependents": {
+          "E-1": 190, "E-2": 200, "E-3": 210, "E-4": 240, "E-5": 300,
+          "E-6": 350, "E-7": 380, "E-8": 410, "E-9": 450,
+          "W-1": 360, "W-2": 380, "W-3": 410, "W-4": 440, "W-5": 470,
+          "O-1": 270, "O-2": 330, "O-3": 410, "O-4": 470, "O-5": 520,
+          "O-6": 550, "O-7+": 580, "Other": 300
+        }
+      }
+    }
+  }
+}

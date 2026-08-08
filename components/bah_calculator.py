@@ -1,4 +1,4 @@
-"""Homepage 2026 BAH calculator widget."""
+"""Homepage housing allowance calculator (BAH CONUS + OHA/COLA OCONUS)."""
 
 from __future__ import annotations
 
@@ -6,10 +6,10 @@ import streamlit as st
 
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
 from components.html_utils import safe_html
-from services.bah_rates import compare_bah, get_bah_effective_date, list_bah_installations
+from services.bah_rates import list_bah_installations
+from services.housing_allowances import compare_housing_packages, get_housing_package
 from services.installation_data import SUPPORTED_INSTALLATIONS
 
-# Years of service does not change BAH (rank + dependents + location do).
 YOS_OPTIONS = [
     "Under 2 years",
     "2–3 years",
@@ -37,13 +37,11 @@ def _money(n: int | None) -> str:
 
 
 def _resolve_dependents(deps_value: str) -> bool:
-    """Map UI label to boolean. Must not use startswith('With') — Without also starts with With."""
     return deps_value.strip() == _WITH
 
 
 def render_bah_calculator() -> None:
-    """Interactive BAH calculator for the homepage."""
-    # Must match form Move Basics installation list exactly.
+    """Interactive BAH / OHA + COLA calculator for the homepage."""
     installations = list_bah_installations()
     if list(installations) != list(SUPPORTED_INSTALLATIONS):
         installations = list(SUPPORTED_INSTALLATIONS)
@@ -51,18 +49,16 @@ def render_bah_calculator() -> None:
         return
 
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
-    effective = get_bah_effective_date()
 
     st.markdown(
         f"""
         <div class="pcs-bah-wrap">
             <div class="pcs-bah-header">
-                <div class="pcs-bah-badge">2026 rates · {len(installations)} posts · same list as the plan form</div>
-                <h3>BAH Calculator</h3>
+                <div class="pcs-bah-badge">2026 · {len(installations)} posts · same list as the plan form</div>
+                <h3>Housing Allowance Calculator</h3>
                 <p class="pcs-bah-sub">
-                    Plug in your rank and dependents, pick your posts, and see your monthly
-                    housing allowance — plus how much it changes when you PCS.
-                    Effective {safe_html(effective)}. OCONUS uses planning estimates (OHA applies overseas).
+                    CONUS: BAH. Foreign OCONUS: OHA (rent max + utilities) + COLA.
+                    Hawaii / Puerto Rico: BAH + COLA. Compare posts to see the monthly change.
                 </p>
             </div>
         </div>
@@ -87,7 +83,7 @@ def render_bah_calculator() -> None:
                 options=YOS_OPTIONS,
                 index=2,
                 key="bah_calc_yos",
-                help="BAH does not change with years of service. Only rank, dependents, and location set your rate.",
+                help="COLA can vary with pay and YOS. BAH/OHA ceilings use grade + dependents + location.",
             )
         with c3:
             deps = st.radio(
@@ -109,118 +105,176 @@ def render_bah_calculator() -> None:
                 key="bah_calc_gaining",
             )
         with d2:
-            current_options = [_NONE_CURRENT] + installations
             current_raw = st.selectbox(
                 "Current post (optional compare)",
-                options=current_options,
+                options=[_NONE_CURRENT] + installations,
                 key="bah_calc_current",
-                help="Leave as skip to only see BAH at your new installation.",
             )
             current = None if current_raw == _NONE_CURRENT else current_raw
 
-        # Exact match only — "Without dependents".startswith("With") is True and was a bug.
         with_dependents = _resolve_dependents(deps)
-        result = compare_bah(
+        result = compare_housing_packages(
             pay_grade=pay_grade,
             with_dependents=with_dependents,
             gaining_installation=gaining,
             current_installation=current,
         )
+        pkg = result["gaining"]
 
-        gain = result["gaining"]
-        gain_amt = gain.get("monthly_usd")
-
-        if not gain.get("found") or gain_amt is None:
+        if not pkg.get("found") or pkg.get("total_monthly_usd") is None:
             st.warning(
-                f"No 2026 BAH rate on file for {pay_grade} at {gaining}. "
-                "Try another post or verify with finance."
+                f"No 2026 housing package on file for {pay_grade} at {gaining}. "
+                "Try another post or verify with finance / DTMO."
             )
             return
 
         rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
         dep_label = "with dependents" if with_dependents else "without dependents"
         dep_chip = "WITH DEPS" if with_dependents else "NO DEPS"
-        gain_int = int(gain_amt)
+        system = pkg.get("housing_system") or "BAH"
+        housing = int(pkg["housing_monthly_usd"] or 0)
+        cola = int(pkg.get("cola_monthly_usd") or 0)
+        total = int(pkg["total_monthly_usd"])
 
-        # Side-by-side with/without preview so users see both rates for this grade+post
-        from services.bah_rates import get_bah_monthly
-
-        alt_with = get_bah_monthly(gaining, pay_grade, with_dependents=True)
-        alt_without = get_bah_monthly(gaining, pay_grade, with_dependents=False)
+        if system == "OHA":
+            label = f"OHA planning max · {gaining}"
+            system_chip = "OHA + COLA"
+            annual_note = f"{_money(total * 12)} / year combined (housing package + COLA)"
+        elif system == "BAH_PLUS_COLA":
+            label = f"BAH + COLA · {gaining}"
+            system_chip = "BAH + COLA"
+            annual_note = f"{_money(total * 12)} / year combined (BAH + COLA)"
+        else:
+            label = f"Monthly BAH · {gaining}"
+            system_chip = "BAH"
+            annual_note = f"{_money(total * 12)} / year housing allowance"
 
         st.markdown(
             f"""
-            <div class="pcs-bah-result" data-deps="{safe_html(dep_chip)}">
+            <div class="pcs-bah-result">
                 <div class="pcs-bah-result-top">
-                    <div class="pcs-bah-result-label">Monthly BAH · {safe_html(gaining)}</div>
-                    <span class="pcs-bah-chip pcs-bah-chip-{'with' if with_dependents else 'without'}">{safe_html(dep_chip)}</span>
+                    <div class="pcs-bah-result-label">{safe_html(label)}</div>
+                    <span class="pcs-bah-chip pcs-bah-chip-{'with' if with_dependents else 'without'}">{safe_html(dep_chip)} · {safe_html(system_chip)}</span>
                 </div>
-                <div class="pcs-bah-result-amount">{_money(gain_int)}<span>/mo</span></div>
+                <div class="pcs-bah-result-amount">{_money(total)}<span>/mo total</span></div>
                 <div class="pcs-bah-result-meta">
-                    {safe_html(pay_grade)} ({safe_html(rank_label)}) · {safe_html(dep_label)} ·
-                    {safe_html(yos)}
+                    {safe_html(pay_grade)} ({safe_html(rank_label)}) · {safe_html(dep_label)} · {safe_html(yos)}
                 </div>
-                <div class="pcs-bah-result-annual">
-                    {_money(gain_int * 12)} / year housing allowance
-                </div>
+                <div class="pcs-bah-result-annual">{safe_html(annual_note)}</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        # Dual-rate strip — always shows both so toggle change is obvious
-        if alt_with is not None and alt_without is not None:
-            active_with = "pcs-bah-pair-active" if with_dependents else ""
-            active_without = "pcs-bah-pair-active" if not with_dependents else ""
+        # Breakdown cards
+        if system == "OHA":
+            rent = pkg.get("oha_rent_max_usd")
+            util = pkg.get("oha_utility_usd")
             st.markdown(
                 f"""
                 <div class="pcs-bah-pair">
-                    <div class="pcs-bah-pair-card {active_with}">
-                        <div class="pcs-bah-pair-k">With dependents</div>
-                        <div class="pcs-bah-pair-v">{_money(int(alt_with))}/mo</div>
+                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
+                        <div class="pcs-bah-pair-k">OHA rent ceiling</div>
+                        <div class="pcs-bah-pair-v">{_money(int(rent) if rent else None)}/mo</div>
                     </div>
-                    <div class="pcs-bah-pair-card {active_without}">
-                        <div class="pcs-bah-pair-k">Without dependents</div>
-                        <div class="pcs-bah-pair-v">{_money(int(alt_without))}/mo</div>
+                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
+                        <div class="pcs-bah-pair-k">OHA utilities</div>
+                        <div class="pcs-bah-pair-v">{_money(int(util) if util else None)}/mo</div>
                     </div>
                     <div class="pcs-bah-pair-card pcs-bah-pair-diff">
-                        <div class="pcs-bah-pair-k">Dependent difference</div>
-                        <div class="pcs-bah-pair-v">{_money(int(alt_with) - int(alt_without))}/mo</div>
+                        <div class="pcs-bah-pair-k">COLA (index {safe_html(str(pkg.get('cola_index') or '—'))})</div>
+                        <div class="pcs-bah-pair-v">{_money(cola)}/mo</div>
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
+            st.caption(pkg.get("disclaimer") or "")
+            if pkg.get("currency_note"):
+                st.caption(pkg["currency_note"])
+        elif system == "BAH_PLUS_COLA":
+            st.markdown(
+                f"""
+                <div class="pcs-bah-pair">
+                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
+                        <div class="pcs-bah-pair-k">BAH</div>
+                        <div class="pcs-bah-pair-v">{_money(housing)}/mo</div>
+                    </div>
+                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
+                        <div class="pcs-bah-pair-k">COLA (index {safe_html(str(pkg.get('cola_index') or '—'))})</div>
+                        <div class="pcs-bah-pair-v">{_money(cola)}/mo</div>
+                    </div>
+                    <div class="pcs-bah-pair-card pcs-bah-pair-diff">
+                        <div class="pcs-bah-pair-k">Combined</div>
+                        <div class="pcs-bah-pair-v">{_money(total)}/mo</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.caption(pkg.get("disclaimer") or "")
+        else:
+            alt_with = get_housing_package(gaining, pay_grade, with_dependents=True)
+            alt_without = get_housing_package(gaining, pay_grade, with_dependents=False)
+            aw = alt_with.get("housing_monthly_usd")
+            awo = alt_without.get("housing_monthly_usd")
+            if aw is not None and awo is not None:
+                active_with = "pcs-bah-pair-active" if with_dependents else ""
+                active_without = "pcs-bah-pair-active" if not with_dependents else ""
+                st.markdown(
+                    f"""
+                    <div class="pcs-bah-pair">
+                        <div class="pcs-bah-pair-card {active_with}">
+                            <div class="pcs-bah-pair-k">With dependents</div>
+                            <div class="pcs-bah-pair-v">{_money(int(aw))}/mo</div>
+                        </div>
+                        <div class="pcs-bah-pair-card {active_without}">
+                            <div class="pcs-bah-pair-k">Without dependents</div>
+                            <div class="pcs-bah-pair-v">{_money(int(awo))}/mo</div>
+                        </div>
+                        <div class="pcs-bah-pair-card pcs-bah-pair-diff">
+                            <div class="pcs-bah-pair-k">Dependent difference</div>
+                            <div class="pcs-bah-pair-v">{_money(int(aw) - int(awo))}/mo</div>
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-        curr = result.get("current")
+        # Comparison to current post
+        cur = result.get("current")
         delta = result.get("monthly_delta_usd")
-        if current and curr and curr.get("found") and curr.get("monthly_usd") is not None and delta is not None:
-            curr_amt = int(curr["monthly_usd"])
+        if current and cur and cur.get("found") and cur.get("total_monthly_usd") is not None and delta is not None:
+            curr_tot = int(cur["total_monthly_usd"])
             annual = int(result.get("annual_delta_usd") or 0)
+            cur_sys = cur.get("housing_system") or "BAH"
             if delta > 0:
-                tone = "up"
-                headline = f"+{_money(delta)}/mo more at your new post"
-                detail = (
-                    f"{curr['installation']} → {gaining}: "
-                    f"{_money(curr_amt)} becomes {_money(gain_int)}. "
-                    f"About {_money(annual)} more per year."
-                )
+                tone, headline = "up", f"+{_money(delta)}/mo more at your new post"
             elif delta < 0:
-                tone = "down"
-                headline = f"{_money(delta)}/mo less at your new post"
-                detail = (
-                    f"{curr['installation']} → {gaining}: "
-                    f"{_money(curr_amt)} becomes {_money(gain_int)}. "
-                    f"About {_money(annual)} less per year — budget the drop before you move."
-                )
+                tone, headline = "down", f"{_money(delta)}/mo less at your new post"
             else:
-                tone = "flat"
-                headline = "Same BAH at both posts"
-                detail = (
-                    f"{curr['installation']} and {gaining} both pay "
-                    f"{_money(gain_int)}/mo for your grade and dependency status."
-                )
+                tone, headline = "flat", "Same total package at both posts"
 
+            cur_bits = []
+            if cur_sys == "OHA":
+                cur_bits.append(f"OHA ≈ {_money(cur.get('housing_monthly_usd'))}")
+            else:
+                cur_bits.append(f"BAH {_money(cur.get('housing_monthly_usd'))}")
+            if int(cur.get("cola_monthly_usd") or 0):
+                cur_bits.append(f"COLA {_money(int(cur['cola_monthly_usd']))}")
+            new_bits = []
+            if system == "OHA":
+                new_bits.append(f"OHA ≈ {_money(housing)}")
+            else:
+                new_bits.append(f"BAH {_money(housing)}")
+            if cola:
+                new_bits.append(f"COLA {_money(cola)}")
+
+            detail = (
+                f"{current} ({', '.join(cur_bits)} → {_money(curr_tot)} total) → "
+                f"{gaining} ({', '.join(new_bits)} → {_money(total)} total). "
+                f"About {_money(annual)} per year."
+            )
             st.markdown(
                 f"""
                 <div class="pcs-bah-delta pcs-bah-delta-{tone}">
@@ -228,14 +282,14 @@ def render_bah_calculator() -> None:
                     <div class="pcs-bah-delta-detail">{safe_html(detail)}</div>
                     <div class="pcs-bah-delta-grid">
                         <div class="pcs-bah-delta-cell">
-                            <div class="pcs-bah-delta-k">Current</div>
-                            <div class="pcs-bah-delta-v">{_money(curr_amt)}/mo</div>
-                            <div class="pcs-bah-delta-s">{safe_html(str(curr["installation"]))}</div>
+                            <div class="pcs-bah-delta-k">Current total</div>
+                            <div class="pcs-bah-delta-v">{_money(curr_tot)}/mo</div>
+                            <div class="pcs-bah-delta-s">{safe_html(current)}</div>
                         </div>
-                        <div class="pcs-bah-delta-arrow" aria-hidden="true">→</div>
+                        <div class="pcs-bah-delta-arrow">→</div>
                         <div class="pcs-bah-delta-cell">
-                            <div class="pcs-bah-delta-k">New post</div>
-                            <div class="pcs-bah-delta-v">{_money(gain_int)}/mo</div>
+                            <div class="pcs-bah-delta-k">New total</div>
+                            <div class="pcs-bah-delta-v">{_money(total)}/mo</div>
                             <div class="pcs-bah-delta-s">{safe_html(gaining)}</div>
                         </div>
                         <div class="pcs-bah-delta-cell">
@@ -248,14 +302,9 @@ def render_bah_calculator() -> None:
                 """,
                 unsafe_allow_html=True,
             )
-        elif current:
-            st.info(
-                f"No comparison rate for {pay_grade} at {current}. "
-                "BAH at your gaining post is shown above."
-            )
 
         st.caption(
-            "BAH uses pay grade, dependency status, and Military Housing Area — not years of service. "
-            "2026 planning rates for supported installations. "
-            "Verify with finance or the official DTMO BAH calculator before signing a lease."
+            "CONUS = BAH. Foreign OCONUS = OHA (actual rent up to max + utilities) + COLA. "
+            "HI/PR = BAH + COLA. Figures are 2026 planning packages — OHA/COLA change with "
+            "exchange rates and DTMO updates. Always verify on your LES and DTMO calculators."
         )

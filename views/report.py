@@ -184,6 +184,13 @@ def _render_bah_summary_banner(form_data: dict) -> None:
             return
         gain = meta.get("bah_gaining_amount")
         delta = meta.get("bah_monthly_delta")
+        system = str(meta.get("housing_system") or "BAH")
+        if system == "OHA":
+            amount_label = "OHA + COLA package"
+        elif system == "BAH_PLUS_COLA":
+            amount_label = "BAH + COLA package"
+        else:
+            amount_label = "BAH at new post"
         amount = f"${int(gain):,}/mo" if gain is not None else "—"
         delta_html = ""
         if delta is not None:
@@ -193,13 +200,13 @@ def _render_bah_summary_banner(form_data: dict) -> None:
             elif d < 0:
                 delta_html = f'<div class="pcs-bah-report-delta down">−${abs(d):,}/mo vs current post</div>'
             else:
-                delta_html = '<div class="pcs-bah-report-delta flat">Same BAH as current post</div>'
+                delta_html = '<div class="pcs-bah-report-delta flat">Same total as current post</div>'
         from components.html_utils import safe_html
 
         st.markdown(
             f"""
             <div class="pcs-bah-report-banner">
-                <div class="pcs-bah-report-amount">{safe_html(amount)} BAH at new post</div>
+                <div class="pcs-bah-report-amount">{safe_html(amount)} {safe_html(amount_label)}</div>
                 {delta_html}
                 <div class="pcs-bah-report-text">{safe_html(callout)}</div>
             </div>

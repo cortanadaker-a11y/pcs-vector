@@ -263,10 +263,21 @@ def _bah_callout_cell(
     curr = metadata.get("bah_current_amount")
     delta = metadata.get("bah_monthly_delta")
 
-    header = "Your BAH at new post"
+    system = str(metadata.get("housing_system") or "BAH")
+    if system == "OHA":
+        header = "OHA + COLA package"
+    elif system == "BAH_PLUS_COLA":
+        header = "BAH + COLA package"
+    else:
+        header = "Your BAH at new post"
     if gain not in (None, ""):
         try:
-            header = f"${int(gain):,}/mo BAH"
+            if system == "OHA":
+                header = f"${int(gain):,}/mo OHA+COLA"
+            elif system == "BAH_PLUS_COLA":
+                header = f"${int(gain):,}/mo BAH+COLA"
+            else:
+                header = f"${int(gain):,}/mo BAH"
         except (TypeError, ValueError):
             pass
 
@@ -276,11 +287,11 @@ def _bah_callout_cell(
             d = int(delta)
             c = int(curr)
             if d > 0:
-                delta_line = f"+${d:,}/mo vs current (${c:,})"
+                delta_line = f"+${d:,}/mo vs current (${c:,} total)"
             elif d < 0:
-                delta_line = f"−${abs(d):,}/mo vs current (${c:,})"
+                delta_line = f"−${abs(d):,}/mo vs current (${c:,} total)"
             else:
-                delta_line = f"Same as current (${c:,}/mo)"
+                delta_line = f"Same total as current (${c:,}/mo)"
         except (TypeError, ValueError):
             delta_line = ""
 
@@ -636,15 +647,15 @@ def _draw_page_frame(canvas, doc, report_date: str) -> None:
 
 
 def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
-    """Extract cover metadata from session form data, including BAH callout."""
+    """Extract cover metadata including BAH/OHA + COLA callout."""
     from components.form_options import rank_short_for_pay_grade
     from components.form_state import (
         resolved_current_installation,
         resolved_gaining_installation,
     )
-    from services.bah_rates import (
-        compare_bah,
-        format_bah_callout,
+    from services.housing_allowances import (
+        compare_housing_packages,
+        format_housing_callout,
         with_dependents_from_family_status,
     )
 
@@ -662,23 +673,24 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
     family_status = str(form_data.get("family_status") or "Married / with dependents")
     with_deps = with_dependents_from_family_status(family_status)
 
-    bah = compare_bah(
+    pkg = compare_housing_packages(
         pay_grade=pay_grade or "E-5",
         with_dependents=with_deps,
         gaining_installation=gaining,
         current_installation=current or None,
     )
-    gain_amt = bah.get("gaining", {}).get("monthly_usd")
-    curr_amt = (bah.get("current") or {}).get("monthly_usd")
-    callout = format_bah_callout(
+    gaining_pkg = pkg["gaining"]
+    current_pkg = pkg.get("current")
+    callout = format_housing_callout(
         rank_short=rank_short_for_pay_grade(pay_grade),
         last_name=last,
-        gaining=gaining or "your new post",
-        gaining_bah=int(gain_amt) if gain_amt is not None else None,
-        current=current or None,
-        current_bah=int(curr_amt) if curr_amt is not None else None,
-        with_dependents=with_deps,
+        package=gaining_pkg,
+        current_package=current_pkg,
     )
+
+    # Display amount = total package (BAH or OHA+COLA)
+    gain_amt = gaining_pkg.get("total_monthly_usd")
+    curr_amt = current_pkg.get("total_monthly_usd") if current_pkg else None
 
     return {
         "family_name": family_name,
@@ -691,6 +703,8 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         "bah_callout": callout,
         "bah_gaining_amount": gain_amt,
         "bah_current_amount": curr_amt,
-        "bah_monthly_delta": bah.get("monthly_delta_usd"),
+        "bah_monthly_delta": pkg.get("monthly_delta_usd"),
         "bah_with_dependents": with_deps,
+        "housing_system": gaining_pkg.get("housing_system"),
+        "cola_monthly_usd": gaining_pkg.get("cola_monthly_usd"),
     }
