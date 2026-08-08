@@ -17,24 +17,19 @@ def _load_bah_data() -> dict[str, Any]:
 
 
 def list_bah_installations() -> list[str]:
-    """CONUS (and AK) installations for the BAH calculator — alphabetical.
+    """Same alphabetical installation list as the form Move Basics dropdowns.
 
-    OCONUS posts use OHA, not CONUS BAH, so they are excluded here.
+    Uses SUPPORTED_INSTALLATIONS so calculator and form stay in lockstep.
+    OCONUS posts are included for comparison; rates may be planning estimates
+    (OHA applies overseas — captioned in the UI).
     """
-    data = _load_bah_data()
-    with_rates = set(data.get("installations", {}).keys())
     try:
-        from services.installation_data import INSTALLATION_DATA
+        from services.installation_data import SUPPORTED_INSTALLATIONS
 
-        conus = [
-            name
-            for name, meta in INSTALLATION_DATA.items()
-            if meta.get("theater", "CONUS") != "OCONUS"
-        ]
-        # Prefer curated rate posts first in quality, but list is alphabetical overall
-        return sorted(set(conus) | with_rates)
+        return list(SUPPORTED_INSTALLATIONS)
     except Exception:
-        return sorted(with_rates)
+        data = _load_bah_data()
+        return sorted(data.get("installations", {}).keys())
 
 
 def get_bah_effective_date() -> str:
@@ -129,7 +124,12 @@ def compare_bah(
         with_dependents=with_dependents,
     )
     current = None
-    if current_installation and current_installation != "— Select current post —":
+    if current_installation and current_installation not in (
+        "— Select current post —",
+        "— Skip comparison (gaining post only) —",
+        "",
+        None,
+    ):
         current = get_bah_rate(
             current_installation,
             pay_grade,
@@ -151,6 +151,7 @@ def compare_bah(
             "monthly_usd": gain_amt,
             "mha": gaining.get("mha"),
             "found": bool(gaining.get("found")),
+            "is_estimate": bool(gaining.get("is_estimate")),
         },
         "current": (
             {
@@ -158,6 +159,7 @@ def compare_bah(
                 "monthly_usd": curr_amt,
                 "mha": current.get("mha") if current else None,
                 "found": bool(current.get("found")) if current else False,
+                "is_estimate": bool(current.get("is_estimate")) if current else False,
             }
             if current is not None
             else None
@@ -165,3 +167,51 @@ def compare_bah(
         "monthly_delta_usd": delta,
         "annual_delta_usd": (delta * 12) if delta is not None else None,
     }
+
+
+def format_bah_callout(
+    *,
+    rank_short: str,
+    last_name: str,
+    gaining: str,
+    gaining_bah: int | None,
+    current: str | None = None,
+    current_bah: int | None = None,
+    with_dependents: bool = True,
+) -> str:
+    """Plain-language BAH summary for PDF / report header (calculator-style)."""
+    who = f"{rank_short} {last_name}".strip() if last_name else rank_short or "Soldier"
+    dep = "with dependents" if with_dependents else "without dependents"
+    if gaining_bah is None:
+        return (
+            f"{who}: BAH for {gaining} is not on file for your grade — "
+            f"verify with finance ({dep})."
+        )
+    lines = [
+        f"{who}, your BAH for {gaining} is ${gaining_bah:,}/mo ({dep}).",
+    ]
+    if current and current_bah is not None:
+        delta = gaining_bah - current_bah
+        if delta > 0:
+            lines.append(
+                f"That is ${delta:,}/mo more than you currently receive at {current} "
+                f"(${current_bah:,}/mo)."
+            )
+        elif delta < 0:
+            lines.append(
+                f"That is ${abs(delta):,}/mo less than you currently receive at {current} "
+                f"(${current_bah:,}/mo)."
+            )
+        else:
+            lines.append(
+                f"That matches what you currently receive at {current} (${current_bah:,}/mo)."
+            )
+    return " ".join(lines)
+
+
+def with_dependents_from_family_status(family_status: str) -> bool:
+    """Single Soldiers use without-dependents BAH; married/with family use with-dependents."""
+    status = (family_status or "").strip().lower()
+    if status.startswith("single"):
+        return False
+    return True

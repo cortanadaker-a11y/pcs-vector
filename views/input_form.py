@@ -15,9 +15,9 @@ from components.form_options import (
     GAINING_INSTALLATIONS,
     HOUSING_MUST_HAVES,
     HOUSING_PREFERENCES,
+    FAMILY_STATUS_OPTIONS,
     MOVE_FLEXIBILITY,
     MOVE_WINDOWS,
-
     PET_OPTIONS,
     PET_TYPES,
     PRIORITY_CHOICES,
@@ -195,48 +195,77 @@ def _render_move_basics() -> None:
 def _render_family_situation() -> None:
     _section_header(
         "2. Family Situation",
-        "Help us factor in employment, schools, and pets.",
+        "Single or with family — this sets your BAH with/without dependents rate on the report.",
     )
 
     set_form_value(
-        "spouse_career_field",
-        st.selectbox(
-            "Spouse profession / field",
-            options=SPOUSE_CAREER_FIELDS,
-            index=_option_index(SPOUSE_CAREER_FIELDS, get_form_value("spouse_career_field")),
-            help="Pick the closest match — we'll tailor job-market advice.",
+        "family_status",
+        st.radio(
+            "Family status",
+            options=FAMILY_STATUS_OPTIONS,
+            index=_option_index(FAMILY_STATUS_OPTIONS, get_form_value("family_status")),
+            horizontal=True,
+            help="Single = BAH without dependents. Married / with dependents = BAH with dependents.",
+            key="form_family_status",
         ),
     )
 
-    if get_form_value("spouse_career_field") == "Other field":
+    is_single = str(get_form_value("family_status") or "").startswith("Single")
+
+    if is_single:
+        set_form_value("spouse_career_field", "N/A — single Soldier")
+        set_form_value("spouse_career_other", "")
+        set_form_value("num_children", 0)
+        reset_multiselect("child_age_ranges")
+        st.caption(
+            "Single Soldier selected — spouse and children fields are skipped. "
+            "Your report will use **without-dependents** BAH."
+        )
+    else:
         set_form_value(
-            "spouse_career_other",
-            st.text_input(
-                "Describe spouse field",
-                value=get_form_value("spouse_career_other"),
-                placeholder="e.g., Real estate agent, military contractor",
+            "spouse_career_field",
+            st.selectbox(
+                "Spouse profession / field",
+                options=[f for f in SPOUSE_CAREER_FIELDS if not f.startswith("N/A")],
+                index=_option_index(
+                    [f for f in SPOUSE_CAREER_FIELDS if not f.startswith("N/A")],
+                    get_form_value("spouse_career_field")
+                    if not str(get_form_value("spouse_career_field") or "").startswith("N/A")
+                    else "Not currently working — seeking employment",
+                ),
+                help="Pick the closest match — we'll tailor job-market advice.",
             ),
         )
 
-    col_children, col_ages = st.columns([1, 2])
-    with col_children:
-        render_number_input(
-            "Number of children",
-            "num_children",
-            min_value=0,
-            max_value=12,
-            step=1,
-        )
-    with col_ages:
-        if get_form_value("num_children") > 0:
-            render_multiselect(
-                "Children's age ranges",
-                CHILD_AGE_RANGES,
-                "child_age_ranges",
+        if get_form_value("spouse_career_field") == "Other field":
+            set_form_value(
+                "spouse_career_other",
+                st.text_input(
+                    "Describe spouse field",
+                    value=get_form_value("spouse_career_other"),
+                    placeholder="e.g., Real estate agent, military contractor",
+                ),
             )
-        else:
-            reset_multiselect("child_age_ranges")
-            st.caption("No children — school planning will be lighter.")
+
+        col_children, col_ages = st.columns([1, 2])
+        with col_children:
+            render_number_input(
+                "Number of children",
+                "num_children",
+                min_value=0,
+                max_value=12,
+                step=1,
+            )
+        with col_ages:
+            if get_form_value("num_children") > 0:
+                render_multiselect(
+                    "Children's age ranges",
+                    CHILD_AGE_RANGES,
+                    "child_age_ranges",
+                )
+            else:
+                reset_multiselect("child_age_ranges")
+                st.caption("No children — school planning will be lighter.")
 
     set_form_value(
         "has_pets",

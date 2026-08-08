@@ -7,6 +7,7 @@ import streamlit as st
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
 from components.html_utils import safe_html
 from services.bah_rates import compare_bah, get_bah_effective_date, list_bah_installations
+from services.installation_data import SUPPORTED_INSTALLATIONS
 
 # Years of service does not change BAH (rank + dependents + location do).
 YOS_OPTIONS = [
@@ -42,7 +43,10 @@ def _resolve_dependents(deps_value: str) -> bool:
 
 def render_bah_calculator() -> None:
     """Interactive BAH calculator for the homepage."""
+    # Must match form Move Basics installation list exactly.
     installations = list_bah_installations()
+    if list(installations) != list(SUPPORTED_INSTALLATIONS):
+        installations = list(SUPPORTED_INSTALLATIONS)
     if not installations:
         return
 
@@ -53,12 +57,12 @@ def render_bah_calculator() -> None:
         f"""
         <div class="pcs-bah-wrap">
             <div class="pcs-bah-header">
-                <div class="pcs-bah-badge">2026 rates · free tool</div>
+                <div class="pcs-bah-badge">2026 rates · {len(installations)} posts · same list as the plan form</div>
                 <h3>BAH Calculator</h3>
                 <p class="pcs-bah-sub">
                     Plug in your rank and dependents, pick your posts, and see your monthly
                     housing allowance — plus how much it changes when you PCS.
-                    Effective {safe_html(effective)}.
+                    Effective {safe_html(effective)}. OCONUS uses planning estimates (OHA applies overseas).
                 </p>
             </div>
         </div>

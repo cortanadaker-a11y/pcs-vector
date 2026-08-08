@@ -28,6 +28,7 @@ FULL_TO_COMPACT: dict[str, str] = {
     "gaining_installation_other": "gio",
     "move_window": "mw",
     "move_flexibility": "mf",
+    "family_status": "fs",
     "spouse_career_field": "scf",
     "spouse_career_other": "sco",
     "num_children": "nc",

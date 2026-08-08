@@ -56,6 +56,43 @@ def rank_for_pay_grade(pay_grade: str) -> str:
     """Return the standard rank title for a pay grade."""
     return PAY_GRADE_TO_RANK.get(pay_grade, "")
 
+
+# Short rank for PDF/report address lines (e.g. "LTC Daker").
+PAY_GRADE_TO_SHORT: dict[str, str] = {
+    "E-1": "PVT",
+    "E-2": "PV2",
+    "E-3": "PFC",
+    "E-4": "SPC",
+    "E-5": "SGT",
+    "E-6": "SSG",
+    "E-7": "SFC",
+    "E-8": "MSG",
+    "E-9": "SGM",
+    "W-1": "WO1",
+    "W-2": "CW2",
+    "W-3": "CW3",
+    "W-4": "CW4",
+    "W-5": "CW5",
+    "O-1": "2LT",
+    "O-2": "1LT",
+    "O-3": "CPT",
+    "O-4": "MAJ",
+    "O-5": "LTC",
+    "O-6": "COL",
+    "O-7+": "GO",
+    "Other": "",
+}
+
+
+def rank_short_for_pay_grade(pay_grade: str) -> str:
+    return PAY_GRADE_TO_SHORT.get(pay_grade, pay_grade or "")
+
+
+FAMILY_STATUS_OPTIONS = [
+    "Married / with dependents",
+    "Single (no dependents)",
+]
+
 # Alphabetical list from INSTALLATION_DATA (CONUS + OCONUS).
 CURRENT_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other installation"]
 

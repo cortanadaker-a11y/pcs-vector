@@ -191,7 +191,7 @@ def _build_cover_block(
     report_date: str,
     styles: dict[str, ParagraphStyle],
 ) -> list[Any]:
-    """Build title and optional move summary above section content."""
+    """Build title, move summary (left), and BAH callout (top right)."""
     flowables: list[Any] = []
     title_line = _extract_title(markdown_content)
 
@@ -205,24 +205,135 @@ def _build_cover_block(
 
     if metadata:
         move_lines = _metadata_lines(metadata)
+        bah_cell = _bah_callout_cell(metadata, styles)
+        meta_table = None
         if move_lines:
-            flowables.append(Spacer(1, 0.08 * inch))
-            meta_table = Table(move_lines, colWidths=[1.35 * inch, 4.8 * inch])
+            meta_table = Table(move_lines, colWidths=[1.25 * inch, 2.55 * inch])
             meta_table.setStyle(
                 TableStyle(
                     [
                         ("VALIGN", (0, 0), (-1, -1), "TOP"),
                         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-                        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
                         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
                         ("TOPPADDING", (0, 0), (-1, -1), 1),
                     ]
                 )
             )
+
+        if bah_cell is not None and meta_table is not None:
+            outer = Table(
+                [[meta_table, bah_cell]],
+                colWidths=[3.9 * inch, 2.7 * inch],
+            )
+            outer.setStyle(
+                TableStyle(
+                    [
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                        ("TOPPADDING", (0, 0), (-1, -1), 4),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+                    ]
+                )
+            )
+            flowables.append(Spacer(1, 0.06 * inch))
+            flowables.append(outer)
+        elif bah_cell is not None:
+            flowables.append(Spacer(1, 0.06 * inch))
+            flowables.append(bah_cell)
+        elif meta_table is not None:
+            flowables.append(Spacer(1, 0.08 * inch))
             flowables.append(meta_table)
 
     flowables.append(HRFlowable(width="100%", thickness=1, color=BORDER, spaceBefore=8, spaceAfter=4))
     return flowables
+
+
+def _bah_callout_cell(
+    metadata: dict[str, Any],
+    styles: dict[str, ParagraphStyle],
+) -> Table | None:
+    """Top-right BAH comparison box matching the homepage calculator message."""
+    callout = str(metadata.get("bah_callout") or "").strip()
+    if not callout:
+        return None
+
+    gain = metadata.get("bah_gaining_amount")
+    curr = metadata.get("bah_current_amount")
+    delta = metadata.get("bah_monthly_delta")
+
+    header = "Your BAH at new post"
+    if gain not in (None, ""):
+        try:
+            header = f"${int(gain):,}/mo BAH"
+        except (TypeError, ValueError):
+            pass
+
+    delta_line = ""
+    if delta not in (None, "") and curr not in (None, ""):
+        try:
+            d = int(delta)
+            c = int(curr)
+            if d > 0:
+                delta_line = f"+${d:,}/mo vs current (${c:,})"
+            elif d < 0:
+                delta_line = f"−${abs(d):,}/mo vs current (${c:,})"
+            else:
+                delta_line = f"Same as current (${c:,}/mo)"
+        except (TypeError, ValueError):
+            delta_line = ""
+
+    body_style = ParagraphStyle(
+        "BahCalloutBody",
+        parent=styles["body"],
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.white,
+    )
+    head_style = ParagraphStyle(
+        "BahCalloutHead",
+        parent=styles["body"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=14,
+        textColor=colors.white,
+        spaceAfter=4,
+    )
+    sub_style = ParagraphStyle(
+        "BahCalloutSub",
+        parent=styles["body"],
+        fontName="Helvetica-Bold",
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#a8d4bc"),
+        spaceAfter=4,
+    )
+
+    inner: list[list[Any]] = [
+        [Paragraph(_escape(header), head_style)],
+    ]
+    if delta_line:
+        inner.append([Paragraph(_escape(delta_line), sub_style)])
+    inner.append([Paragraph(_escape(callout), body_style)])
+
+    box = Table(inner, colWidths=[2.55 * inch])
+    box.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), NAVY),
+                ("BOX", (0, 0), (-1, -1), 0, NAVY),
+                ("LEFTPADDING", (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+                ("TOPPADDING", (0, 0), (0, 0), 10),
+                ("BOTTOMPADDING", (0, -1), (-1, -1), 10),
+                ("TOPPADDING", (0, 1), (-1, -1), 2),
+                ("BOTTOMPADDING", (0, 0), (-1, -2), 2),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+        )
+    )
+    return box
 
 
 def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
@@ -524,26 +635,62 @@ def _draw_page_frame(canvas, doc, report_date: str) -> None:
     canvas.restoreState()
 
 
-def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, str]:
-    """Extract cover metadata from session form data."""
+def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
+    """Extract cover metadata from session form data, including BAH callout."""
+    from components.form_options import rank_short_for_pay_grade
     from components.form_state import (
         resolved_current_installation,
         resolved_gaining_installation,
     )
+    from services.bah_rates import (
+        compare_bah,
+        format_bah_callout,
+        with_dependents_from_family_status,
+    )
 
-    rank = form_data.get("rank_pay_grade", "")
+    pay_grade = str(form_data.get("rank_pay_grade", "") or "")
+    rank = pay_grade
     if form_data.get("rank_title"):
-        rank = f"{rank} ({form_data['rank_title']})"
+        rank = f"{pay_grade} ({form_data['rank_title']})"
 
     first = str(form_data.get("first_name", "")).strip()
     last = str(form_data.get("last_name", "")).strip()
     family_name = f"{first} {last}".strip()
 
+    current = resolved_current_installation(form_data)
+    gaining = resolved_gaining_installation(form_data)
+    family_status = str(form_data.get("family_status") or "Married / with dependents")
+    with_deps = with_dependents_from_family_status(family_status)
+
+    bah = compare_bah(
+        pay_grade=pay_grade or "E-5",
+        with_dependents=with_deps,
+        gaining_installation=gaining,
+        current_installation=current or None,
+    )
+    gain_amt = bah.get("gaining", {}).get("monthly_usd")
+    curr_amt = (bah.get("current") or {}).get("monthly_usd")
+    callout = format_bah_callout(
+        rank_short=rank_short_for_pay_grade(pay_grade),
+        last_name=last,
+        gaining=gaining or "your new post",
+        gaining_bah=int(gain_amt) if gain_amt is not None else None,
+        current=current or None,
+        current_bah=int(curr_amt) if curr_amt is not None else None,
+        with_dependents=with_deps,
+    )
+
     return {
         "family_name": family_name,
         "rank": rank,
-        "from_installation": resolved_current_installation(form_data),
-        "to_installation": resolved_gaining_installation(form_data),
+        "from_installation": current,
+        "to_installation": gaining,
         "move_window": str(form_data.get("move_window", "")),
         "primary_priority": str(form_data.get("primary_priority", "")),
+        "family_status": family_status,
+        "bah_callout": callout,
+        "bah_gaining_amount": gain_amt,
+        "bah_current_amount": curr_amt,
+        "bah_monthly_delta": bah.get("monthly_delta_usd"),
+        "bah_with_dependents": with_deps,
     }

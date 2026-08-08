@@ -173,6 +173,43 @@ def _render_report_header(form_data: dict) -> None:
         st.caption(f"Personalized for your move to **{gaining}**")
 
 
+def _render_bah_summary_banner(form_data: dict) -> None:
+    """On-screen BAH callout (mirrors PDF top-right calculator comparison)."""
+    try:
+        from services.pdf_generator import build_pdf_metadata
+
+        meta = build_pdf_metadata(form_data)
+        callout = str(meta.get("bah_callout") or "").strip()
+        if not callout:
+            return
+        gain = meta.get("bah_gaining_amount")
+        delta = meta.get("bah_monthly_delta")
+        amount = f"${int(gain):,}/mo" if gain is not None else "—"
+        delta_html = ""
+        if delta is not None:
+            d = int(delta)
+            if d > 0:
+                delta_html = f'<div class="pcs-bah-report-delta up">+${d:,}/mo vs current post</div>'
+            elif d < 0:
+                delta_html = f'<div class="pcs-bah-report-delta down">−${abs(d):,}/mo vs current post</div>'
+            else:
+                delta_html = '<div class="pcs-bah-report-delta flat">Same BAH as current post</div>'
+        from components.html_utils import safe_html
+
+        st.markdown(
+            f"""
+            <div class="pcs-bah-report-banner">
+                <div class="pcs-bah-report-amount">{safe_html(amount)} BAH at new post</div>
+                {delta_html}
+                <div class="pcs-bah-report-text">{safe_html(callout)}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    except Exception:
+        return
+
+
 def _render_spouse_share_callout(report: str) -> None:
     lines = [ln.strip() for ln in report.strip().splitlines() if ln.strip()]
     if not lines:
@@ -260,6 +297,7 @@ def render_report() -> None:
 
     render_payment_confirmation_banner()
     _render_report_header(form_data)
+    _render_bah_summary_banner(form_data)
 
     date_stamp = datetime.now().strftime("%Y%m%d")
     md_filename = f"pcs-vector-report-{date_stamp}.md"

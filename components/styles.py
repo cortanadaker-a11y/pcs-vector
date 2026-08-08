@@ -513,6 +513,38 @@ CUSTOM_CSS = """
         padding-top: 0.85rem;
     }
 
+    .pcs-bah-report-banner {
+        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
+        border-radius: 12px;
+        padding: 0.95rem 1.15rem;
+        color: #fff;
+        margin: 0.65rem 0 0.85rem 0;
+        box-shadow: var(--pcs-shadow);
+    }
+
+    .pcs-bah-report-amount {
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.25rem;
+    }
+
+    .pcs-bah-report-delta {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .pcs-bah-report-delta.up { color: #a8d4bc; }
+    .pcs-bah-report-delta.down { color: #f0c4b4; }
+    .pcs-bah-report-delta.flat { color: rgba(255,255,255,0.8); }
+
+    .pcs-bah-report-text {
+        font-size: 0.88rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
     /* ── Cards & sections ── */
     .pcs-card {
         background: var(--pcs-surface);

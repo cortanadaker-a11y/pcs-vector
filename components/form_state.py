@@ -29,6 +29,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "gaining_installation_other": "",
     "move_window": "1–3 months",
     "move_flexibility": "Fixed — must align with reporting date",
+    "family_status": "Married / with dependents",
     "spouse_career_field": "Not currently working — seeking employment",
     "spouse_career_other": "",
     "num_children": 0,
