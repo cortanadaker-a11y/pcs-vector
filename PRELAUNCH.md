@@ -23,8 +23,11 @@ Use this checklist before sharing PCS Vector publicly or switching Stripe to liv
   - [ ] `[stripe] secret_key`
   - [ ] `[grok] api_key`
   - [ ] `[pcs_vector] app_url` (exact live URL, no trailing slash)
+  - [ ] `[email]` SMTP block (host, user, password, from_address) for PDF auto-send
 - [ ] Sidebar shows no "Configuration incomplete" warning in production
+- [ ] Sidebar shows `📧 Email connected` (or confirm download-only fallback is acceptable)
 - [ ] Grok API key has sufficient quota for expected traffic
+- [ ] `scripts/test_email.py --to <you>` succeeds before launch
 
 ---
 

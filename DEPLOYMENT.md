@@ -85,6 +85,35 @@ app_url = "https://YOUR-APP-NAME.streamlit.app"
 
 Click **Save**. The app will reboot automatically.
 
+### Email delivery (PDF auto-send)
+
+Automatic PDF email needs an `[email]` block in secrets (local **and** Streamlit Cloud).
+
+```toml
+[email]
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+smtp_user = "you@gmail.com"
+smtp_password = "your-app-password"
+from_address = "PCS Vector <you@gmail.com>"
+use_tls = true
+```
+
+| Provider | Host | Notes |
+|----------|------|--------|
+| Gmail | `smtp.gmail.com` | Use a [Google App Password](https://myaccount.google.com/apppasswords) (2FA required) |
+| Outlook / Microsoft 365 | `smtp.office365.com` | Use the mailbox login + app password if required |
+| SendGrid | `smtp.sendgrid.net` | `smtp_user = "apikey"`, `smtp_password = <API key>` |
+
+**Verify locally:**
+
+```bash
+cd pcs-vector
+.venv/bin/python scripts/test_email.py --to you@example.com
+```
+
+If the test succeeds, the sidebar shows `📧 Email connected`. Without `[email]`, the app still works — users download the PDF on the report page.
+
 ---
 
 ## 4. Update Stripe redirect URLs (critical)
@@ -182,6 +211,8 @@ Before going live, complete every item in **[PRELAUNCH.md](PRELAUNCH.md)**.
 | "Grok API key not found" | Add `[grok] api_key` to secrets |
 | Report never generates | Check Streamlit logs; verify Grok key and network access |
 | App build fails | Confirm `requirements.txt` and `app.py` path in deploy settings |
+| PDF never emails | Add `[email]` SMTP block to secrets; run `scripts/test_email.py --to you@…` |
+| Gmail "Authentication failed" | Use a Google App Password, not your normal account password |
 
 ---
 
