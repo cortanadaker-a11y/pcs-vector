@@ -2,25 +2,16 @@
 
 import streamlit as st
 
+from components.bah_calculator import render_bah_calculator
 from components.content import (
-    AUDIENCE_STRIP,
     CTA,
     DIY_VS_VECTOR,
     HERO,
     HOW_IT_WORKS_STEPS,
-    MOTIVATION_CLOSE,
-    MOTIVATION_RALLY,
-    OUTCOME_BENEFITS,
-    PAIN_POINTS,
     PRICING_INCLUDES,
-    REPORT_HIGHLIGHTS,
-    REPORT_SECTIONS,
-    SPOUSE_SHARE_TEASE,
     TESTIMONIAL,
     TRUST_SIGNALS,
-    WHY_25,
 )
-from components.bah_calculator import render_bah_calculator
 from components.faq import render_faq
 from components.html_utils import safe_html, safe_markdown
 from components.report_preview import render_report_preview
@@ -34,7 +25,7 @@ def _with_price(text: str, price: str) -> str:
 
 
 def _cta_block(price: str, *, cta_id: str = "bottom") -> None:
-    """Reusable pricing + CTA column."""
+    """Pricing box + primary CTA."""
     price_safe = safe_html(price)
     includes_html = "".join(f"<li>{safe_html(item)}</li>" for item in PRICING_INCLUDES)
     st.markdown(
@@ -42,7 +33,7 @@ def _cta_block(price: str, *, cta_id: str = "bottom") -> None:
         <div class="pcs-pricing-box">
             <div class="pcs-price">{price_safe}</div>
             <div class="pcs-price-sub">one-time · per report · no subscription</div>
-            <div class="pcs-price-guarantee">Less than a tank of gas · More than a week of PCS stress</div>
+            <div class="pcs-price-guarantee">Less than a tank of gas · more clarity than a week of Facebook threads</div>
             <ul class="pcs-price-includes">{includes_html}</ul>
         </div>
         """,
@@ -75,68 +66,43 @@ def _render_hero(price: str) -> None:
     )
 
 
-def _render_trust_signals() -> None:
-    badges = "".join(f'<span class="pcs-trust-badge">{safe_html(b)}</span>' for b in TRUST_SIGNALS["badges"])
+def _render_trust_bar() -> None:
+    """Compact trust row — banner + 3 badges only."""
+    # Prefer the highest-signal badges; skip filler.
+    keep = {"By Soldiers, for families", "Secure Stripe checkout", "PDF emailed to you"}
+    badges = [b for b in TRUST_SIGNALS["badges"] if b in keep]
+    if len(badges) < 3:
+        badges = TRUST_SIGNALS["badges"][:3]
+    badges_html = "".join(f'<span class="pcs-trust-badge">{safe_html(b)}</span>' for b in badges)
     st.markdown(
         f"""
         <div class="pcs-trust-banner">{safe_html(TRUST_SIGNALS["banner"])}</div>
-        <div class="pcs-trust-row">{badges}</div>
-        <div class="pcs-audience-strip">{safe_html(AUDIENCE_STRIP)}</div>
+        <div class="pcs-trust-row">{badges_html}</div>
         """,
         unsafe_allow_html=True,
     )
 
 
-def _render_rally(block: dict, *, css_class: str = "pcs-rally") -> None:
-    punch = block.get("punch", "")
-    punch_html = f'<p class="pcs-rally-punch">{safe_html(punch)}</p>' if punch else ""
-    st.markdown(
-        f"""
-        <div class="{css_class}">
-            <h3>{safe_html(block["headline"])}</h3>
-            <p class="pcs-rally-body">{safe_html(block["body"])}</p>
-            {punch_html}
+def _render_how_it_works(price: str) -> None:
+    st.markdown("### How it works")
+    steps_html = '<div class="pcs-flow">'
+    for i, step in enumerate(HOW_IT_WORKS_STEPS):
+        desc = _with_price(step["desc"], price)
+        steps_html += f"""
+        <div class="pcs-flow-step">
+            <div class="pcs-flow-num">{safe_html(step["num"])}</div>
+            <div class="pcs-flow-title">{safe_html(step["title"])}</div>
+            <div class="pcs-flow-desc">{desc}</div>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def _render_pain_section() -> None:
-    st.markdown("### The stakes are higher than another move")
-    cols = st.columns(3)
-    for col, pain in zip(cols, PAIN_POINTS):
-        with col:
-            st.markdown(
-                f"""
-                <div class="pcs-pain-card">
-                    <h4>{safe_html(pain["title"])}</h4>
-                    <p>{safe_html(pain["desc"])}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-
-def _render_outcomes() -> None:
-    st.markdown("### What changes when you have a real plan")
-    cols = st.columns(3)
-    for col, benefit in zip(cols, OUTCOME_BENEFITS):
-        with col:
-            st.markdown(
-                f"""
-                <div class="pcs-outcome-card">
-                    <div class="pcs-outcome-icon">{safe_html(benefit["icon"])}</div>
-                    <h3>{safe_html(benefit["title"])}</h3>
-                    <p>{safe_html(benefit["desc"])}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+        """
+        if i < len(HOW_IT_WORKS_STEPS) - 1:
+            steps_html += '<div class="pcs-flow-arrow">→</div>'
+    steps_html += "</div>"
+    st.markdown(steps_html, unsafe_allow_html=True)
 
 
 def _render_comparison() -> None:
-    st.markdown("### Stop piecing it together. Start executing.")
+    st.markdown("### Why not just use free checklists?")
     cells = [
         '<div class="pcs-cmp-h pcs-cmp-topic"></div>',
         '<div class="pcs-cmp-h">On your own</div>',
@@ -157,51 +123,7 @@ def _render_comparison() -> None:
     )
 
 
-def _render_how_it_works(price: str) -> None:
-    st.markdown("### Four steps. One plan. Done tonight.")
-    steps_html = '<div class="pcs-flow">'
-    for i, step in enumerate(HOW_IT_WORKS_STEPS):
-        desc = _with_price(step["desc"], price)
-        steps_html += f"""
-        <div class="pcs-flow-step">
-            <div class="pcs-flow-num">{safe_html(step["num"])}</div>
-            <div class="pcs-flow-title">{safe_html(step["title"])}</div>
-            <div class="pcs-flow-desc">{desc}</div>
-        </div>
-        """
-        if i < len(HOW_IT_WORKS_STEPS) - 1:
-            steps_html += '<div class="pcs-flow-arrow">→</div>'
-    steps_html += "</div>"
-    st.markdown(steps_html, unsafe_allow_html=True)
-
-
-def _render_report_sections() -> None:
-    st.markdown("### Your complete strategic plan — all eight sections")
-
-    cols = st.columns(2)
-    for i, section in enumerate(REPORT_SECTIONS):
-        with cols[i % 2]:
-            st.markdown(
-                f"""
-                <div class="pcs-section-item">
-                    <span class="pcs-section-num">{section["num"]}</span>
-                    <div>
-                        <strong>{safe_html(section["title"])}</strong><br>
-                        <span class="pcs-section-desc-inline">{safe_html(section["desc"])}</span>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-
-def _render_example_highlights() -> None:
-    st.markdown("### This is the kind of clarity you get")
-    st.caption(safe_markdown(SPOUSE_SHARE_TEASE))
-
-    for quote in REPORT_HIGHLIGHTS:
-        st.markdown(f'<div class="pcs-highlight">{safe_html(quote)}</div>', unsafe_allow_html=True)
-
+def _render_testimonial() -> None:
     t = TESTIMONIAL
     st.markdown(
         f"""
@@ -214,54 +136,13 @@ def _render_example_highlights() -> None:
     )
 
 
-def _render_why_25(price: str) -> None:
-    # Streamlit markdown breaks when multiple <p> tags are nested in one HTML block —
-    # use div-based markup throughout this section.
-    points_html = "".join(
-        f'<div class="pcs-why-point">'
-        f'<strong>{safe_html(p["title"])}</strong>'
-        f'<div class="pcs-why-point-desc">{safe_html(p["desc"])}</div>'
-        f"</div>"
-        for p in WHY_25["points"]
-    )
-    punch = MOTIVATION_RALLY.get("punch", "")
-    punch_html = (
-        f'<div class="pcs-why-punch">{safe_html(punch)}</div>' if punch else ""
-    )
-    st.markdown(
-        f'<div class="pcs-why-box">'
-        f'<h3>{_with_price(WHY_25["headline"], price)}</h3>'
-        f'<div class="pcs-why-intro">{safe_html(WHY_25["intro"])}</div>'
-        f"{points_html}"
-        f'<div class="pcs-why-roi">{safe_html(WHY_25["roi_line"])}</div>'
-        f"{punch_html}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-
-
-def _render_mid_cta(price: str) -> None:
-    st.markdown(
-        f"""
-        <div class="pcs-mid-cta">
-            <div class="pcs-mid-cta-text">
-                <strong>{safe_html(MOTIVATION_CLOSE["headline"])}</strong>
-                <span>{_with_price(MOTIVATION_CLOSE["body"], price)}</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    if st.button(CTA["mid"], type="primary", use_container_width=True, key="mid_cta"):
-        navigate_to("input")
-
-
 def render_home() -> None:
-    """Render the conversion-focused landing page."""
+    """Lean homepage: hero → BAH → product proof → buy → FAQ."""
     price = get_price_display()
 
+    # 1. Hook
     _render_hero(price)
-    _render_trust_signals()
+    _render_trust_bar()
 
     cta_top_l, cta_top_c, cta_top_r = st.columns([1, 2, 1])
     with cta_top_c:
@@ -269,41 +150,30 @@ def render_home() -> None:
             navigate_to("input")
         st.caption(safe_markdown(CTA["caption"].replace("$25", price)))
 
+    # 2. Immediate value tool (high engagement, early)
     st.markdown("<br>", unsafe_allow_html=True)
-    _render_rally(MOTIVATION_RALLY)
-    st.markdown("<br>", unsafe_allow_html=True)
+    render_bah_calculator()
 
-    _render_pain_section()
+    # 3. Product path + proof
     st.markdown("<br>", unsafe_allow_html=True)
-    _render_outcomes()
+    _render_how_it_works(price)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    render_report_preview()
+
     st.markdown("<br>", unsafe_allow_html=True)
     _render_comparison()
-    st.markdown("<br>", unsafe_allow_html=True)
 
-    _render_how_it_works(price)
     st.markdown("<br>", unsafe_allow_html=True)
+    _render_testimonial()
 
-    render_report_preview()
+    # 4. Convert
     st.markdown("<br>", unsafe_allow_html=True)
-
-    _render_mid_cta(price)
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    _render_report_sections()
-    st.markdown("<br>", unsafe_allow_html=True)
-    _render_example_highlights()
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    _render_why_25(price)
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    render_bah_calculator()
-    st.markdown("<br>", unsafe_allow_html=True)
-
     cta_l, cta_c, cta_r = st.columns([1, 2, 1])
     with cta_c:
         _cta_block(price, cta_id="bottom")
 
+    # 5. Objections
     st.markdown("<br>", unsafe_allow_html=True)
     render_faq("Questions before you start")
 

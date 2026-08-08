@@ -8,24 +8,18 @@ HERO = {
     "kicker": "Your PCS. Your family. One clear plan.",
     "headline": "Stop guessing your PCS — get a plan your whole family can follow",
     "subheadline": (
-        "PCS Vector turns your real inputs into a personalized strategic plan: where to live, "
-        "how to protect spouse income, which schools work, and what to tackle in the first "
-        "30 days — written like advice from a senior NCO who's done this move."
+        "A personalized strategic plan for where to live, spouse employment, schools, "
+        "and your first 30 days — written like advice from a senior NCO who's done this move."
     ),
 }
-
-AUDIENCE_STRIP = (
-    "For Soldiers and families juggling spouse careers, school zones, BAH math, and a hard report date — "
-    "not another generic checklist."
-)
 
 TRUST_SIGNALS = {
     "banner": "Built For Soldiers; By Soldiers",
     "badges": [
         "By Soldiers, for families",
-        "22 CONUS installations",
         "Secure Stripe checkout",
         "PDF emailed to you",
+        "22 CONUS installations",
         "Minutes, not weeks of research",
     ],
 }
@@ -199,10 +193,10 @@ SPOUSE_SHARE_TEASE = (
 )
 
 REPORT_PREVIEW = {
-    "headline": "Preview your report before you pay",
+    "headline": "What's in your plan",
     "subhead": (
-        "Every plan follows this eight-section structure — written for your family, "
-        "your installation, and your priorities. Here's what the finished product looks like."
+        "Eight sections tailored to your family, installation, and priorities — "
+        "not a generic checklist."
     ),
     "sample_meta": "Sample · E-5 family · Fort Riley → Fort Campbell · minimizing total costs",
     "blur_note": "Your report uses your actual BAH, zip codes, spouse career field, and move window.",
