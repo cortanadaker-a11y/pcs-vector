@@ -45,7 +45,7 @@ def render_bah_calculator() -> None:
         f"""
         <div class="pcs-bah-wrap">
             <div class="pcs-bah-header">
-                <div class="pcs-bah-badge">2026 · {len(installations)} posts · same list as the plan form</div>
+                <div class="pcs-bah-badge">2026 · {len(installations)} posts</div>
                 <h3>Housing Allowance Calculator</h3>
                 <p class="pcs-bah-sub">
                     CONUS: BAH. Foreign OCONUS: OHA (rent max + utilities) + COLA.
