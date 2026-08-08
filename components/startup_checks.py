@@ -69,9 +69,12 @@ def render_config_warnings() -> None:
 
         if status["email_configured"]:
             st.caption(f"📧 Email connected · {status['email_from']}")
+            cfg = get_smtp_config() or {}
+            if cfg.get("provider") == "resend":
+                st.caption("Provider: Resend")
         else:
             st.warning("PDF email not connected")
             st.caption(
-                "Add `[email]` SMTP settings in Streamlit secrets "
-                "(see DEPLOYMENT.md → Email delivery)."
+                "Add Resend `[email]` settings in Streamlit secrets "
+                "(see DEPLOYMENT.md → Email delivery — Resend)."
             )

@@ -85,25 +85,40 @@ app_url = "https://YOUR-APP-NAME.streamlit.app"
 
 Click **Save**. The app will reboot automatically.
 
-### Email delivery (PDF auto-send)
+### Email delivery — Resend (recommended)
 
 Automatic PDF email needs an `[email]` block in secrets (local **and** Streamlit Cloud).
 
+#### Resend setup checklist
+
+1. Create an account at [resend.com](https://resend.com)
+2. **API Keys** → Create → copy `re_…` key
+3. **Domains** → Add your domain → add the DNS records Resend shows (SPF, DKIM, DMARC)
+4. Wait until the domain status is **Verified**
+5. Paste secrets (local `secrets.toml` **and** Streamlit Cloud):
+
 ```toml
 [email]
-smtp_host = "smtp.gmail.com"
+smtp_host = "smtp.resend.com"
 smtp_port = 587
-smtp_user = "you@gmail.com"
-smtp_password = "your-app-password"
-from_address = "PCS Vector <you@gmail.com>"
+smtp_user = "resend"
+smtp_password = "re_xxxxxxxx"
+from_address = "PCS Vector <reports@yourdomain.com>"
+reply_to = "pcs0vector@gmail.com"
 use_tls = true
 ```
 
-| Provider | Host | Notes |
-|----------|------|--------|
-| Gmail | `smtp.gmail.com` | Use a [Google App Password](https://myaccount.google.com/apppasswords) (2FA required) |
-| Outlook / Microsoft 365 | `smtp.office365.com` | Use the mailbox login + app password if required |
-| SendGrid | `smtp.sendgrid.net` | `smtp_user = "apikey"`, `smtp_password = <API key>` |
+| Field | Value |
+|-------|--------|
+| Host | `smtp.resend.com` |
+| Port | `587` (STARTTLS) or `465` (SSL, set `use_ssl = true`) |
+| Username | always `resend` |
+| Password | your Resend **API key** (`re_…`) |
+| From | address on your **verified domain** |
+
+**Test without a domain first:** use  
+`from_address = "PCS Vector <onboarding@resend.dev>"`  
+and send **only** to the email on your Resend account. Domain verification is required before sending to customers.
 
 **Verify locally:**
 
@@ -112,47 +127,19 @@ cd pcs-vector
 .venv/bin/python scripts/test_email.py --to you@example.com
 ```
 
-If the test succeeds, the sidebar shows `📧 Email connected`. Without `[email]`, the app still works — users download the PDF on the report page.
+If the test succeeds, the sidebar shows `📧 Email connected`. Check [resend.com/emails](https://resend.com/emails) for delivery logs.
 
-### Email going to spam (deliverability)
+Without `[email]`, the app still works — users download the PDF on the report page.
 
-**Why free Gmail often lands in spam**
+#### Why Resend beats free Gmail for spam
 
-Sending from `something@gmail.com` via SMTP has weak reputation for bulk/transactional mail. You cannot set custom SPF/DKIM for `@gmail.com`. Filters often treat free Gmail + PDF attachments as lower trust.
+| | Free Gmail SMTP | Resend + verified domain |
+|--|-----------------|---------------------------|
+| SPF / DKIM / DMARC | You cannot set these for @gmail.com | Resend gives DNS records |
+| Inbox placement | Often spam (esp. PDF) | Much better once domain is verified |
+| Logs | Limited | Full send log in Resend dashboard |
 
-**What improves deliverability most (recommended path)**
-
-1. **Use a real domain** you own (e.g. `mail@pcsvector.com` or Google Workspace).
-2. **Authenticate the domain** with the provider:
-   - **SPF** DNS TXT record authorizing the sending host
-   - **DKIM** DNS TXT records from the provider
-   - **DMARC** DNS TXT (start with `v=DMARC1; p=none; rua=mailto:you@domain.com`)
-3. Prefer a transactional provider with easy domain auth:
-   - [Resend](https://resend.com), [SendGrid](https://sendgrid.com), [Postmark](https://postmarkapp.com), or Amazon SES
-4. Keep content transactional (order reference, PDF you requested) — avoid promo wording.
-
-**What you can do immediately on free Gmail**
-
-1. In Gmail (as the **recipient**), open the message → **Not spam** / **Report not spam**.
-2. Add `pcs0vector@gmail.com` (or your From address) to **Contacts**.
-3. Create a filter: from your sending address → **Never send it to Spam**.
-4. Ask first testers to do the same (warms reputation slightly).
-5. Keep volume low and consistent; sudden spikes look like spam.
-
-**App-side (already implemented)**
-
-- Clean subject lines (no “FREE”, “ACT NOW”, etc.)
-- Multipart plain + HTML
-- Proper `Message-ID`, `Date`, `Reply-To`, envelope From
-- Order reference in subject/body for expected transactional mail
-
-**Optional secrets**
-
-```toml
-[email]
-# ...existing smtp fields...
-reply_to = "pcs0vector@gmail.com"
-```
+App-side (already implemented): clean subject, plain+HTML body, proper Message-ID/Date/Reply-To, Resend idempotency key per order.
 
 ---
 

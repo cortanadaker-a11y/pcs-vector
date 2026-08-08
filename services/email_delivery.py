@@ -54,6 +54,7 @@ def get_smtp_config() -> dict[str, Any] | None:
     ).strip()
     port_raw = _from_streamlit_secrets("email.smtp_port") or os.environ.get("PCS_EMAIL_SMTP_PORT", "587")
     use_tls_raw = _from_streamlit_secrets("email.use_tls") or os.environ.get("PCS_EMAIL_USE_TLS", "true")
+    use_ssl_raw = _from_streamlit_secrets("email.use_ssl") or os.environ.get("PCS_EMAIL_USE_SSL", "")
 
     if not host or not from_address:
         return None
@@ -64,6 +65,15 @@ def get_smtp_config() -> dict[str, Any] | None:
         port = 587
 
     use_tls = str(use_tls_raw).strip().lower() in ("1", "true", "yes", "on")
+    # Port 465/2465 = implicit SSL (Resend SMTPS). Override with email.use_ssl if set.
+    if str(use_ssl_raw).strip():
+        use_ssl = str(use_ssl_raw).strip().lower() in ("1", "true", "yes", "on")
+    else:
+        use_ssl = port in (465, 2465)
+
+    # Resend / API-key providers: strip spaces from password
+    if password:
+        password = password.replace(" ", "").strip()
 
     return {
         "host": host,
@@ -72,7 +82,9 @@ def get_smtp_config() -> dict[str, Any] | None:
         "password": password,
         "from_address": from_address,
         "reply_to": reply_to or None,
-        "use_tls": use_tls,
+        "use_tls": use_tls and not use_ssl,
+        "use_ssl": use_ssl,
+        "provider": "resend" if "resend.com" in host.lower() else "smtp",
     }
 
 
@@ -195,6 +207,9 @@ def send_report_pdf_email(
     message["Auto-Submitted"] = "auto-generated"
     if order_reference:
         message["X-PCS-Order"] = order_reference
+        # Resend SMTP: prevent duplicate sends if a retry happens
+        if config.get("provider") == "resend":
+            message["Resend-Idempotency-Key"] = f"pcs-vector/{order_reference}"
 
     alt = MIMEMultipart("alternative")
     alt.attach(MIMEText(plain, "plain", "utf-8"))
@@ -207,17 +222,48 @@ def send_report_pdf_email(
     message.attach(attachment)
 
     try:
-        with smtplib.SMTP(config["host"], config["port"], timeout=30) as server:
-            if config["use_tls"]:
-                server.starttls(context=ssl.create_default_context())
-            if config["user"] and config["password"]:
-                server.login(config["user"], config["password"])
-            # Envelope sender must be the bare address (not "Name <addr>")
-            server.sendmail(from_addr, [recipient], message.as_string())
+        _send_via_smtp(config, from_addr, recipient, message.as_string())
     except (OSError, smtplib.SMTPException) as exc:
         logger.warning("Failed to email PDF to %s: %s", recipient, exc)
+        detail = str(exc)
+        hint = ""
+        if config.get("provider") == "resend":
+            hint = (
+                " Resend tip: From must be on a verified domain (or onboarding@resend.dev "
+                "for testing), and smtp_password must be your API key (user = resend)."
+            )
         raise EmailDeliveryError(
             "We could not send the email right now. Please try again or download the PDF below."
+            + (f" ({detail})" if detail else "")
+            + hint
         ) from exc
 
-    logger.info("Emailed PCS Vector PDF to %s (order %s)", recipient, order_reference or "n/a")
+    logger.info(
+        "Emailed PCS Vector PDF to %s (order %s, provider=%s)",
+        recipient,
+        order_reference or "n/a",
+        config.get("provider", "smtp"),
+    )
+
+
+def _send_via_smtp(
+    config: dict[str, Any],
+    from_addr: str,
+    recipient: str,
+    payload: str,
+) -> None:
+    """Connect via SSL (465) or STARTTLS (587) and send."""
+    ctx = ssl.create_default_context()
+    if config.get("use_ssl"):
+        with smtplib.SMTP_SSL(config["host"], config["port"], timeout=30, context=ctx) as server:
+            if config["user"] and config["password"]:
+                server.login(config["user"], config["password"])
+            server.sendmail(from_addr, [recipient], payload)
+        return
+
+    with smtplib.SMTP(config["host"], config["port"], timeout=30) as server:
+        if config.get("use_tls"):
+            server.starttls(context=ctx)
+        if config["user"] and config["password"]:
+            server.login(config["user"], config["password"])
+        server.sendmail(from_addr, [recipient], payload)
