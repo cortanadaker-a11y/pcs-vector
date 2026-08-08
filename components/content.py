@@ -19,7 +19,7 @@ TRUST_SIGNALS = {
         "By Soldiers, for families",
         "Secure Stripe checkout",
         "PDF emailed to you",
-        "55 Army installations",
+        "68+ Army installations",
         "Minutes, not weeks of research",
     ],
 }
