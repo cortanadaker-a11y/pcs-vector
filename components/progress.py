@@ -3,9 +3,9 @@
 import streamlit as st
 
 STEPS = [
-    {"id": "home", "label": "Welcome", "number": 1},
-    {"id": "input", "label": "Your Details", "number": 2},
-    {"id": "report", "label": "Your Report", "number": 3},
+    {"id": "home", "label": "Start", "number": 1},
+    {"id": "input", "label": "Your plan", "number": 2},
+    {"id": "report", "label": "Report", "number": 3},
 ]
 
 STEP_ORDER = [step["id"] for step in STEPS]

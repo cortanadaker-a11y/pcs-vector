@@ -154,6 +154,18 @@ def render_home() -> None:
     st.markdown("<br>", unsafe_allow_html=True)
     render_bah_calculator()
 
+    # Soft CTA after free tool — convert while intent is high
+    cta_bah_l, cta_bah_c, cta_bah_r = st.columns([1, 2, 1])
+    with cta_bah_c:
+        if st.button(
+            "Turn this into a full PCS plan →",
+            type="primary",
+            use_container_width=True,
+            key="bah_mid_cta",
+        ):
+            navigate_to("input")
+        st.caption(f"Full 8-section plan · {price} one-time · PDF emailed")
+
     # 3. Product path + proof
     st.markdown("<br>", unsafe_allow_html=True)
     _render_how_it_works(price)

@@ -83,22 +83,13 @@ def _render_move_basics() -> None:
             ),
         )
 
-    st.markdown(
-        """
-        <div class="pcs-email-block">
-            <p class="pcs-email-block-title">Report delivery email</p>
-            <p class="pcs-email-block-caption">Your report and PDF will be sent to this email.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     set_form_value(
         "email",
         st.text_input(
-            "Email address *",
+            "Email for report & PDF *",
             value=get_form_value("email"),
             placeholder="you@example.com",
-            help="Required. Your personalized PCS Vector report and PDF will be sent here after payment.",
+            help="Required. Your plan and PDF are emailed here after payment.",
             key="form_email_input",
         ),
     )
@@ -464,15 +455,12 @@ def render_input_form() -> None:
     step = max(0, min(step, len(FORM_STEPS) - 1))
     st.session_state.form_step = step
 
-    st.markdown("## Tell us about your move")
     price = get_price_display()
+    step_titles = [t for t, _ in FORM_STEPS]
+    st.markdown("## Build your PCS plan")
     st.markdown(
-        f"Most families finish in **6–8 minutes**. After checkout (**{price}** one-time), "
-        "you'll receive your full 8-section plan and PDF emailed to you."
-    )
-    st.caption(
-        "Your answers stay in this browser session only — used to generate your report. "
-        "We don't sell your data. Payment is handled securely by Stripe."
+        f"**Step {step + 1} of {len(FORM_STEPS)}** — {step_titles[step]}. "
+        f"About 6–8 minutes total. After checkout (**{price}**), your plan and PDF are emailed to you."
     )
 
     if st.session_state.get("payment_cancelled"):
@@ -508,27 +496,23 @@ def render_input_form() -> None:
         )
 
     st.markdown('<div class="pcs-form-nav">', unsafe_allow_html=True)
-    st.markdown(
-        '<p class="pcs-form-nav-title">Continue your PCS plan</p>',
-        unsafe_allow_html=True,
-    )
 
     col_back, col_next = st.columns([1, 1.35], gap="medium")
     next_step_title = FORM_STEPS[step + 1][0] if step < len(FORM_STEPS) - 1 else None
 
     with col_back:
         if step == 0:
-            if st.button("← Back to Home", use_container_width=True, key="form_nav_back"):
+            if st.button("← Home", use_container_width=True, key="form_nav_back"):
                 st.session_state.form_step = 0
                 navigate_to("home")
-        elif st.button("← Previous section", use_container_width=True, key="form_nav_back"):
+        elif st.button("← Back", use_container_width=True, key="form_nav_back"):
             st.session_state.form_step = step - 1
             request_scroll_to_top()
             st.rerun()
 
     with col_next:
         if step < len(FORM_STEPS) - 1:
-            button_label = f"Continue to {next_step_title}"
+            button_label = f"Next: {next_step_title} →"
             if st.button(button_label, type="primary", use_container_width=True, key="form_nav_next"):
                 form_data = collect_form_from_widgets()
                 errors = validate_form_step(step, form_data)
@@ -540,7 +524,7 @@ def render_input_form() -> None:
                     request_scroll_to_top()
                     st.rerun()
         elif st.button(
-            f"Proceed to secure payment · {price}",
+            f"Pay {price} — get my plan",
             type="primary",
             use_container_width=True,
             key="form_nav_pay",

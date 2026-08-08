@@ -11,11 +11,11 @@ def render_payment_cancelled_banner() -> None:
     price = get_price_display()
 
     st.markdown(
-        f"""
+        """
         <div class="pcs-payment-cancelled">
-            <strong>Payment not completed</strong><br>
-            No worries — your answers are still saved. You can review the form and try again
-            when you're ready. You won't need to re-enter everything.
+            <strong>Checkout cancelled</strong><br>
+            Your answers are still saved. Review anything you need, then retry payment —
+            you won't re-enter the form.
         </div>
         """,
         unsafe_allow_html=True,
@@ -23,10 +23,10 @@ def render_payment_cancelled_banner() -> None:
 
     col_msg, col_retry = st.columns([2, 1])
     with col_msg:
-        st.caption(f"PCS Vector report — {price} one-time, secure checkout via Stripe.")
+        st.caption(f"{price} one-time · secure Stripe checkout")
     with col_retry:
         if st.button(
-            f"Retry Payment — {price}",
+            f"Retry payment — {price}",
             type="primary",
             use_container_width=True,
             key="retry_payment_cancelled",

@@ -2,14 +2,13 @@
 
 import streamlit as st
 
-from components.progress import STEPS
 from components.scroll import request_scroll_to_top
 
 PAGE_LABELS = {
     "home": "Home",
-    "input": "Input Form",
-    "report": "Report",
-    "retrieve": "Retrieve Report",
+    "input": "Build your plan",
+    "report": "Your report",
+    "retrieve": "Retrieve report",
 }
 
 
@@ -41,7 +40,7 @@ def render_sidebar() -> str:
     """Render sidebar navigation and return the selected page."""
     with st.sidebar:
         st.markdown("## PCS Vector")
-        st.caption("Decision-grade PCS planning for Army families.")
+        st.caption("Personalized PCS plans for Army families.")
         st.caption("Built For Soldiers; By Soldiers")
 
         st.divider()
@@ -56,22 +55,19 @@ def render_sidebar() -> str:
 
         st.divider()
 
-        with st.expander("About this service", expanded=False):
+        with st.expander("About", expanded=False):
             st.markdown(
                 """
-                **PCS Vector** turns your family's PCS inputs into a
-                personalized strategic plan — housing, schools, spouse career,
-                finances, and time-bound next steps.
+                **PCS Vector** builds a decision-grade PCS plan for your family —
+                housing, schools, spouse career, cash flow, and first 30 days.
 
-                - 8-section decision-grade report
-                - 22 major CONUS Army installations
-                - $25 one-time (Stripe Checkout)
-                - PDF emailed automatically
+                - 8-section personalized report
+                - Major CONUS Army installations
+                - One-time payment · PDF emailed
                 - Retrieve anytime with your order reference
                 """
             )
 
-        st.divider()
         st.caption("CONUS Army moves only")
 
     return st.session_state.nav_page

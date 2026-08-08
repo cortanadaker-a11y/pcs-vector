@@ -44,13 +44,13 @@ MOTIVATION_CLOSE = {
 }
 
 CTA = {
-    "primary": "Build My Family's PCS Plan",
-    "hero": "Build My Family's PCS Plan →",
-    "mid": "I'm Ready — Build My Plan →",
-    "caption": "One-time payment · 6–8 minute form · Plan in your inbox minutes later",
+    "primary": "Build my PCS plan",
+    "hero": "Build my PCS plan →",
+    "mid": "Build my PCS plan →",
+    "caption": "One-time payment · 6–8 minute form · PDF in your inbox after payment",
     "form_pay_reassurance": (
-        "You'll review everything on the next screen, then pay once through Stripe. "
-        "No subscription. Your report generates immediately after payment."
+        "Next step is secure Stripe checkout — one payment, no subscription. "
+        "Your report generates right after payment and the PDF is emailed to you."
     ),
 }
 
@@ -174,10 +174,10 @@ REPORT_SECTIONS = [
 ]
 
 HOW_IT_WORKS_STEPS = [
-    {"num": "1", "title": "Tell us your PCS", "desc": "6–8 min form · family, priorities, installations"},
-    {"num": "2", "title": "Secure checkout", "desc": "One-time $25 · Stripe · no subscription"},
-    {"num": "3", "title": "Get your plan", "desc": "Personalized 8-section strategic report"},
-    {"num": "4", "title": "Execute together", "desc": "PDF emailed · share with your spouse"},
+    {"num": "1", "title": "Your move details", "desc": "6–8 min · family, posts, priorities"},
+    {"num": "2", "title": "Pay once", "desc": "One-time $25 · Stripe · no subscription"},
+    {"num": "3", "title": "Get your plan", "desc": "8-section report + PDF emailed"},
+    {"num": "4", "title": "Execute", "desc": "Share with your spouse · first 30 days locked in"},
 ]
 
 REPORT_HIGHLIGHTS = [

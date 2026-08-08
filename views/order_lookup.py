@@ -30,15 +30,8 @@ def render_order_lookup() -> None:
     """Let users enter PCS-XXXXXXXX to unlock a paid report without re-paying."""
     st.markdown("## Retrieve your report")
     st.markdown(
-        "Already paid? Enter the **Order Reference** from your payment confirmation "
-        "or Stripe receipt (e.g. `PCS-ABC12XYZ`) to access your report and PDF — "
-        "**no additional charge**."
-    )
-
-    st.info(
-        "After retrieval, your report generates automatically and your **PDF is emailed** "
-        "to the address you entered on the form. You can also download it on the report page.",
-        icon="ℹ️",
+        "Already paid? Enter your **order reference** (e.g. `PCS-ABC12XYZ`) "
+        "to open your plan and PDF — **no extra charge**."
     )
 
     prefilled = _query_param("order") or _query_param("ref")
@@ -47,9 +40,9 @@ def render_order_lookup() -> None:
 
     with st.container(border=True):
         order_input = st.text_input(
-            "Order Reference",
+            "Order reference",
             placeholder="PCS-ABC12XYZ",
-            help="Shown on your payment confirmation screen and in your Stripe receipt.",
+            help="On your payment confirmation and Stripe receipt email.",
             key="lookup_order_input",
         )
 
@@ -82,33 +75,29 @@ def render_order_lookup() -> None:
 
             if restored:
                 st.success(
-                    f"Order **{result.order_reference}** verified. "
-                    "Taking you to your report…",
+                    f"Order **{result.order_reference}** verified. Opening your report…",
                     icon="✅",
                 )
             else:
                 st.warning(
-                    f"Payment confirmed for **{result.order_reference}**, but your form answers "
-                    "need one more step. On the next screen, tap **Generate my report now** — "
-                    "you will not be charged again.",
+                    f"Payment confirmed for **{result.order_reference}**. "
+                    "On the next screen, tap **Generate my report now** — no re-charge.",
                     icon="⚠️",
                 )
 
             _clear_lookup_query_params()
             navigate_to("report")
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("#### Where to find your order reference")
-    st.markdown(
-        "- On the green **Payment confirmed** banner after checkout  \n"
-        "- In your **Stripe receipt email**  \n"
-        "- On the recovery screen if your browser session was interrupted"
-    )
+        st.caption(
+            "Find your reference on the payment confirmation screen or in your Stripe receipt. "
+            "Your PDF is also emailed to the address from the form."
+        )
 
+    st.markdown("<br>", unsafe_allow_html=True)
     col_home, col_input = st.columns(2)
     with col_home:
-        if st.button("← Back to Home", use_container_width=True):
+        if st.button("← Home", use_container_width=True):
             navigate_to("home")
     with col_input:
-        if st.button("Start a new report", use_container_width=True):
+        if st.button("Start a new plan", use_container_width=True):
             navigate_to("input")

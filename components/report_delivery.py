@@ -97,42 +97,30 @@ def render_pdf_delivery_status(pdf_bytes: bytes, pdf_filename: str) -> None:
     delivery_error = st.session_state.get("pdf_email_delivery_error")
 
     with st.container(border=True):
-        st.markdown("### PDF delivery")
-        st.markdown(
-            "After your report is generated, your **PDF is automatically emailed** to the address "
-            "you entered on the form. You can also download it below anytime."
-        )
-
         if auto_sent and preferred:
             st.success(
-                f"Your PDF has been emailed to **{preferred}** (order **{order_ref}**).",
+                f"PDF emailed to **{preferred}** · order **{order_ref}**",
                 icon="📧",
             )
-            st.caption(
-                "If it is not in your inbox within a few minutes, check **Spam/Junk** and "
-                "mark it as **Not spam**, then add the sender to your contacts so the next plan lands in inbox."
-            )
+            st.caption("Check spam if you don't see it. Mark as Not spam for next time.")
         elif delivery_error:
             st.warning(delivery_error, icon="⚠️")
+        else:
+            st.markdown("**PDF delivery** — emailed after generation; download anytime above.")
 
         if not is_email_configured():
-            st.info(
-                "Email delivery requires server configuration. Save your order reference "
-                f"**{order_ref}** and download the PDF below.",
-                icon="ℹ️",
-            )
+            st.caption(f"Email not configured on server. Save order **{order_ref}** and download the PDF.")
             return
 
         if auto_sent:
-            if st.button("Resend PDF to my email", use_container_width=True, key="resend_pdf_email_btn"):
+            if st.button("Resend PDF", use_container_width=True, key="resend_pdf_email_btn"):
                 st.session_state.pdf_email_sent_for_order = None
                 if auto_email_pdf_after_generation(pdf_bytes, pdf_filename):
                     st.rerun()
             return
 
-        # Auto-send failed or was skipped — offer one-click resend.
         if pdf_bytes and preferred and st.button(
-            "Send PDF to my email now",
+            "Email PDF now",
             type="primary",
             use_container_width=True,
             key="send_pdf_email_btn",

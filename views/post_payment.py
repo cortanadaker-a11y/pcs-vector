@@ -26,7 +26,7 @@ def render_payment_confirmation_banner() -> None:
 
     delivery_email = st.session_state.get("form_data", {}).get("email", "")
     email_note = f" · PDF will be emailed to **{delivery_email}**" if delivery_email else ""
-    st.success(f"Payment confirmed. {caption}{email_note}", icon="✅")
+    st.success(f"Payment confirmed · {caption}{email_note}", icon="✅")
 
 
 def render_order_reference_recovery() -> None:
