@@ -15,7 +15,7 @@ MULTISELECT_FORM_KEYS = (
     "concern_flags",
 )
 
-NUMBER_WIDGET_KEYS = ("num_children", "max_monthly_budget")
+NUMBER_WIDGET_KEYS = ("num_children", "num_dependents", "years_of_service", "max_monthly_budget")
 
 FORM_DEFAULTS: dict[str, Any] = {
     "first_name": "",
@@ -23,6 +23,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "email": "",
     "rank_pay_grade": "E-5",
     "rank_title": "Sergeant",
+    "years_of_service": 4,
     "current_installation_preset": "Fort Hood, TX",
     "current_installation_other": "",
     "gaining_installation": "Fort Bragg, NC",
@@ -32,6 +33,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "family_status": "Married / with dependents",
     "spouse_career_field": "Not currently working — seeking employment",
     "spouse_career_other": "",
+    "num_dependents": 1,
     "num_children": 0,
     "child_age_ranges": [],
     "has_pets": "No pets",
@@ -111,6 +113,7 @@ def render_number_input(
     min_value: int,
     max_value: int,
     step: int = 1,
+    help_text: str | None = None,
 ) -> int:
     """Render a number input bound to a stable widget key."""
     widget_key = _number_widget_key(form_key)
@@ -123,6 +126,7 @@ def render_number_input(
         max_value=max_value,
         step=step,
         key=widget_key,
+        help=help_text,
     )
     int_value = int(value)
     set_form_value(form_key, int_value)

@@ -122,6 +122,15 @@ def _render_move_basics() -> None:
             unsafe_allow_html=True,
         )
 
+    render_number_input(
+        "Years of service",
+        "years_of_service",
+        min_value=0,
+        max_value=40,
+        step=1,
+        help_text="Used for OCONUS COLA (spendable income varies with pay grade and YOS).",
+    )
+
     col_current, col_gaining = st.columns(2)
     with col_current:
         set_form_value(
@@ -195,7 +204,7 @@ def _render_move_basics() -> None:
 def _render_family_situation() -> None:
     _section_header(
         "2. Family Situation",
-        "Single or with family — this sets your BAH with/without dependents rate on the report.",
+        "Single or with family — sets BAH/OHA with/without dependents and OCONUS COLA.",
     )
 
     set_form_value(
@@ -205,7 +214,7 @@ def _render_family_situation() -> None:
             options=FAMILY_STATUS_OPTIONS,
             index=_option_index(FAMILY_STATUS_OPTIONS, get_form_value("family_status")),
             horizontal=True,
-            help="Single = BAH without dependents. Married / with dependents = BAH with dependents.",
+            help="Single = without-dependents housing rates. Married / with dependents = with-dependents rates.",
             key="form_family_status",
         ),
     )
@@ -216,12 +225,25 @@ def _render_family_situation() -> None:
         set_form_value("spouse_career_field", "N/A — single Soldier")
         set_form_value("spouse_career_other", "")
         set_form_value("num_children", 0)
+        set_form_value("num_dependents", 0)
         reset_multiselect("child_age_ranges")
         st.caption(
             "Single Soldier selected — spouse and children fields are skipped. "
-            "Your report will use **without-dependents** BAH."
+            "Your report will use **without-dependents** BAH/OHA and 0-dependent COLA."
         )
     else:
+        render_number_input(
+            "Number of command-sponsored dependents",
+            "num_dependents",
+            min_value=1,
+            max_value=5,
+            step=1,
+            help_text=(
+                "Count for OCONUS COLA: spouse + children who will be with you (1–5+). "
+                "Also selects with-dependents BAH/OHA. Caps at 5 for the COLA table."
+            ),
+        )
+
         set_form_value(
             "spouse_career_field",
             st.selectbox(

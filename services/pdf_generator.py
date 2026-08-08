@@ -672,12 +672,22 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
     gaining = resolved_gaining_installation(form_data)
     family_status = str(form_data.get("family_status") or "Married / with dependents")
     with_deps = with_dependents_from_family_status(family_status)
+    yos = form_data.get("years_of_service", 4)
+    raw_deps = form_data.get("num_dependents")
+    if raw_deps is None:
+        if with_deps:
+            raw_deps = 1 + int(form_data.get("num_children") or 0)
+        else:
+            raw_deps = 0
+    num_deps = max(0, min(5, int(raw_deps)))
 
     pkg = compare_housing_packages(
         pay_grade=pay_grade or "E-5",
         with_dependents=with_deps,
         gaining_installation=gaining,
         current_installation=current or None,
+        years_of_service=yos,
+        num_dependents=num_deps,
     )
     gaining_pkg = pkg["gaining"]
     current_pkg = pkg.get("current")
@@ -705,6 +715,9 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         "bah_current_amount": curr_amt,
         "bah_monthly_delta": pkg.get("monthly_delta_usd"),
         "bah_with_dependents": with_deps,
+        "num_dependents": num_deps,
+        "years_of_service": gaining_pkg.get("years_of_service"),
         "housing_system": gaining_pkg.get("housing_system"),
         "cola_monthly_usd": gaining_pkg.get("cola_monthly_usd"),
+        "cola_index": gaining_pkg.get("cola_index"),
     }
