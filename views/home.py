@@ -20,9 +20,10 @@ from components.content import (
     TRUST_SIGNALS,
     WHY_25,
 )
+from components.bah_calculator import render_bah_calculator
 from components.faq import render_faq
-from components.report_preview import render_report_preview
 from components.html_utils import safe_html, safe_markdown
+from components.report_preview import render_report_preview
 from components.sidebar import navigate_to
 from services.stripe_payment import get_price_display
 
@@ -294,6 +295,9 @@ def render_home() -> None:
     st.markdown("<br>", unsafe_allow_html=True)
 
     _render_why_25(price)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    render_bah_calculator()
     st.markdown("<br>", unsafe_allow_html=True)
 
     cta_l, cta_c, cta_r = st.columns([1, 2, 1])

@@ -266,6 +266,149 @@ CUSTOM_CSS = """
         font-style: italic;
     }
 
+    /* ── BAH calculator ── */
+    .pcs-bah-header h3 {
+        color: var(--pcs-navy);
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0 0 0.35rem 0;
+        letter-spacing: -0.02em;
+    }
+
+    .pcs-bah-sub {
+        color: var(--pcs-muted);
+        font-size: 0.92rem;
+        line-height: 1.55;
+        margin: 0 0 0.75rem 0;
+        max-width: 40rem;
+    }
+
+    .pcs-bah-result {
+        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
+        border-radius: 14px;
+        padding: 1.25rem 1.35rem;
+        color: #fff;
+        margin: 0.75rem 0 0.85rem 0;
+        box-shadow: var(--pcs-shadow);
+    }
+
+    .pcs-bah-result-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+        margin-bottom: 0.25rem;
+    }
+
+    .pcs-bah-result-amount {
+        font-size: 2.35rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+    }
+
+    .pcs-bah-result-amount span {
+        font-size: 1rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        margin-left: 0.2rem;
+    }
+
+    .pcs-bah-result-meta {
+        margin-top: 0.45rem;
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.45;
+    }
+
+    .pcs-bah-result-annual {
+        margin-top: 0.55rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #a8d4bc;
+    }
+
+    .pcs-bah-delta {
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
+        margin: 0 0 0.75rem 0;
+        border: 1px solid var(--pcs-border);
+        background: var(--pcs-surface);
+    }
+
+    .pcs-bah-delta-up {
+        border-left: 4px solid var(--pcs-success);
+        background: #f0f7f3;
+    }
+
+    .pcs-bah-delta-down {
+        border-left: 4px solid #b85c38;
+        background: #faf4f1;
+    }
+
+    .pcs-bah-delta-flat {
+        border-left: 4px solid var(--pcs-gold);
+    }
+
+    .pcs-bah-delta-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--pcs-navy);
+        margin-bottom: 0.3rem;
+    }
+
+    .pcs-bah-delta-detail {
+        font-size: 0.88rem;
+        color: var(--pcs-slate);
+        line-height: 1.5;
+        margin-bottom: 0.85rem;
+    }
+
+    .pcs-bah-delta-grid {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr 1fr;
+        gap: 0.65rem;
+        align-items: center;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-bah-delta-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .pcs-bah-delta-arrow {
+            display: none;
+        }
+    }
+
+    .pcs-bah-delta-k {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+    }
+
+    .pcs-bah-delta-v {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: -0.02em;
+    }
+
+    .pcs-bah-delta-s {
+        font-size: 0.75rem;
+        color: var(--pcs-muted);
+        line-height: 1.35;
+    }
+
+    .pcs-bah-delta-arrow {
+        font-size: 1.25rem;
+        color: var(--pcs-accent);
+        font-weight: 700;
+        text-align: center;
+    }
+
     /* ── Cards & sections ── */
     .pcs-card {
         background: var(--pcs-surface);
