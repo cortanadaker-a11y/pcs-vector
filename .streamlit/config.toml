@@ -22,4 +22,4 @@ serverPort = 8501
 fastReruns = true
 
 [client]
-showErrorDetails = false
+showErrorDetails = false# rebuild 2026-08-08T12:08:16Z
