@@ -63,7 +63,6 @@ def _render_hero(price: str) -> None:
             <div class="pcs-brand-title">PCS Vector</div>
             <h1 class="pcs-hero-headline">{safe_html(HERO["headline"])}</h1>
             <p class="pcs-hero-body">{safe_html(HERO["subheadline"])}</p>
-            <p class="pcs-hero-outcomes">{safe_html(HERO["outcome_line"])}</p>
             <div class="pcs-hero-stats">
                 <span class="pcs-hero-stat"><strong>8</strong> decision sections</span>
                 <span class="pcs-hero-stat"><strong>6–8</strong> min intake</span>

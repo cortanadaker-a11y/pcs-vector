@@ -12,9 +12,6 @@ HERO = {
         "how to protect spouse income, which schools work, and what to tackle in the first "
         "30 days — written like advice from a senior NCO who's done this move."
     ),
-    "outcome_line": (
-        "Built for E-5 through W-3 families · 6–8 minute intake · Plan in your inbox tonight"
-    ),
 }
 
 AUDIENCE_STRIP = (
