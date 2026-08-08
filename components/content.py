@@ -262,7 +262,7 @@ TESTIMONIAL = {
 
 PRICING_INCLUDES = [
     "Full 8-section personalized strategic plan",
-    f"Local depth across {INSTALLATION_COUNT} major CONUS Army installations",
+    f"Local depth across {INSTALLATION_COUNT}+ Army installations (CONUS & OCONUS)",
     "2026 BAH-aware housing and DITY math",
     "Professional PDF emailed automatically",
     "Generated in minutes after payment",
@@ -305,9 +305,10 @@ FAQ_ITEMS = [
     },
     {
         "q": "Which installations are supported?",
-        "a": f"PCS Vector includes tailored data for **{INSTALLATION_COUNT} major CONUS Army installations** "
-        "(Fort Bragg, Fort Hood, Fort Bliss, Fort Campbell, JBLM, and more). Other CONUS locations receive "
-        "strong general PCS guidance with BAH and move math where available.",
+        "a": f"PCS Vector includes tailored data for **{INSTALLATION_COUNT} Army installations** — "
+        "full major CONUS coverage plus primary OCONUS locations (Korea, Japan, Germany, Italy, Hawaii, "
+        "and more). Names use traditional post titles (e.g. Fort Bragg, Fort Benning, Fort Hood). "
+        "If your post isn't listed, choose **Other CONUS** or **Other OCONUS** for solid general guidance.",
     },
     {
         "q": "Can I get a refund?",

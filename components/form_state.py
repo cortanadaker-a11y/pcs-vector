@@ -312,9 +312,10 @@ def validate_form(data: dict[str, Any]) -> list[str]:
 
 def resolved_gaining_installation(data: dict[str, Any]) -> str:
     """Return the display name for the gaining installation."""
-    if data.get("gaining_installation") == "Other CONUS installation":
+    gaining = data.get("gaining_installation", "")
+    if gaining in ("Other CONUS installation", "Other OCONUS installation"):
         return data.get("gaining_installation_other", "").strip()
-    return data.get("gaining_installation", "")
+    return gaining
 
 
 def budget_display(data: dict[str, Any]) -> str:

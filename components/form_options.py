@@ -56,9 +56,14 @@ def rank_for_pay_grade(pay_grade: str) -> str:
     """Return the standard rank title for a pay grade."""
     return PAY_GRADE_TO_RANK.get(pay_grade, "")
 
+# Alphabetical list from INSTALLATION_DATA (CONUS + OCONUS).
 CURRENT_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other installation"]
 
-GAINING_INSTALLATIONS = [*SUPPORTED_INSTALLATIONS, "Other CONUS installation"]
+GAINING_INSTALLATIONS = [
+    *SUPPORTED_INSTALLATIONS,
+    "Other CONUS installation",
+    "Other OCONUS installation",
+]
 
 MOVE_WINDOWS = [
     "Within 30 days",

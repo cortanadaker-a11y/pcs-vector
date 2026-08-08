@@ -17,9 +17,24 @@ def _load_bah_data() -> dict[str, Any]:
 
 
 def list_bah_installations() -> list[str]:
-    """Installation labels that have BAH data (sorted)."""
+    """CONUS (and AK) installations for the BAH calculator — alphabetical.
+
+    OCONUS posts use OHA, not CONUS BAH, so they are excluded here.
+    """
     data = _load_bah_data()
-    return sorted(data.get("installations", {}).keys())
+    with_rates = set(data.get("installations", {}).keys())
+    try:
+        from services.installation_data import INSTALLATION_DATA
+
+        conus = [
+            name
+            for name, meta in INSTALLATION_DATA.items()
+            if meta.get("theater", "CONUS") != "OCONUS"
+        ]
+        # Prefer curated rate posts first in quality, but list is alphabetical overall
+        return sorted(set(conus) | with_rates)
+    except Exception:
+        return sorted(with_rates)
 
 
 def get_bah_effective_date() -> str:
@@ -35,32 +50,53 @@ def get_bah_rate(
     """Return BAH rate metadata for an installation and pay grade."""
     data = _load_bah_data()
     install = data["installations"].get(installation_label)
-    if not install:
+    if install:
+        if with_dependents:
+            bucket = install.get("with_dependents") or {}
+        else:
+            bucket = install.get("without_dependents") or {}
+        amount = bucket.get(pay_grade)
+        if amount is None:
+            amount = bucket.get("Other")
         return {
-            "monthly_usd": None,
-            "mha": None,
+            "monthly_usd": amount,
+            "mha": install.get("mha"),
             "effective_date": data.get("effective_date"),
             "source": data.get("source"),
             "with_dependents": with_dependents,
-            "found": False,
+            "found": amount is not None,
         }
 
-    if with_dependents:
-        bucket = install.get("with_dependents") or {}
-    else:
-        bucket = install.get("without_dependents") or {}
+    # Planning fallback for CONUS posts not yet in bah_2026.json
+    try:
+        from services.installation_data import INSTALLATIONS, _canonical_installation_name
 
-    amount = bucket.get(pay_grade)
-    if amount is None:
-        amount = bucket.get("Other")
+        canonical = _canonical_installation_name(installation_label)
+        profile = INSTALLATIONS.get(canonical) if canonical else None
+        if profile is not None:
+            amount = profile.bah_rates.get(pay_grade, profile.bah_rates.get("E-5"))
+            if amount is not None and not with_dependents:
+                # Approximate without-deps (~85% of with-deps) when only planning rates exist
+                amount = int(round(amount * 0.85 / 3) * 3)
+            return {
+                "monthly_usd": amount,
+                "mha": profile.display_name,
+                "effective_date": data.get("effective_date"),
+                "source": "PCS Vector planning estimate (verify with DTMO / finance)",
+                "with_dependents": with_dependents,
+                "found": amount is not None,
+                "is_estimate": True,
+            }
+    except Exception:
+        pass
 
     return {
-        "monthly_usd": amount,
-        "mha": install.get("mha"),
+        "monthly_usd": None,
+        "mha": None,
         "effective_date": data.get("effective_date"),
         "source": data.get("source"),
         "with_dependents": with_dependents,
-        "found": amount is not None,
+        "found": False,
     }
 
 

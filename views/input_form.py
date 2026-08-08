@@ -143,7 +143,8 @@ def _render_move_basics() -> None:
                 index=_option_index(
                     GAINING_INSTALLATIONS, get_form_value("gaining_installation")
                 ),
-                help="Best local data for Fort Bragg, Fort Hood, Fort Drum, and Fort Gordon.",
+                help="Alphabetical list of major CONUS and OCONUS Army locations. "
+                "Traditional names (Fort Bragg, Fort Benning, Fort Hood, etc.).",
             ),
         )
 
@@ -153,17 +154,20 @@ def _render_move_basics() -> None:
             st.text_input(
                 "Current installation name",
                 value=get_form_value("current_installation_other"),
-                placeholder="e.g., Fort Johnson, LA",
+                placeholder="e.g., Fort Polk, LA",
             ),
         )
 
-    if get_form_value("gaining_installation") == "Other CONUS installation":
+    if get_form_value("gaining_installation") in (
+        "Other CONUS installation",
+        "Other OCONUS installation",
+    ):
         set_form_value(
             "gaining_installation_other",
             st.text_input(
-                "Other gaining installation",
+                "Gaining installation (specify)",
                 value=get_form_value("gaining_installation_other"),
-                placeholder="e.g., Fort Gordon, GA",
+                placeholder="e.g., USAG Ansbach, Germany",
             ),
         )
 
