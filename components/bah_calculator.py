@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import streamlit as st
 
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
@@ -14,6 +16,9 @@ YOS_OPTIONS = list(range(0, 41))
 
 _NONE_CURRENT = "— Skip comparison (gaining post only) —"
 _DEP_OPTIONS = [0, 1, 2, 3, 4, 5]
+
+# Session key written each calculator render so CTAs can pre-fill the plan form.
+CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
 
 
 def _money(n: int | None) -> str:
@@ -29,6 +34,45 @@ def _deps_label(n: int) -> str:
     if n == 5:
         return "5+ dependents"
     return f"{n} dependent{'s' if n != 1 else ''}"
+
+
+def get_calculator_snapshot() -> dict[str, Any] | None:
+    """Return the latest homepage calculator values, if any."""
+    snap = st.session_state.get(CALC_SNAPSHOT_KEY)
+    return dict(snap) if isinstance(snap, dict) and snap.get("pay_grade") else None
+
+
+def _store_snapshot(
+    *,
+    pay_grade: str,
+    years_of_service: int,
+    num_dependents: int,
+    gaining: str,
+    current: str | None,
+    barracks_meal_card: bool,
+    package: dict[str, Any] | None,
+) -> None:
+    total = None
+    housing = None
+    cola = None
+    system = None
+    if package and package.get("found"):
+        total = package.get("total_monthly_usd")
+        housing = package.get("housing_monthly_usd")
+        cola = package.get("cola_monthly_usd")
+        system = package.get("housing_system")
+    st.session_state[CALC_SNAPSHOT_KEY] = {
+        "pay_grade": pay_grade,
+        "years_of_service": int(years_of_service),
+        "num_dependents": int(num_dependents),
+        "gaining_installation": gaining,
+        "current_installation": current,
+        "barracks_meal_card": bool(barracks_meal_card),
+        "housing_monthly_usd": housing,
+        "cola_monthly_usd": cola,
+        "total_monthly_usd": total,
+        "housing_system": system,
+    }
 
 
 def render_bah_calculator() -> None:
@@ -117,6 +161,7 @@ def render_bah_calculator() -> None:
             current = None if current_raw == _NONE_CURRENT else current_raw
 
         with_dependents = int(num_deps) > 0
+        barracks_on = bool(barracks) and int(num_deps) == 0
         result = compare_housing_packages(
             pay_grade=pay_grade,
             with_dependents=with_dependents,
@@ -124,9 +169,18 @@ def render_bah_calculator() -> None:
             current_installation=current,
             years_of_service=int(yos),
             num_dependents=int(num_deps),
-            barracks_meal_card=bool(barracks) and int(num_deps) == 0,
+            barracks_meal_card=barracks_on,
         )
         pkg = result["gaining"]
+        _store_snapshot(
+            pay_grade=pay_grade,
+            years_of_service=int(yos),
+            num_dependents=int(num_deps),
+            gaining=gaining,
+            current=current,
+            barracks_meal_card=barracks_on,
+            package=pkg if pkg.get("found") else None,
+        )
 
         if not pkg.get("found") or pkg.get("total_monthly_usd") is None:
             st.warning(

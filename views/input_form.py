@@ -141,6 +141,7 @@ def _render_move_basics() -> None:
                 index=_option_index(
                     CURRENT_INSTALLATIONS, get_form_value("current_installation_preset")
                 ),
+                key="form_current_installation",
             ),
         )
     with col_gaining:
@@ -154,6 +155,7 @@ def _render_move_basics() -> None:
                 ),
                 help="Alphabetical list of major CONUS and OCONUS Army locations. "
                 "Traditional names (Fort Bragg, Fort Benning, Fort Hood, etc.).",
+                key="form_gaining_installation",
             ),
         )
 
@@ -517,6 +519,15 @@ def render_input_form() -> None:
         f"**Step {step + 1} of {len(FORM_STEPS)}** — {step_titles[step]}. "
         f"About 6–8 minutes total. After checkout (**{price}**), your plan and PDF are emailed to you."
     )
+
+    carryover = st.session_state.pop("calculator_carryover_banner", None)
+    if carryover:
+        st.success(carryover)
+    elif st.session_state.get("calculator_carryover_active") and step == 0:
+        st.info(
+            "Housing calculator details are pre-filled below. Edit anything that changed, "
+            "then continue — your BAH/OHA figures will follow this profile."
+        )
 
     if st.session_state.get("payment_cancelled"):
         render_payment_cancelled_banner()

@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from components.bah_calculator import render_bah_calculator
+from components.bah_calculator import get_calculator_snapshot, render_bah_calculator
 from components.content import (
     CTA,
     DIY_VS_VECTOR,
@@ -13,6 +13,7 @@ from components.content import (
     TRUST_SIGNALS,
 )
 from components.faq import render_faq
+from components.form_state import start_plan_from_calculator
 from components.html_utils import safe_html, safe_markdown
 from components.report_preview import render_report_preview
 from components.sidebar import navigate_to
@@ -40,7 +41,8 @@ def _cta_block(price: str, *, cta_id: str = "bottom") -> None:
         unsafe_allow_html=True,
     )
     if st.button(CTA["primary"], type="primary", use_container_width=True, key=f"cta_primary_{cta_id}"):
-        navigate_to("input")
+        # Carry calculator fields when the user already ran the housing tool.
+        start_plan_from_calculator(require_snapshot=False)
     if st.button("Already paid? Retrieve your report", use_container_width=True, key=f"cta_retrieve_{cta_id}"):
         navigate_to("retrieve")
     st.caption("Secure Stripe checkout · Built For Soldiers; By Soldiers")
@@ -147,24 +149,36 @@ def render_home() -> None:
     cta_top_l, cta_top_c, cta_top_r = st.columns([1, 2, 1])
     with cta_top_c:
         if st.button(CTA["hero"], type="primary", use_container_width=True, key="hero_cta"):
-            navigate_to("input")
+            start_plan_from_calculator(require_snapshot=False)
         st.caption(safe_markdown(CTA["caption"].replace("$25", price)))
 
     # 2. Immediate value tool (high engagement, early)
     st.markdown("<br>", unsafe_allow_html=True)
     render_bah_calculator()
 
-    # Soft CTA after free tool — convert while intent is high
+    # Soft CTA after free tool — convert while intent is high; carry calculator → form
     cta_bah_l, cta_bah_c, cta_bah_r = st.columns([1, 2, 1])
     with cta_bah_c:
+        snap = get_calculator_snapshot()
         if st.button(
             "Turn this into a full PCS plan →",
             type="primary",
             use_container_width=True,
             key="bah_mid_cta",
         ):
-            navigate_to("input")
-        st.caption(f"Full 8-section plan · {price} one-time · PDF emailed")
+            start_plan_from_calculator(require_snapshot=False)
+        if snap:
+            grade = snap.get("pay_grade", "")
+            gaining = snap.get("gaining_installation", "")
+            total = snap.get("total_monthly_usd")
+            deps = snap.get("num_dependents", 0)
+            total_bit = f" · ~${int(total):,}/mo package" if total is not None else ""
+            st.caption(
+                f"Pre-fills **{grade}**, **{gaining}**, {deps} dep(s), YOS"
+                f"{total_bit} · then full 8-section plan · {price}"
+            )
+        else:
+            st.caption(f"Full 8-section plan · {price} one-time · PDF emailed")
 
     # 3. Product path + proof
     st.markdown("<br>", unsafe_allow_html=True)

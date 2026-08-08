@@ -169,6 +169,156 @@ def apply_restored_form_data(form_data: dict[str, Any]) -> None:
     clear_number_widget_state()
 
 
+# Widget keys used by the multi-step plan form (must stay in sync with input_form.py).
+_FORM_WIDGET_KEYS = (
+    "form_rank_pay_grade",
+    "form_rank_title_other",
+    "form_family_status",
+    "form_email_input",
+    "form_current_installation",
+    "form_gaining_installation",
+)
+
+
+def clear_form_widget_state() -> None:
+    """Drop form widget keys so they re-seed from form_data on next render."""
+    for key in _FORM_WIDGET_KEYS:
+        st.session_state.pop(key, None)
+    clear_number_widget_state()
+    clear_multiselect_widget_state()
+
+
+def apply_calculator_snapshot_to_form(snapshot: dict[str, Any]) -> str:
+    """Pre-fill plan form from homepage housing calculator. Returns banner text."""
+    from components.form_options import (
+        CURRENT_INSTALLATIONS,
+        GAINING_INSTALLATIONS,
+        rank_for_pay_grade,
+    )
+    from services.installation_data import SUPPORTED_INSTALLATIONS
+
+    init_form_state()
+    data = st.session_state.form_data
+
+    pay_grade = str(snapshot.get("pay_grade") or data.get("rank_pay_grade") or "E-5")
+    yos = int(snapshot.get("years_of_service") if snapshot.get("years_of_service") is not None else 4)
+    yos = max(0, min(40, yos))
+    num_deps = int(snapshot.get("num_dependents") if snapshot.get("num_dependents") is not None else 0)
+    num_deps = max(0, min(5, num_deps))
+
+    gaining = str(snapshot.get("gaining_installation") or "").strip()
+    current = snapshot.get("current_installation")
+    current_s = str(current).strip() if current else ""
+
+    data["rank_pay_grade"] = pay_grade
+    if pay_grade != "Other":
+        data["rank_title"] = rank_for_pay_grade(pay_grade)
+    data["years_of_service"] = yos
+    data["num_dependents"] = num_deps if num_deps > 0 else 0
+
+    if num_deps <= 0:
+        data["family_status"] = "Single (no dependents)"
+        data["spouse_career_field"] = "N/A — single Soldier"
+        data["spouse_career_other"] = ""
+        data["num_children"] = 0
+        data["child_age_ranges"] = []
+    else:
+        data["family_status"] = "Married / with dependents"
+        # Spouse counts as 1; remainder treated as children (editable on form).
+        data["num_children"] = max(0, num_deps - 1)
+        if str(data.get("spouse_career_field") or "").startswith("N/A"):
+            data["spouse_career_field"] = "Not currently working — seeking employment"
+
+    if gaining and gaining in GAINING_INSTALLATIONS:
+        data["gaining_installation"] = gaining
+        data["gaining_installation_other"] = ""
+    elif gaining and gaining in SUPPORTED_INSTALLATIONS:
+        data["gaining_installation"] = gaining
+        data["gaining_installation_other"] = ""
+
+    if current_s and current_s in CURRENT_INSTALLATIONS:
+        data["current_installation_preset"] = current_s
+        data["current_installation_other"] = ""
+    elif current_s and current_s in SUPPORTED_INSTALLATIONS:
+        data["current_installation_preset"] = current_s
+        data["current_installation_other"] = ""
+
+    total = snapshot.get("total_monthly_usd")
+    if total is not None:
+        try:
+            total_i = int(total)
+            if total_i > 0:
+                # Seed housing budget so step 2 is not a cold start.
+                data["max_monthly_budget"] = total_i
+                data["budget_mode"] = "Set a monthly budget cap"
+                data["budget_preset"] = "Custom amount"
+        except (TypeError, ValueError):
+            pass
+
+    if snapshot.get("barracks_meal_card") and num_deps == 0:
+        note = "Barracks + meal card (reduced OCONUS COLA ~63%) — confirm housing plan."
+        existing = str(data.get("specific_concerns") or "").strip()
+        if note not in existing:
+            data["specific_concerns"] = f"{existing}\n{note}".strip() if existing else note
+
+    sync_rank_from_pay_grade(data)
+    st.session_state.form_data = data
+    clear_form_widget_state()
+
+    # Seed number widgets immediately so first paint matches.
+    st.session_state[_number_widget_key("years_of_service")] = yos
+    st.session_state[_number_widget_key("num_dependents")] = max(1, num_deps) if num_deps > 0 else 0
+    st.session_state[_number_widget_key("num_children")] = int(data.get("num_children") or 0)
+    if data.get("max_monthly_budget") is not None:
+        st.session_state[_number_widget_key("max_monthly_budget")] = int(data["max_monthly_budget"])
+
+    st.session_state["form_rank_pay_grade"] = pay_grade
+    st.session_state["form_family_status"] = data["family_status"]
+    if data.get("gaining_installation"):
+        st.session_state["form_gaining_installation"] = data["gaining_installation"]
+    if data.get("current_installation_preset"):
+        st.session_state["form_current_installation"] = data["current_installation_preset"]
+
+    bits = [pay_grade, f"{yos} YOS"]
+    if num_deps <= 0:
+        bits.append("single / 0 dependents")
+    else:
+        bits.append(f"{num_deps} dependent{'s' if num_deps != 1 else ''}")
+    if gaining:
+        bits.append(f"→ {gaining}")
+    if current_s:
+        bits.append(f"from {current_s}")
+    if total is not None:
+        try:
+            bits.append(f"~${int(total):,}/mo housing package")
+        except (TypeError, ValueError):
+            pass
+
+    banner = (
+        "**Calculator details applied.** We pre-filled your plan with: "
+        + " · ".join(bits)
+        + ". Review and complete the remaining fields — nothing is locked."
+    )
+    st.session_state["calculator_carryover_banner"] = banner
+    st.session_state["calculator_carryover_active"] = True
+    return banner
+
+
+def start_plan_from_calculator(*, require_snapshot: bool = False) -> None:
+    """Navigate to the plan form, carrying calculator fields when available."""
+    from components.bah_calculator import get_calculator_snapshot
+    from components.sidebar import navigate_to
+
+    snap = get_calculator_snapshot()
+    if snap:
+        apply_calculator_snapshot_to_form(snap)
+    elif require_snapshot:
+        st.session_state["calculator_carryover_banner"] = (
+            "Open the housing calculator above first — then we can pre-fill your plan."
+        )
+    navigate_to("input")
+
+
 def collect_form_from_widgets() -> dict[str, Any]:
     """Return the current widget-backed form payload."""
     return st.session_state.form_data.copy()
