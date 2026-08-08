@@ -550,7 +550,9 @@ def render_input_form() -> None:
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div class="pcs-form-nav">', unsafe_allow_html=True)
+    # Streamlit cannot wrap widgets inside a markdown <div>; an empty open/close
+    # pair rendered as a blank white card above the buttons. Style via keys/CSS.
+    st.markdown('<div class="pcs-form-nav-rule" aria-hidden="true"></div>', unsafe_allow_html=True)
 
     col_back, col_next = st.columns([1, 1.35], gap="medium")
     next_step_title = FORM_STEPS[step + 1][0] if step < len(FORM_STEPS) - 1 else None
@@ -608,5 +610,3 @@ def render_input_form() -> None:
                     queue_checkout_redirect(checkout_url, session_id)
                 except StripePaymentError as exc:
                     st.error(str(exc))
-
-    st.markdown("</div>", unsafe_allow_html=True)

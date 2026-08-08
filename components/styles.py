@@ -1010,35 +1010,21 @@ CUSTOM_CSS = """
 
     .pcs-form-steps { margin: 0 0 1.5rem 0; }
 
-    .pcs-form-nav {
-        background: var(--pcs-surface);
-        border: 1px solid var(--pcs-border);
-        border-radius: 16px;
-        padding: 1.25rem 1.5rem 1.5rem 1.5rem;
-        margin-top: 0.75rem;
-        box-shadow: var(--pcs-shadow);
-    }
-
-    .pcs-form-nav-title {
-        color: var(--pcs-navy);
-        font-size: 0.92rem;
-        font-weight: 700;
-        margin: 0 0 1rem 0;
-        text-align: center;
-    }
-
-    .pcs-form-nav div[data-testid="stButton"] > button {
-        min-height: 3rem;
-        border-radius: 10px;
-        font-weight: 600;
-        border: 1px solid var(--pcs-border);
-    }
-
-    .pcs-form-nav div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, var(--pcs-navy) 0%, var(--pcs-navy-light) 100%);
+    /* Thin divider above Home/Next — no empty card (Streamlit can't wrap widgets in HTML). */
+    .pcs-form-nav-rule {
+        height: 0;
         border: none;
-        color: white;
-        box-shadow: 0 6px 16px rgba(21, 42, 69, 0.2);
+        border-top: 1px solid var(--pcs-border);
+        margin: 1.35rem 0 1rem 0;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    /* Hide Streamlit's empty markdown element if a stray wrapper ever reappears */
+    .element-container:has(> div > .pcs-form-nav:empty),
+    div[data-testid="stMarkdownContainer"]:has(> .pcs-form-nav:empty) {
+        display: none !important;
     }
 
     /* ── Content blocks ── */
