@@ -9,7 +9,6 @@ from components.html_utils import safe_html
 from services.bah_rates import compare_bah, get_bah_effective_date, list_bah_installations
 
 # Years of service does not change BAH (rank + dependents + location do).
-# Shown so Soldiers can pick a realistic profile when reading the result.
 YOS_OPTIONS = [
     "Under 2 years",
     "2–3 years",
@@ -25,6 +24,8 @@ YOS_OPTIONS = [
 ]
 
 _NONE_CURRENT = "— Skip comparison (gaining post only) —"
+_WITH = "With dependents"
+_WITHOUT = "Without dependents"
 
 
 def _money(n: int | None) -> str:
@@ -32,6 +33,11 @@ def _money(n: int | None) -> str:
         return "—"
     sign = "-" if n < 0 else ""
     return f"{sign}${abs(n):,}"
+
+
+def _resolve_dependents(deps_value: str) -> bool:
+    """Map UI label to boolean. Must not use startswith('With') — Without also starts with With."""
+    return deps_value.strip() == _WITH
 
 
 def render_bah_calculator() -> None:
@@ -47,10 +53,12 @@ def render_bah_calculator() -> None:
         f"""
         <div class="pcs-bah-wrap">
             <div class="pcs-bah-header">
-                <h3>2026 BAH Calculator</h3>
+                <div class="pcs-bah-badge">2026 rates · free tool</div>
+                <h3>BAH Calculator</h3>
                 <p class="pcs-bah-sub">
-                    See your monthly Basic Allowance for Housing at your next post —
-                    and the change from where you are now. Rates effective {safe_html(effective)}.
+                    Plug in your rank and dependents, pick your posts, and see your monthly
+                    housing allowance — plus how much it changes when you PCS.
+                    Effective {safe_html(effective)}.
                 </p>
             </div>
         </div>
@@ -59,55 +67,55 @@ def render_bah_calculator() -> None:
     )
 
     with st.container(border=True):
-        c1, c2 = st.columns(2)
+        st.markdown('<p class="pcs-bah-section-label">Your profile</p>', unsafe_allow_html=True)
+        c1, c2, c3 = st.columns([1.1, 1.1, 1.2])
         with c1:
             pay_grade = st.selectbox(
-                "Pay grade / rank",
+                "Pay grade",
                 options=grades,
                 index=grades.index("E-5") if "E-5" in grades else 0,
                 format_func=lambda g: f"{g} — {PAY_GRADE_TO_RANK.get(g, g)}",
                 key="bah_calc_grade",
             )
+        with c2:
             yos = st.selectbox(
                 "Years of service",
                 options=YOS_OPTIONS,
                 index=2,
                 key="bah_calc_yos",
-                help="BAH is not based on years of service — only rank, dependents, and location. "
-                "YOS is for your context when planning the rest of your pay.",
+                help="BAH does not change with years of service. Only rank, dependents, and location set your rate.",
             )
-        with c2:
+        with c3:
             deps = st.radio(
                 "Dependents",
-                options=["With dependents", "Without dependents"],
+                options=[_WITH, _WITHOUT],
                 horizontal=True,
                 key="bah_calc_deps",
             )
+
+        st.markdown('<p class="pcs-bah-section-label">Duty stations</p>', unsafe_allow_html=True)
+        d1, d2 = st.columns(2)
+        with d1:
             gaining = st.selectbox(
-                "Gaining installation (new post)",
+                "New post (gaining)",
                 options=installations,
                 index=installations.index("Fort Bragg, NC")
                 if "Fort Bragg, NC" in installations
                 else 0,
                 key="bah_calc_gaining",
             )
-
-        show_compare = st.checkbox(
-            "Compare to my current post (show monthly difference)",
-            value=True,
-            key="bah_calc_compare",
-        )
-        current = None
-        if show_compare:
-            current = st.selectbox(
-                "Current installation (losing post)",
-                options=[_NONE_CURRENT] + installations,
+        with d2:
+            current_options = [_NONE_CURRENT] + installations
+            current_raw = st.selectbox(
+                "Current post (optional compare)",
+                options=current_options,
                 key="bah_calc_current",
+                help="Leave as skip to only see BAH at your new installation.",
             )
-            if current == _NONE_CURRENT:
-                current = None
+            current = None if current_raw == _NONE_CURRENT else current_raw
 
-        with_dependents = deps.startswith("With")
+        # Exact match only — "Without dependents".startswith("With") is True and was a bug.
+        with_dependents = _resolve_dependents(deps)
         result = compare_bah(
             pay_grade=pay_grade,
             with_dependents=with_dependents,
@@ -127,51 +135,86 @@ def render_bah_calculator() -> None:
 
         rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
         dep_label = "with dependents" if with_dependents else "without dependents"
+        dep_chip = "WITH DEPS" if with_dependents else "NO DEPS"
+        gain_int = int(gain_amt)
+
+        # Side-by-side with/without preview so users see both rates for this grade+post
+        from services.bah_rates import get_bah_monthly
+
+        alt_with = get_bah_monthly(gaining, pay_grade, with_dependents=True)
+        alt_without = get_bah_monthly(gaining, pay_grade, with_dependents=False)
 
         st.markdown(
             f"""
-            <div class="pcs-bah-result">
-                <div class="pcs-bah-result-label">Your BAH at {safe_html(gaining)}</div>
-                <div class="pcs-bah-result-amount">{_money(int(gain_amt))}<span>/mo</span></div>
+            <div class="pcs-bah-result" data-deps="{safe_html(dep_chip)}">
+                <div class="pcs-bah-result-top">
+                    <div class="pcs-bah-result-label">Monthly BAH · {safe_html(gaining)}</div>
+                    <span class="pcs-bah-chip pcs-bah-chip-{'with' if with_dependents else 'without'}">{safe_html(dep_chip)}</span>
+                </div>
+                <div class="pcs-bah-result-amount">{_money(gain_int)}<span>/mo</span></div>
                 <div class="pcs-bah-result-meta">
                     {safe_html(pay_grade)} ({safe_html(rank_label)}) · {safe_html(dep_label)} ·
-                    {safe_html(yos)} · effective {safe_html(str(result["effective_date"]))}
+                    {safe_html(yos)}
                 </div>
                 <div class="pcs-bah-result-annual">
-                    About {_money(int(gain_amt) * 12)} per year in housing allowance
+                    {_money(gain_int * 12)} / year housing allowance
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
+        # Dual-rate strip — always shows both so toggle change is obvious
+        if alt_with is not None and alt_without is not None:
+            active_with = "pcs-bah-pair-active" if with_dependents else ""
+            active_without = "pcs-bah-pair-active" if not with_dependents else ""
+            st.markdown(
+                f"""
+                <div class="pcs-bah-pair">
+                    <div class="pcs-bah-pair-card {active_with}">
+                        <div class="pcs-bah-pair-k">With dependents</div>
+                        <div class="pcs-bah-pair-v">{_money(int(alt_with))}/mo</div>
+                    </div>
+                    <div class="pcs-bah-pair-card {active_without}">
+                        <div class="pcs-bah-pair-k">Without dependents</div>
+                        <div class="pcs-bah-pair-v">{_money(int(alt_without))}/mo</div>
+                    </div>
+                    <div class="pcs-bah-pair-card pcs-bah-pair-diff">
+                        <div class="pcs-bah-pair-k">Dependent difference</div>
+                        <div class="pcs-bah-pair-v">{_money(int(alt_with) - int(alt_without))}/mo</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
         curr = result.get("current")
         delta = result.get("monthly_delta_usd")
-        if show_compare and curr and curr.get("found") and curr.get("monthly_usd") is not None and delta is not None:
+        if current and curr and curr.get("found") and curr.get("monthly_usd") is not None and delta is not None:
             curr_amt = int(curr["monthly_usd"])
             annual = int(result.get("annual_delta_usd") or 0)
             if delta > 0:
                 tone = "up"
-                headline = f"You gain {_money(delta)}/mo at your new post"
+                headline = f"+{_money(delta)}/mo more at your new post"
                 detail = (
-                    f"From {curr['installation']} ({_money(curr_amt)}/mo) → "
-                    f"{gaining} ({_money(int(gain_amt))}/mo). "
-                    f"That's about {_money(annual)} more per year."
+                    f"{curr['installation']} → {gaining}: "
+                    f"{_money(curr_amt)} becomes {_money(gain_int)}. "
+                    f"About {_money(annual)} more per year."
                 )
             elif delta < 0:
                 tone = "down"
-                headline = f"You receive {_money(delta)}/mo less at your new post"
+                headline = f"{_money(delta)}/mo less at your new post"
                 detail = (
-                    f"From {curr['installation']} ({_money(curr_amt)}/mo) → "
-                    f"{gaining} ({_money(int(gain_amt))}/mo). "
-                    f"Plan for about {_money(annual)} less per year."
+                    f"{curr['installation']} → {gaining}: "
+                    f"{_money(curr_amt)} becomes {_money(gain_int)}. "
+                    f"About {_money(annual)} less per year — budget the drop before you move."
                 )
             else:
                 tone = "flat"
                 headline = "Same BAH at both posts"
                 detail = (
                     f"{curr['installation']} and {gaining} both pay "
-                    f"{_money(int(gain_amt))}/mo for your grade and dependency status."
+                    f"{_money(gain_int)}/mo for your grade and dependency status."
                 )
 
             st.markdown(
@@ -180,19 +223,19 @@ def render_bah_calculator() -> None:
                     <div class="pcs-bah-delta-title">{safe_html(headline)}</div>
                     <div class="pcs-bah-delta-detail">{safe_html(detail)}</div>
                     <div class="pcs-bah-delta-grid">
-                        <div>
+                        <div class="pcs-bah-delta-cell">
                             <div class="pcs-bah-delta-k">Current</div>
                             <div class="pcs-bah-delta-v">{_money(curr_amt)}/mo</div>
                             <div class="pcs-bah-delta-s">{safe_html(str(curr["installation"]))}</div>
                         </div>
-                        <div class="pcs-bah-delta-arrow">→</div>
-                        <div>
+                        <div class="pcs-bah-delta-arrow" aria-hidden="true">→</div>
+                        <div class="pcs-bah-delta-cell">
                             <div class="pcs-bah-delta-k">New post</div>
-                            <div class="pcs-bah-delta-v">{_money(int(gain_amt))}/mo</div>
+                            <div class="pcs-bah-delta-v">{_money(gain_int)}/mo</div>
                             <div class="pcs-bah-delta-s">{safe_html(gaining)}</div>
                         </div>
-                        <div>
-                            <div class="pcs-bah-delta-k">Monthly change</div>
+                        <div class="pcs-bah-delta-cell">
+                            <div class="pcs-bah-delta-k">Change</div>
                             <div class="pcs-bah-delta-v">{_money(int(delta))}</div>
                             <div class="pcs-bah-delta-s">{_money(annual)} / year</div>
                         </div>
@@ -201,14 +244,14 @@ def render_bah_calculator() -> None:
                 """,
                 unsafe_allow_html=True,
             )
-        elif show_compare and current:
+        elif current:
             st.info(
                 f"No comparison rate for {pay_grade} at {current}. "
                 "BAH at your gaining post is shown above."
             )
 
         st.caption(
-            "BAH is set by pay grade, dependency status, and Military Housing Area — not years of service. "
-            "Figures are 2026 planning rates for supported installations. "
-            "Always verify with your finance office or the official DTMO BAH calculator before signing a lease."
+            "BAH uses pay grade, dependency status, and Military Housing Area — not years of service. "
+            "2026 planning rates for supported installations. "
+            "Verify with finance or the official DTMO BAH calculator before signing a lease."
         )

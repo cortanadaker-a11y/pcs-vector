@@ -267,29 +267,65 @@ CUSTOM_CSS = """
     }
 
     /* ── BAH calculator ── */
+    .pcs-bah-wrap {
+        margin-top: 0.25rem;
+    }
+
+    .pcs-bah-badge {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--pcs-accent);
+        background: #eef4f0;
+        border: 1px solid #c8ddd0;
+        border-radius: 999px;
+        padding: 0.22rem 0.65rem;
+        margin-bottom: 0.55rem;
+    }
+
     .pcs-bah-header h3 {
         color: var(--pcs-navy);
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin: 0 0 0.35rem 0;
-        letter-spacing: -0.02em;
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin: 0 0 0.4rem 0;
+        letter-spacing: -0.025em;
     }
 
     .pcs-bah-sub {
         color: var(--pcs-muted);
         font-size: 0.92rem;
         line-height: 1.55;
-        margin: 0 0 0.75rem 0;
-        max-width: 40rem;
+        margin: 0 0 0.85rem 0;
+        max-width: 42rem;
+    }
+
+    .pcs-bah-section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin: 0.35rem 0 0.55rem 0;
     }
 
     .pcs-bah-result {
         background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
         border-radius: 14px;
-        padding: 1.25rem 1.35rem;
+        padding: 1.2rem 1.35rem 1.15rem 1.35rem;
         color: #fff;
-        margin: 0.75rem 0 0.85rem 0;
+        margin: 1rem 0 0.75rem 0;
         box-shadow: var(--pcs-shadow);
+    }
+
+    .pcs-bah-result-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.35rem;
     }
 
     .pcs-bah-result-label {
@@ -298,14 +334,33 @@ CUSTOM_CSS = """
         letter-spacing: 0.04em;
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.72);
-        margin-bottom: 0.25rem;
+    }
+
+    .pcs-bah-chip {
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        padding: 0.22rem 0.55rem;
+        border-radius: 6px;
+    }
+
+    .pcs-bah-chip-with {
+        background: rgba(168, 212, 188, 0.25);
+        color: #c5ebd4;
+        border: 1px solid rgba(168, 212, 188, 0.45);
+    }
+
+    .pcs-bah-chip-without {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .pcs-bah-result-amount {
-        font-size: 2.35rem;
+        font-size: 2.5rem;
         font-weight: 800;
         letter-spacing: -0.03em;
-        line-height: 1.1;
+        line-height: 1.05;
     }
 
     .pcs-bah-result-amount span {
@@ -324,9 +379,56 @@ CUSTOM_CSS = """
 
     .pcs-bah-result-annual {
         margin-top: 0.55rem;
-        font-size: 0.88rem;
+        font-size: 0.9rem;
         font-weight: 600;
         color: #a8d4bc;
+    }
+
+    .pcs-bah-pair {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.55rem;
+        margin: 0 0 0.85rem 0;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-bah-pair {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pcs-bah-pair-card {
+        background: #f7f5f1;
+        border: 1px solid var(--pcs-border);
+        border-radius: 10px;
+        padding: 0.7rem 0.85rem;
+        transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pcs-bah-pair-active {
+        background: #eef4f0;
+        border-color: var(--pcs-accent);
+        box-shadow: 0 0 0 1px var(--pcs-accent);
+    }
+
+    .pcs-bah-pair-diff {
+        background: #faf9f7;
+    }
+
+    .pcs-bah-pair-k {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin-bottom: 0.2rem;
+    }
+
+    .pcs-bah-pair-v {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: -0.02em;
     }
 
     .pcs-bah-delta {
@@ -352,10 +454,11 @@ CUSTOM_CSS = """
     }
 
     .pcs-bah-delta-title {
-        font-size: 1.02rem;
-        font-weight: 700;
+        font-size: 1.05rem;
+        font-weight: 800;
         color: var(--pcs-navy);
         margin-bottom: 0.3rem;
+        letter-spacing: -0.02em;
     }
 
     .pcs-bah-delta-detail {
@@ -369,7 +472,7 @@ CUSTOM_CSS = """
         display: grid;
         grid-template-columns: 1fr auto 1fr 1fr;
         gap: 0.65rem;
-        align-items: center;
+        align-items: start;
     }
 
     @media (max-width: 640px) {
@@ -407,6 +510,7 @@ CUSTOM_CSS = """
         color: var(--pcs-accent);
         font-weight: 700;
         text-align: center;
+        padding-top: 0.85rem;
     }
 
     /* ── Cards & sections ── */
