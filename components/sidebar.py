@@ -62,7 +62,7 @@ def render_sidebar() -> str:
                 housing, schools, spouse career, cash flow, and first 30 days.
 
                 - 8-section personalized report
-                - Major CONUS Army installations
+                - 55 CONUS & OCONUS Army installations
                 - One-time payment · PDF emailed
                 - Retrieve anytime with your order reference
                 """
