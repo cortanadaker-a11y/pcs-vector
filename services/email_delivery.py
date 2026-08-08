@@ -1,8 +1,7 @@
 """Email delivery for PCS Vector PDF reports.
 
 PDFs are always available for on-site download after payment. Email is an additional
-delivery channel when SMTP is configured in Streamlit secrets — we use the address
-collected by Stripe at checkout when available.
+delivery channel when SMTP is configured in Streamlit secrets.
 """
 
 from __future__ import annotations
@@ -15,6 +14,7 @@ import ssl
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr, formatdate, make_msgid, parseaddr
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,9 @@ def get_smtp_config() -> dict[str, Any] | None:
     from_address = _from_streamlit_secrets("email.from_address") or os.environ.get(
         "PCS_EMAIL_FROM_ADDRESS", ""
     ).strip()
+    reply_to = _from_streamlit_secrets("email.reply_to") or os.environ.get(
+        "PCS_EMAIL_REPLY_TO", ""
+    ).strip()
     port_raw = _from_streamlit_secrets("email.smtp_port") or os.environ.get("PCS_EMAIL_SMTP_PORT", "587")
     use_tls_raw = _from_streamlit_secrets("email.use_tls") or os.environ.get("PCS_EMAIL_USE_TLS", "true")
 
@@ -68,6 +71,7 @@ def get_smtp_config() -> dict[str, Any] | None:
         "user": user,
         "password": password,
         "from_address": from_address,
+        "reply_to": reply_to or None,
         "use_tls": use_tls,
     }
 
@@ -80,6 +84,62 @@ def is_email_configured() -> bool:
 def normalize_email(raw: str) -> str | None:
     email = (raw or "").strip().lower()
     return email if _EMAIL_PATTERN.match(email) else None
+
+
+def _build_bodies(
+    *,
+    family_name: str,
+    order_reference: str,
+) -> tuple[str, str]:
+    """Return (plain_text, html) bodies tuned for deliverability."""
+    first = (family_name or "").strip().split()[0] if (family_name or "").strip() else ""
+    greeting = f"Hi {first}," if first else "Hi,"
+    order_plain = f"\nOrder reference: {order_reference}\n" if order_reference else "\n"
+    order_html = (
+        f'<p style="margin:12px 0;color:#454540;">Order reference: '
+        f"<strong>{order_reference}</strong></p>"
+        if order_reference
+        else ""
+    )
+
+    plain = (
+        f"{greeting}\n\n"
+        "Thanks for purchasing PCS Vector. Your personalized PCS strategic plan is attached "
+        "as a PDF.\n\n"
+        "You can also open the app anytime with your order reference to view or download "
+        "the report again — no extra charge."
+        f"{order_plain}\n"
+        "If this landed in spam, mark it as Not spam and add this address to your contacts "
+        "so future plans arrive in your inbox.\n\n"
+        "— PCS Vector\n"
+        "Built For Soldiers; By Soldiers\n"
+    )
+
+    html = f"""\
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>PCS Vector</title></head>
+<body style="margin:0;padding:0;background:#f4f2ee;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1c1c1a;">
+  <div style="max-width:560px;margin:24px auto;background:#ffffff;border:1px solid #e0ddd6;border-radius:12px;padding:28px 24px;">
+    <p style="margin:0 0 8px 0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#4a7c64;font-weight:700;">PCS Vector</p>
+    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;">{greeting}</p>
+    <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;">
+      Thanks for purchasing PCS Vector. Your personalized PCS strategic plan is attached as a PDF.
+    </p>
+    <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;">
+      You can also open the app anytime with your order reference to view or download the report again — no extra charge.
+    </p>
+    {order_html}
+    <p style="margin:16px 0 0 0;font-size:13px;line-height:1.5;color:#6b6b66;">
+      If this landed in spam, mark it as Not spam and add this address to your contacts so future plans arrive in your inbox.
+    </p>
+    <p style="margin:20px 0 0 0;font-size:14px;line-height:1.5;">— PCS Vector<br>
+    <span style="color:#6b6b66;font-size:12px;">Built For Soldiers; By Soldiers</span></p>
+  </div>
+</body>
+</html>
+"""
+    return plain, html
 
 
 def send_report_pdf_email(
@@ -105,27 +165,45 @@ def send_report_pdf_email(
             "Download your PDF from the report page instead."
         )
 
-    greeting = f"Hi {family_name}," if family_name else "Hi,"
-    order_line = f"\nOrder reference: {order_reference}" if order_reference else ""
+    from_display, from_addr = parseaddr(config["from_address"])
+    if not from_addr:
+        from_addr = config["from_address"]
+        from_display = "PCS Vector"
+    if not from_display:
+        from_display = "PCS Vector"
 
-    body = (
-        f"{greeting}\n\n"
-        "Your PCS Vector strategic plan is attached as a PDF. "
-        "You can also return to the app anytime with your order reference "
-        "to view or download your report again — no extra charge."
-        f"{order_line}\n\n"
-        "Thank you for using PCS Vector.\n"
-        "— PCS Vector"
+    reply_to = config.get("reply_to") or from_addr
+    domain = from_addr.split("@")[-1] if "@" in from_addr else "localhost"
+
+    plain, html = _build_bodies(family_name=family_name, order_reference=order_reference)
+
+    # multipart/mixed → alternative (plain+html) + PDF attachment
+    message = MIMEMultipart("mixed")
+    message["Subject"] = (
+        f"Your PCS Vector plan is ready — {order_reference}"
+        if order_reference
+        else "Your PCS Vector plan is ready"
     )
-
-    message = MIMEMultipart()
-    message["Subject"] = "Your PCS Vector report (PDF attached)"
-    message["From"] = config["from_address"]
+    message["From"] = formataddr((from_display, from_addr))
     message["To"] = recipient
-    message.attach(MIMEText(body, "plain", "utf-8"))
+    message["Reply-To"] = reply_to
+    message["Date"] = formatdate(localtime=True)
+    message["Message-ID"] = make_msgid(domain=domain)
+    message["MIME-Version"] = "1.0"
+    # Helps some filters treat this as a one-to-one transactional message
+    message["X-Auto-Response-Suppress"] = "OOF, AutoReply"
+    message["Auto-Submitted"] = "auto-generated"
+    if order_reference:
+        message["X-PCS-Order"] = order_reference
+
+    alt = MIMEMultipart("alternative")
+    alt.attach(MIMEText(plain, "plain", "utf-8"))
+    alt.attach(MIMEText(html, "html", "utf-8"))
+    message.attach(alt)
 
     attachment = MIMEApplication(pdf_bytes, _subtype="pdf")
     attachment.add_header("Content-Disposition", "attachment", filename=pdf_filename)
+    attachment.add_header("Content-Type", "application/pdf", name=pdf_filename)
     message.attach(attachment)
 
     try:
@@ -134,7 +212,8 @@ def send_report_pdf_email(
                 server.starttls(context=ssl.create_default_context())
             if config["user"] and config["password"]:
                 server.login(config["user"], config["password"])
-            server.sendmail(config["from_address"], [recipient], message.as_string())
+            # Envelope sender must be the bare address (not "Name <addr>")
+            server.sendmail(from_addr, [recipient], message.as_string())
     except (OSError, smtplib.SMTPException) as exc:
         logger.warning("Failed to email PDF to %s: %s", recipient, exc)
         raise EmailDeliveryError(

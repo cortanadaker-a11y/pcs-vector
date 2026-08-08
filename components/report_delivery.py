@@ -108,7 +108,10 @@ def render_pdf_delivery_status(pdf_bytes: bytes, pdf_filename: str) -> None:
                 f"Your PDF has been emailed to **{preferred}** (order **{order_ref}**).",
                 icon="📧",
             )
-            st.caption("Check spam/junk if it does not arrive within a few minutes.")
+            st.caption(
+                "If it is not in your inbox within a few minutes, check **Spam/Junk** and "
+                "mark it as **Not spam**, then add the sender to your contacts so the next plan lands in inbox."
+            )
         elif delivery_error:
             st.warning(delivery_error, icon="⚠️")
 

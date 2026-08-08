@@ -114,6 +114,46 @@ cd pcs-vector
 
 If the test succeeds, the sidebar shows `📧 Email connected`. Without `[email]`, the app still works — users download the PDF on the report page.
 
+### Email going to spam (deliverability)
+
+**Why free Gmail often lands in spam**
+
+Sending from `something@gmail.com` via SMTP has weak reputation for bulk/transactional mail. You cannot set custom SPF/DKIM for `@gmail.com`. Filters often treat free Gmail + PDF attachments as lower trust.
+
+**What improves deliverability most (recommended path)**
+
+1. **Use a real domain** you own (e.g. `mail@pcsvector.com` or Google Workspace).
+2. **Authenticate the domain** with the provider:
+   - **SPF** DNS TXT record authorizing the sending host
+   - **DKIM** DNS TXT records from the provider
+   - **DMARC** DNS TXT (start with `v=DMARC1; p=none; rua=mailto:you@domain.com`)
+3. Prefer a transactional provider with easy domain auth:
+   - [Resend](https://resend.com), [SendGrid](https://sendgrid.com), [Postmark](https://postmarkapp.com), or Amazon SES
+4. Keep content transactional (order reference, PDF you requested) — avoid promo wording.
+
+**What you can do immediately on free Gmail**
+
+1. In Gmail (as the **recipient**), open the message → **Not spam** / **Report not spam**.
+2. Add `pcs0vector@gmail.com` (or your From address) to **Contacts**.
+3. Create a filter: from your sending address → **Never send it to Spam**.
+4. Ask first testers to do the same (warms reputation slightly).
+5. Keep volume low and consistent; sudden spikes look like spam.
+
+**App-side (already implemented)**
+
+- Clean subject lines (no “FREE”, “ACT NOW”, etc.)
+- Multipart plain + HTML
+- Proper `Message-ID`, `Date`, `Reply-To`, envelope From
+- Order reference in subject/body for expected transactional mail
+
+**Optional secrets**
+
+```toml
+[email]
+# ...existing smtp fields...
+reply_to = "pcs0vector@gmail.com"
+```
+
 ---
 
 ## 4. Update Stripe redirect URLs (critical)
