@@ -304,11 +304,11 @@ def build_value_context(
     else:
         partner_piece = f"your {career_short} path and the first paycheck timeline"
     spouse_share = (
-        f"Hey — we're in this together for the move to {gaining}. "
-        f"Priority we're protecting: {primary_priority.lower()}. "
-        f"I'll own the Army side (orders, finance, housing paperwork, section 5 timeline); "
-        f"I'd love your lead on {partner_piece}. "
-        f"If we stick to the decision gates, we don't have to reinvent this mid-move."
+        f"For both of us on the move to {gaining}: the thing that matters most right now is "
+        f"{primary_priority.lower()}. "
+        f"I'll handle the Army paperwork side — orders, finance, housing apps, and the first-month checklist. "
+        f"If you can take the lead on {partner_piece}, we cover both lanes without either of us drowning. "
+        f"Let's use this plan as our shared playbook, not a list of orders for one person."
     )
     return {
         "situation_snapshot": build_situation_snapshot(
