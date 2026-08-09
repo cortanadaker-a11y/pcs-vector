@@ -290,7 +290,7 @@ def render_report() -> None:
     if not form_submitted:
         st.markdown("## Your report")
         st.markdown(
-            "No plan is ready in this browser session yet. Takes about **6–8 minutes** to fill the form, "
+            "No plan is ready in this browser session yet. Takes about **3–5 minutes** to fill the form, "
             "then one-time checkout unlocks your personalized 8-section plan and PDF."
         )
         with st.container(border=True):

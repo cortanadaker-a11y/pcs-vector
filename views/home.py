@@ -59,7 +59,7 @@ def _render_hero(price: str) -> None:
             <p class="pcs-hero-body">{safe_html(HERO["subheadline"])}</p>
             <div class="pcs-hero-stats">
                 <span class="pcs-hero-stat"><strong>8</strong> decision sections</span>
-                <span class="pcs-hero-stat"><strong>6–8</strong> min intake</span>
+                <span class="pcs-hero-stat"><strong>3–5</strong> min intake</span>
                 <span class="pcs-hero-stat"><strong>{price_safe}</strong> one-time</span>
             </div>
         </div>

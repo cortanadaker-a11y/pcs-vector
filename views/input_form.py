@@ -73,7 +73,7 @@ def _render_step_context(step: int) -> None:
         <div class="pcs-step-context">
             <div class="pcs-step-context-row">
                 <span class="pcs-step-context-chip">This step {safe_html(meta.get("time", ""))}</span>
-                <span class="pcs-step-context-chip muted">About 6–8 min total</span>
+                <span class="pcs-step-context-chip muted">About 3–5 min total</span>
             </div>
             <p class="pcs-step-context-why"><strong>Why we ask:</strong> {safe_html(meta.get("why", ""))}</p>
             <p class="pcs-step-context-need"><strong>Have handy:</strong> {safe_html(meta.get("need", ""))}</p>

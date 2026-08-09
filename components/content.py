@@ -39,7 +39,7 @@ MOTIVATION_RALLY = {
 MOTIVATION_CLOSE = {
     "headline": "Your next PCS doesn't have to feel like another deployment for your family.",
     "body": (
-        "Six to eight minutes of inputs. One clear strategic plan. "
+        "Three to five minutes of inputs. One clear strategic plan. "
         "Share it with your spouse tonight and start making decisions tomorrow."
     ),
 }
@@ -48,7 +48,7 @@ CTA = {
     "primary": "Build my PCS plan",
     "hero": "Build my PCS plan →",
     "mid": "Build my PCS plan →",
-    "caption": "One-time · ~6–8 min form · PDF emailed · no subscription",
+    "caption": "One-time · ~3–5 min form · PDF emailed · no subscription",
     "form_pay_reassurance": (
         "Next: secure Stripe checkout — one payment, no subscription. "
         "Your plan generates after payment and the PDF is emailed so you can share it with your spouse."
@@ -175,7 +175,7 @@ REPORT_SECTIONS = [
 ]
 
 HOW_IT_WORKS_STEPS = [
-    {"num": "1", "title": "Your move details", "desc": "6–8 min · family, posts, priorities"},
+    {"num": "1", "title": "Your move details", "desc": "3–5 min · family, posts, priorities"},
     {"num": "2", "title": "Pay once", "desc": "One-time $25 · Stripe · no subscription"},
     {"num": "3", "title": "Get your plan", "desc": "8-section report + PDF emailed"},
     {"num": "4", "title": "Execute", "desc": "Share with your spouse · first 30 days locked in"},
@@ -285,7 +285,7 @@ FAQ_ITEMS = [
     },
     {
         "q": "How long does the form take?",
-        "a": "Most families finish in 6–8 minutes across three short sections. Your answers stay saved "
+        "a": "Most families finish in 3–5 minutes across three short sections. Your answers stay saved "
         "if you need a break before checkout.",
     },
     {
