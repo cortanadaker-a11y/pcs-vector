@@ -27,6 +27,7 @@ from components.form_options import (
     VEHICLE_COUNTS,
 )
 from components.form_state import (
+    FORM_STEP_META,
     FORM_STEPS,
     collect_form_from_widgets,
     get_form_value,
@@ -53,14 +54,39 @@ def _option_index(options: list[str], value: str, default: int = 0) -> int:
 
 
 def _section_header(title: str, description: str) -> None:
-    st.markdown(f'<p class="pcs-section-title">{title}</p>', unsafe_allow_html=True)
-    st.markdown(f'<p class="pcs-section-desc">{description}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p class="pcs-section-title">{safe_html(title)}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p class="pcs-section-desc">{safe_html(description)}</p>', unsafe_allow_html=True)
+
+
+def _render_step_context(step: int) -> None:
+    """Soldier-friendly context: time left, why we ask, what you need."""
+    meta = FORM_STEP_META.get(step) or {}
+    if not meta:
+        return
+    remaining = []
+    for i in range(step, len(FORM_STEPS)):
+        t = (FORM_STEP_META.get(i) or {}).get("time", "")
+        if t:
+            remaining.append(t.replace("~", ""))
+    st.markdown(
+        f"""
+        <div class="pcs-step-context">
+            <div class="pcs-step-context-row">
+                <span class="pcs-step-context-chip">This step {safe_html(meta.get("time", ""))}</span>
+                <span class="pcs-step-context-chip muted">About 6–8 min total</span>
+            </div>
+            <p class="pcs-step-context-why"><strong>Why we ask:</strong> {safe_html(meta.get("why", ""))}</p>
+            <p class="pcs-step-context-need"><strong>Have handy:</strong> {safe_html(meta.get("need", ""))}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _render_move_basics() -> None:
     _section_header(
         "1. Move Basics",
-        "Where you're coming from, where you're headed, and your timeline.",
+        "Your posts, timeline, and identity — so the plan talks to you, not a generic Soldier.",
     )
 
     col_first, col_last = st.columns(2)
@@ -206,7 +232,7 @@ def _render_move_basics() -> None:
 def _render_family_situation() -> None:
     _section_header(
         "2. Family Situation",
-        "Single or with family — sets BAH/OHA with/without dependents and OCONUS COLA.",
+        "Who is PCS'ing with you — sets BAH/OHA rates and OCONUS COLA (dependents count).",
     )
 
     set_form_value(
@@ -319,7 +345,7 @@ def _render_family_situation() -> None:
 def _render_housing_budget() -> None:
     _section_header(
         "3. Housing & Budget",
-        "Your living preferences and spending comfort zone.",
+        "On-post vs off-post preference and what you can live with for rent vs BAH/OHA.",
     )
 
     set_form_value(
@@ -517,7 +543,7 @@ def render_input_form() -> None:
     st.markdown("## Build your PCS plan")
     st.markdown(
         f"**Step {step + 1} of {len(FORM_STEPS)}** — {step_titles[step]}. "
-        f"About 6–8 minutes total. After checkout (**{price}**), your plan and PDF are emailed to you."
+        f"Answer straight — no essays. After checkout (**{price}**), your plan + PDF land in your inbox."
     )
 
     carryover = st.session_state.pop("calculator_carryover_banner", None)
@@ -537,6 +563,7 @@ def render_input_form() -> None:
         st.error(st.session_state.report_error)
 
     _render_form_step_indicator(step)
+    _render_step_context(step)
 
     if step == 0:
         with st.container(border=True):

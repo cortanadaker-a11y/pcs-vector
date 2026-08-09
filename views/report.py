@@ -167,10 +167,21 @@ def _render_report_header(form_data: dict) -> None:
     gaining = resolved_gaining_installation(form_data)
     if family:
         st.markdown(f"## {family}'s PCS Strategic Plan")
-        st.caption(f"Personalized for your move to **{gaining}**")
+        st.caption(f"Personalized for your move to **{gaining}** · share the PDF with your spouse")
     else:
         st.markdown("## Your PCS Strategic Plan")
-        st.caption(f"Personalized for your move to **{gaining}**")
+        st.caption(f"Personalized for your move to **{gaining}** · share the PDF with your spouse")
+    st.markdown(
+        """
+        <div class="pcs-report-howto">
+            <strong>How to use this plan:</strong>
+            Read Section 1 together → hit every <em>Gate</em> before you sign →
+            run Section 5 day-by-day → use Section 8 as your short checklist.
+            Always verify BAH/OHA and entitlements with finance / TMO.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _render_bah_summary_banner(form_data: dict) -> None:
@@ -279,9 +290,17 @@ def render_report() -> None:
     if not form_submitted:
         st.markdown("## Your report")
         st.markdown(
-            "No plan is ready in this session yet. Complete the form and checkout to unlock "
-            "your personalized 8-section report and PDF."
+            "No plan is ready in this browser session yet. Takes about **6–8 minutes** to fill the form, "
+            "then one-time checkout unlocks your personalized 8-section plan and PDF."
         )
+        with st.container(border=True):
+            st.markdown(
+                "**What you'll get**  \n"
+                "- Clear housing call (on-post vs off-post) with BAH/OHA math  \n"
+                "- Spouse career + childcare timeline  \n"
+                "- First 30 days with decision gates  \n"
+                "- PDF you can forward to your spouse tonight"
+            )
         col_a, col_b = st.columns(2)
         with col_a:
             if st.button("Build your plan →", type="primary", use_container_width=True, key="report_empty_build"):
@@ -370,11 +389,11 @@ def render_report() -> None:
 
 
 def _render_footer_nav() -> None:
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="pcs-form-nav-rule" aria-hidden="true"></div>', unsafe_allow_html=True)
     col_back, col_home = st.columns(2)
     with col_back:
-        if st.button("← Edit details", use_container_width=True):
+        if st.button("← Edit details", use_container_width=True, key="report_nav_edit"):
             navigate_to("input")
     with col_home:
-        if st.button("Home", use_container_width=True):
+        if st.button("Home", use_container_width=True, key="report_nav_home"):
             navigate_to("home")

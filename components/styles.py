@@ -1010,6 +1010,67 @@ CUSTOM_CSS = """
 
     .pcs-form-steps { margin: 0 0 1.5rem 0; }
 
+    /* Per-step soldier context (time, why, what to have handy) */
+    .pcs-step-context {
+        background: linear-gradient(135deg, #f7faf8 0%, #f0f7f3 100%);
+        border: 1px solid rgba(91, 143, 114, 0.28);
+        border-left: 4px solid var(--pcs-accent);
+        border-radius: 12px;
+        padding: 0.85rem 1.1rem 0.75rem 1.1rem;
+        margin: 0 0 1.15rem 0;
+    }
+
+    .pcs-step-context-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-bottom: 0.55rem;
+    }
+
+    .pcs-step-context-chip {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--pcs-navy);
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(91, 143, 114, 0.35);
+        border-radius: 999px;
+        padding: 0.22rem 0.65rem;
+    }
+
+    .pcs-step-context-chip.muted {
+        color: var(--pcs-muted);
+        font-weight: 600;
+        border-color: var(--pcs-border);
+        background: rgba(255, 255, 255, 0.65);
+    }
+
+    .pcs-step-context-why,
+    .pcs-step-context-need {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        color: var(--pcs-slate);
+    }
+
+    .pcs-step-context-need {
+        color: var(--pcs-muted);
+        font-size: 0.84rem;
+    }
+
+    /* Report reading guide */
+    .pcs-report-howto {
+        background: #f0f7f3;
+        border: 1px solid rgba(91, 143, 114, 0.3);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0 1rem 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: var(--pcs-slate);
+    }
+
     /* Thin divider above Home/Next — no empty card (Streamlit can't wrap widgets in HTML). */
     .pcs-form-nav-rule {
         height: 0;
@@ -1019,6 +1080,41 @@ CUSTOM_CSS = """
         padding: 0;
         background: transparent;
         box-shadow: none;
+    }
+
+    /* Larger touch targets on phone (gate traffic / one-handed use) */
+    @media (max-width: 640px) {
+        .block-container {
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+            padding-top: 0.85rem;
+        }
+
+        .pcs-hero {
+            padding: 1.75rem 1.25rem 1.5rem 1.25rem;
+            border-radius: 16px;
+        }
+
+        .pcs-brand-title {
+            font-size: 2.15rem;
+        }
+
+        .pcs-hero-headline {
+            font-size: 1.25rem !important;
+        }
+
+        div[data-testid="stButton"] > button {
+            min-height: 3rem;
+            font-size: 1rem;
+        }
+
+        .pcs-bah-result-amount {
+            font-size: 1.85rem;
+        }
+
+        .pcs-step-context {
+            padding: 0.75rem 0.85rem;
+        }
     }
 
     /* Hide Streamlit's empty markdown element if a stray wrapper ever reappears */

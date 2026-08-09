@@ -31,7 +31,8 @@ def render_order_lookup() -> None:
     st.markdown("## Retrieve your report")
     st.markdown(
         "Already paid? Enter your **order reference** (e.g. `PCS-ABC12XYZ`) "
-        "to open your plan and PDF — **no extra charge**."
+        "to open your plan and PDF — **no extra charge**. "
+        "Works on a new phone or browser; keep the email with your receipt."
     )
 
     prefilled = _query_param("order") or _query_param("ref")

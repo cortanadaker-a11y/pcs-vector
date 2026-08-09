@@ -391,6 +391,25 @@ FORM_STEPS: tuple[tuple[str, str], ...] = (
     ("Logistics & Notes", "logistics"),
 )
 
+# Soldier-facing time estimates and "why this step" copy (shown on form wizard).
+FORM_STEP_META: dict[int, dict[str, str]] = {
+    0: {
+        "time": "~2–3 min",
+        "why": "We need posts, timeline, and family size so BAH/OHA and spouse plan match your reality.",
+        "need": "Orders (or expected gaining post), pay grade, YOS, and who is moving with you.",
+    },
+    1: {
+        "time": "~2 min",
+        "why": "Housing preference and priorities drive the recommendation in Section 1 of your plan.",
+        "need": "Rough budget comfort and what matters most this PCS (career, schools, cost, speed).",
+    },
+    2: {
+        "time": "~1–2 min",
+        "why": "Vehicles, DITY interest, and concerns shape logistics and risk flags in the report.",
+        "need": "Vehicle count and anything unique (EFMP, dual-military, tight timeline, pets).",
+    },
+}
+
 
 def init_form_step() -> None:
     if "form_step" not in st.session_state:

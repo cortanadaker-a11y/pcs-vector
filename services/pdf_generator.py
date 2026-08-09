@@ -182,6 +182,46 @@ def _build_styles() -> dict[str, ParagraphStyle]:
             leading=12,
             textColor=SLATE,
         ),
+        "howto": ParagraphStyle(
+            "PCSHowTo",
+            parent=base["Normal"],
+            fontName="Helvetica",
+            fontSize=8.5,
+            leading=11.5,
+            textColor=SLATE,
+            spaceAfter=0,
+        ),
+        "howto_label": ParagraphStyle(
+            "PCSHowToLabel",
+            parent=base["Normal"],
+            fontName="Helvetica-Bold",
+            fontSize=8.5,
+            leading=11,
+            textColor=NAVY,
+            spaceAfter=3,
+        ),
+        "gate": ParagraphStyle(
+            "PCSGate",
+            parent=base["Normal"],
+            fontName="Helvetica-Bold",
+            fontSize=10,
+            leading=13.5,
+            textColor=NAVY,
+            spaceBefore=4,
+            spaceAfter=8,
+            leftIndent=4,
+            borderPadding=4,
+        ),
+        "spouse_share": ParagraphStyle(
+            "PCSSpouseShare",
+            parent=base["Normal"],
+            fontName="Helvetica-Oblique",
+            fontSize=10,
+            leading=13.5,
+            textColor=NAVY,
+            spaceBefore=10,
+            spaceAfter=4,
+        ),
     }
 
 
@@ -194,11 +234,16 @@ def _build_cover_block(
     """Build title, move summary (left), and BAH callout (top right)."""
     flowables: list[Any] = []
     title_line = _extract_title(markdown_content)
+    # Prefer personalized family title when metadata is available
+    if metadata and metadata.get("family_name"):
+        family = str(metadata["family_name"]).strip()
+        if family:
+            title_line = f"{family}'s PCS Strategic Plan"
 
     flowables.append(Paragraph(_format_inline(title_line), styles["title"]))
     flowables.append(
         Paragraph(
-            f"<b>Report date:</b> {_escape(report_date)}",
+            f"<b>Report date:</b> {_escape(report_date)} · Built For Soldiers; By Soldiers",
             styles["subtitle"],
         )
     )
@@ -246,7 +291,41 @@ def _build_cover_block(
             flowables.append(Spacer(1, 0.08 * inch))
             flowables.append(meta_table)
 
-    flowables.append(HRFlowable(width="100%", thickness=1, color=BORDER, spaceBefore=8, spaceAfter=4))
+    # How to use this plan — soldier-facing reading guide
+    howto_inner = [
+        [
+            Paragraph("HOW TO USE THIS PLAN", styles["howto_label"]),
+        ],
+        [
+            Paragraph(
+                "1) Read <b>Section 1</b> with your spouse — agree on the primary recommendation. "
+                "2) Hit every <b>Gate</b> before you sign a lease or commit money. "
+                "3) Execute <b>Section 5</b> (first 30 days) day-by-day. "
+                "4) Use <b>Section 8</b> as your short checklist. "
+                "Verify BAH/OHA/COLA and entitlements with finance / TMO before financial decisions.",
+                styles["howto"],
+            )
+        ],
+    ]
+    howto_box = Table(howto_inner, colWidths=[6.6 * inch])
+    howto_box.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f0f7f3")),
+                ("BOX", (0, 0), (-1, -1), 0.75, ACCENT),
+                ("LEFTPADDING", (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+                ("TOPPADDING", (0, 0), (0, 0), 8),
+                ("BOTTOMPADDING", (0, -1), (-1, -1), 8),
+                ("TOPPADDING", (0, 1), (-1, -1), 2),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+        )
+    )
+    flowables.append(Spacer(1, 0.1 * inch))
+    flowables.append(howto_box)
+
+    flowables.append(HRFlowable(width="100%", thickness=1, color=BORDER, spaceBefore=10, spaceAfter=6))
     return flowables
 
 
@@ -350,9 +429,22 @@ def _bah_callout_cell(
 def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
     """Build label/value rows for the cover summary."""
     rows: list[list[Any]] = []
+    yos = metadata.get("years_of_service")
+    deps = metadata.get("num_dependents")
+    yos_label = f"{yos} years" if yos is not None and str(yos) != "" else ""
+    if deps is not None and str(deps) != "":
+        try:
+            d = int(deps)
+            deps_label = f"{d} dependent{'s' if d != 1 else ''}"
+        except (TypeError, ValueError):
+            deps_label = str(deps)
+    else:
+        deps_label = ""
+
     fields = [
         ("Prepared for", metadata.get("family_name", "")),
         ("Rank", metadata.get("rank", "")),
+        ("YOS / family", " · ".join(x for x in (yos_label, deps_label) if x)),
         ("Moving from", metadata.get("from_installation", "")),
         ("Moving to", metadata.get("to_installation", "")),
         ("Move window", metadata.get("move_window", "")),
@@ -443,7 +535,27 @@ def _parse_markdown_to_flowables(
         paragraph_lines, i = _collect_paragraph(lines, i)
         text = " ".join(paragraph_lines).strip()
         if text:
-            flowables.append(Paragraph(_format_inline(text), styles["body"]))
+            # Highlight decision gates and spouse-share closer for scannability
+            lower = text.lower().lstrip()
+            if re.match(r"^(\*\*)?gate:", lower):
+                cleaned = re.sub(r"^(\*\*)?gate:\s*", "", text.strip(), flags=re.I)
+                flowables.append(
+                    Paragraph(f"<b>GATE:</b> {_format_inline(cleaned)}", styles["gate"])
+                )
+            elif re.search(r"\bgate:", lower):
+                # e.g. "Days 1–5 Gate: …" — emphasize the word Gate after escaping
+                formatted = _format_inline(text)
+                formatted = re.sub(r"(?i)\bgate:", "<b>GATE:</b>", formatted, count=1)
+                flowables.append(Paragraph(formatted, styles["gate"]))
+            elif "we're targeting" in lower and len(text) < 400:
+                flowables.append(
+                    Paragraph(
+                        f"<i>Share with your spouse —</i> {_format_inline(text)}",
+                        styles["spouse_share"],
+                    )
+                )
+            else:
+                flowables.append(Paragraph(_format_inline(text), styles["body"]))
         else:
             i += 1
 

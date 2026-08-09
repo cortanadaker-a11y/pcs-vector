@@ -97,23 +97,33 @@ def render_pdf_delivery_status(pdf_bytes: bytes, pdf_filename: str) -> None:
     delivery_error = st.session_state.get("pdf_email_delivery_error")
 
     with st.container(border=True):
+        st.markdown(
+            '<p class="pcs-email-block-title">Your PDF — save it &amp; share with your spouse</p>',
+            unsafe_allow_html=True,
+        )
         if auto_sent and preferred:
             st.success(
-                f"PDF emailed to **{preferred}** · order **{order_ref}**",
+                f"Emailed to **{preferred}** · order **{order_ref}**",
                 icon="📧",
             )
-            st.caption("Check spam if you don't see it. Mark as Not spam for next time.")
+            st.caption(
+                "Check spam/junk if you don't see it within a few minutes. "
+                "Forward the PDF so your spouse can read Section 1 with you tonight."
+            )
         elif delivery_error:
             st.warning(delivery_error, icon="⚠️")
+            st.caption("You can still download the PDF above — save a copy to your phone or drive.")
         else:
             st.markdown("**PDF delivery** — emailed after generation; download anytime above.")
 
         if not is_email_configured():
-            st.caption(f"Email not configured on server. Save order **{order_ref}** and download the PDF.")
+            st.caption(
+                f"Email not configured on server. Save order **{order_ref}** and download the PDF now."
+            )
             return
 
         if auto_sent:
-            if st.button("Resend PDF", use_container_width=True, key="resend_pdf_email_btn"):
+            if st.button("Resend PDF to my email", use_container_width=True, key="resend_pdf_email_btn"):
                 st.session_state.pdf_email_sent_for_order = None
                 if auto_email_pdf_after_generation(pdf_bytes, pdf_filename):
                     st.rerun()

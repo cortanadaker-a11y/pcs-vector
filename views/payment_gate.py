@@ -11,24 +11,25 @@ def render_payment_required() -> None:
     """Show paywall with option to start or resume Stripe Checkout."""
     price = get_price_display()
 
-    st.markdown("## Complete payment to unlock your plan")
+    st.markdown("## Almost there — unlock your plan")
     st.markdown(
-        f"Your answers are saved. Pay **{price}** once for your personalized "
-        "8-section plan and PDF — no subscription."
+        f"Your answers are saved in this session. One-time payment of **{price}** unlocks the full "
+        "8-section plan and PDF — no subscription, no upsells."
     )
 
     with st.container(border=True):
-        st.markdown(f"**PCS Vector Report — {price}**")
+        st.markdown(f"**What you get for {price}**")
         st.markdown(
-            "- Personalized strategy for your posts and family  \n"
-            "- Housing & BAH tradeoffs · spouse career · schools  \n"
-            "- 30-day action plan with decision gates  \n"
-            "- PDF emailed automatically after generation"
+            "- Plan written for *your* posts, rank, and family — not a generic checklist  \n"
+            "- Housing call with 2026 BAH / OHA + COLA math  \n"
+            "- Spouse career, schools/childcare, cash-flow pressure  \n"
+            "- First 30 days with decision gates + commander brief line  \n"
+            "- PDF emailed so you can forward it to your spouse tonight"
         )
 
-    if st.button(f"Pay {price} — unlock report", type="primary", use_container_width=True):
+    if st.button(f"Pay {price} — unlock my plan", type="primary", use_container_width=True):
         retry_checkout_from_saved_form()
 
-    st.caption("Secure checkout via Stripe. If you already paid, use Retrieve report.")
+    st.caption("Secure Stripe checkout · Built For Soldiers; By Soldiers")
     if st.button("Already paid? Retrieve report", use_container_width=True, key="paywall_retrieve"):
         navigate_to("retrieve")

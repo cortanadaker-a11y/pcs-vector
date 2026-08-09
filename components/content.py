@@ -8,8 +8,9 @@ HERO = {
     "kicker": "Your PCS. Your family. One clear plan.",
     "headline": "Stop guessing your PCS — get a plan your whole family can follow",
     "subheadline": (
-        "A personalized strategic plan for where to live, spouse employment, schools, "
-        "and your first 30 days — written like advice from a senior NCO who's done this move."
+        "Where to live, spouse work, schools, cash, and your first 30 days — "
+        "in plain language, like advice from a senior NCO who's done this move. "
+        "Start with the free housing calculator, then turn it into a full plan."
     ),
 }
 
@@ -47,10 +48,10 @@ CTA = {
     "primary": "Build my PCS plan",
     "hero": "Build my PCS plan →",
     "mid": "Build my PCS plan →",
-    "caption": "One-time payment · 6–8 minute form · PDF in your inbox after payment",
+    "caption": "One-time · ~6–8 min form · PDF emailed · no subscription",
     "form_pay_reassurance": (
-        "Next step is secure Stripe checkout — one payment, no subscription. "
-        "Your report generates right after payment and the PDF is emailed to you."
+        "Next: secure Stripe checkout — one payment, no subscription. "
+        "Your plan generates after payment and the PDF is emailed so you can share it with your spouse."
     ),
 }
 

@@ -172,10 +172,11 @@ def render_home() -> None:
             gaining = snap.get("gaining_installation", "")
             total = snap.get("total_monthly_usd")
             deps = snap.get("num_dependents", 0)
+            yos = snap.get("years_of_service", "")
             total_bit = f" · ~${int(total):,}/mo package" if total is not None else ""
             st.caption(
-                f"Pre-fills **{grade}**, **{gaining}**, {deps} dep(s), YOS"
-                f"{total_bit} · then full 8-section plan · {price}"
+                f"Carries **{grade}**, {yos} YOS, {deps} dep(s), **{gaining}**"
+                f"{total_bit} into the form · full plan · {price} one-time"
             )
         else:
             st.caption(f"Full 8-section plan · {price} one-time · PDF emailed")

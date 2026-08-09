@@ -58,16 +58,17 @@ def render_sidebar() -> str:
         with st.expander("About", expanded=False):
             st.markdown(
                 """
-                **PCS Vector** builds a decision-grade PCS plan for your family —
-                housing, schools, spouse career, cash flow, and first 30 days.
+                **PCS Vector** — decision-grade PCS plans for Army families.
 
-                - 8-section personalized report
-                - 68+ CONUS & OCONUS Army installations
+                - Housing, spouse career, schools, cash flow, first 30 days
+                - 68+ CONUS & OCONUS posts (BAH + OHA/COLA)
                 - One-time payment · PDF emailed
                 - Retrieve anytime with your order reference
+
+                Built For Soldiers; By Soldiers. Always verify entitlements with finance.
                 """
             )
 
-        st.caption("CONUS Army moves only")
+        st.caption("Army PCS · CONUS & OCONUS")
 
     return st.session_state.nav_page
