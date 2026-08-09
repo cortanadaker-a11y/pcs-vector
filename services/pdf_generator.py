@@ -51,7 +51,6 @@ TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 # Cover strip: TLE/TLA | DLA (once). Later sections: only non-overlapping topics.
 _INJECT_AFTER_SECTION: dict[int, list[str]] = {
     4: ["financial_numbers"],  # personalized HHG/PPM + cash from this Soldier's inputs
-    5: ["decision_discipline"],
 }
 
 
@@ -574,24 +573,6 @@ def _callout_cash_cushion(styles: dict[str, ParagraphStyle], width: float) -> Ta
     return _make_callout("CASH BEFORE YOU LEAVE", body, styles, width=width, variant="amber")
 
 
-def _callout_decision_discipline(styles: dict[str, ParagraphStyle], width: float) -> Table:
-    body = (
-        "Every <b>Decision Gate</b> in this plan is a hard stop — not a suggestion. "
-        "If the gate fails (housing not locked, childcare open, license not filed), "
-        "use the backup in the gate line the same day. Do not hope it works out.<br/><br/>"
-        "Soldier owns orders, finance, TMO, and unit in-processing. "
-        "Spouse owns job/school/childcare track when that is the family plan. "
-        "Talk once a day for the first two weeks so tasks do not collide."
-    )
-    return _make_callout(
-        "HOW TO USE THE GATES",
-        body,
-        styles,
-        width=width,
-        variant="green",
-    )
-
-
 def _get_insight_callout(
     key: str,
     metadata: dict[str, Any],
@@ -617,8 +598,6 @@ def _get_insight_callout(
         return _callout_hhg_vs_ppm(styles, width, metadata)
     if key == "cash_cushion":
         return _callout_cash_cushion(styles, width)
-    if key == "decision_discipline":
-        return _callout_decision_discipline(styles, width)
     return None
 
 
@@ -655,7 +634,7 @@ def _build_gate_box(text: str, styles: dict[str, ParagraphStyle]) -> Table:
     cleaned = re.sub(r"^(\*\*)?gate:\s*", "", text.strip(), flags=re.I)
     cleaned = re.sub(r"(?i)\bgate:\s*", "", cleaned, count=1)
     inner = [
-        [Paragraph("DECISION GATE — do not skip", styles["gate_label"])],
+        [Paragraph("Worth pausing on", styles["gate_label"])],
         [Paragraph(_format_inline(cleaned), styles["gate"])],
     ]
     box = Table(inner, colWidths=[CONTENT_WIDTH])
@@ -678,9 +657,20 @@ def _build_gate_box(text: str, styles: dict[str, ParagraphStyle]) -> Table:
 
 
 def _build_spouse_share_box(text: str, styles: dict[str, ParagraphStyle]) -> Table:
+    """Closing note meant to be read together — team tone, not a task list."""
+    body = text.strip()
+    # Soften leftover tasking phrasing if an older report still has it
+    body = re.sub(
+        r"your focus is (.+?) and mine is (.+)",
+        r"I'd love your lead on \1, and I'll take \2",
+        body,
+        flags=re.I,
+    )
+    body = re.sub(r"\blocked plan\b", "plan we can both run", body, flags=re.I)
+    body = re.sub(r"\bso we're not guessing\b", "so neither of us is guessing alone", body, flags=re.I)
     inner = [
-        [Paragraph("SHARE WITH YOUR SPOUSE", styles["gate_label"])],
-        [Paragraph(_format_inline(text), styles["spouse_share"])],
+        [Paragraph("For the two of you — read this together", styles["gate_label"])],
+        [Paragraph(_format_inline(body), styles["spouse_share"])],
     ]
     box = Table(inner, colWidths=[CONTENT_WIDTH])
     box.setStyle(
@@ -790,12 +780,12 @@ def _build_cover_block(
             flowables.append(meta_table)
 
     howto_inner = [
-        [Paragraph("HOW TO READ THIS PLAN", styles["howto_label"])],
+        [Paragraph("A quick way to use this", styles["howto_label"])],
         [
             Paragraph(
-                "Open it with your spouse. <b>Section 1</b> is the main call — agree on it first. "
-                "A <b>Decision Gate</b> means stop until that condition is true (do not sign or spend past it). "
-                "Use <b>Section 5</b> for the first 30 days and <b>Section 8</b> as your short checklist.",
+                "Sit down together if you can. Start with <b>Section 1</b> and make sure you both buy the main call. "
+                "When you hit a highlighted pause line, treat it as a real checkpoint before you sign or spend. "
+                "<b>Section 5</b> is the first month; <b>Section 8</b> is the short list to work from.",
                 styles["howto"],
             )
         ],
@@ -1120,7 +1110,11 @@ def _parse_markdown_to_flowables(
                 section_buffer.append(Spacer(1, 0.04 * inch))
                 section_buffer.append(_build_gate_box(text, styles))
                 section_buffer.append(Spacer(1, 0.06 * inch))
-            elif "we're targeting" in lower and len(text) < 420:
+            elif (
+                "we're targeting" in lower
+                or "we're in this together" in lower
+                or "hey — we're in this" in lower
+            ) and len(text) < 550:
                 section_buffer.append(Spacer(1, 0.06 * inch))
                 section_buffer.append(_build_spouse_share_box(text, styles))
             elif re.search(r"commander brief", lower):

@@ -296,14 +296,19 @@ def build_value_context(
     )
     career_short = spouse_career_field.split("/")[0].strip().lower()
     if spouse_career_field == "Student / continuing education":
-        spouse_job = "your coursework and program deadlines"
+        partner_piece = "keeping your program and study schedule on track"
     elif spouse_career_field == "Not currently working — seeking employment":
-        spouse_job = "getting hired on the timeline we set"
+        partner_piece = "getting you hired without a long unpaid gap"
+    elif spouse_career_field == "Remote / work-from-home professional":
+        partner_piece = "keeping your remote work solid (internet, schedule, space)"
     else:
-        spouse_job = career_short
+        partner_piece = f"your {career_short} path and the first paycheck timeline"
     spouse_share = (
-        f"We're targeting {gaining} with a locked plan for {primary_priority.lower()} — "
-        f"your focus is {spouse_job} and mine is executing the timeline in section 5 so we're not guessing."
+        f"Hey — we're in this together for the move to {gaining}. "
+        f"Priority we're protecting: {primary_priority.lower()}. "
+        f"I'll own the Army side (orders, finance, housing paperwork, section 5 timeline); "
+        f"I'd love your lead on {partner_piece}. "
+        f"If we stick to the decision gates, we don't have to reinvent this mid-move."
     )
     return {
         "situation_snapshot": build_situation_snapshot(

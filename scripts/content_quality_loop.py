@@ -264,7 +264,11 @@ def score(report: str, form: dict) -> dict:
         "char_ok": 3500 <= len(report) <= 9000,
         "sections": report.count("## "),
         "sections_ok": sections_ok,
-        "has_spouse_share": "we're targeting" in report.lower(),
+        "has_spouse_share": (
+            "we're targeting" in report.lower()
+            or "we're in this together" in report.lower()
+            or "hey — we're in this" in report.lower()
+        ),
         "gates": gates,
         "has_gates": gates >= 2,
         "dollars": dollars,
