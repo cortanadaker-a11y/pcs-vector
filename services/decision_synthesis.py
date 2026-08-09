@@ -338,10 +338,22 @@ def build_decision_context(
 
     alts = HOUSING_ALTERNATIVES.get(profile.display_name, ())
     risks = list(RISK_CHAINS.get(profile.display_name, ()))
-    biggest_risk = risks[0] if risks else (
-        f"Spouse income gap of ~${cashflow.get('estimated_spouse_income_gap_usd', 0):,} "
-        f"colliding with move deposits before first paycheck"
-    )
+    if risks:
+        biggest_risk = risks[0]
+    elif cashflow.get("spouse_income_provided") and cashflow.get(
+        "estimated_spouse_income_gap_usd"
+    ):
+        biggest_risk = (
+            f"Spouse income gap of ~${int(cashflow['estimated_spouse_income_gap_usd']):,} "
+            f"colliding with move deposits before first paycheck"
+        )
+    else:
+        weeks = cashflow.get("weeks_to_spouse_first_paycheck") or {}
+        w_lo, w_hi = weeks.get("low", 4), weeks.get("high", 8)
+        biggest_risk = (
+            f"A {w_lo}–{w_hi} week spouse paycheck gap colliding with deposits and lodging "
+            f"before work restarts (no dollar amount provided — do not invent one)"
+        )
 
     fast_track = build_spouse_fast_track(profile.display_name, spouse_career_field, cashflow)
 

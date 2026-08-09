@@ -15,7 +15,13 @@ MULTISELECT_FORM_KEYS = (
     "concern_flags",
 )
 
-NUMBER_WIDGET_KEYS = ("num_children", "num_dependents", "years_of_service", "max_monthly_budget")
+NUMBER_WIDGET_KEYS = (
+    "num_children",
+    "num_dependents",
+    "years_of_service",
+    "max_monthly_budget",
+    "spouse_monthly_income_usd",
+)
 
 FORM_DEFAULTS: dict[str, Any] = {
     "first_name": "",
@@ -33,6 +39,7 @@ FORM_DEFAULTS: dict[str, Any] = {
     "family_status": "Married / with dependents",
     "spouse_career_field": "Not currently working — seeking employment",
     "spouse_career_other": "",
+    "spouse_monthly_income_usd": 0,  # 0 = not provided (optional)
     "num_dependents": 1,
     "num_children": 0,
     "child_age_ranges": [],
@@ -220,6 +227,7 @@ def apply_calculator_snapshot_to_form(snapshot: dict[str, Any]) -> str:
         data["family_status"] = "Single (no dependents)"
         data["spouse_career_field"] = "N/A — single Soldier"
         data["spouse_career_other"] = ""
+        data["spouse_monthly_income_usd"] = 0
         data["num_children"] = 0
         data["child_age_ranges"] = []
     else:

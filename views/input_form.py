@@ -252,6 +252,7 @@ def _render_family_situation() -> None:
     if is_single:
         set_form_value("spouse_career_field", "N/A — single Soldier")
         set_form_value("spouse_career_other", "")
+        set_form_value("spouse_monthly_income_usd", 0)
         set_form_value("num_children", 0)
         set_form_value("num_dependents", 0)
         reset_multiselect("child_age_ranges")
@@ -295,6 +296,23 @@ def _render_family_situation() -> None:
                     value=get_form_value("spouse_career_other"),
                     placeholder="e.g., Real estate agent, military contractor",
                 ),
+            )
+
+        render_number_input(
+            "Approximate monthly spouse income (optional)",
+            "spouse_monthly_income_usd",
+            min_value=0,
+            max_value=50000,
+            step=100,
+            help_text=(
+                "Optional. Take-home or gross monthly pay your spouse currently earns "
+                "(or expects). Leave at 0 if you prefer not to share — the plan will not invent a dollar gap."
+            ),
+        )
+        if int(get_form_value("spouse_monthly_income_usd") or 0) == 0:
+            st.caption(
+                "No spouse income entered — the report will talk about paycheck timing in weeks only, "
+                "without making up a dollar amount."
             )
 
         col_children, col_ages = st.columns([1, 2])

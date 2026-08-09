@@ -32,6 +32,7 @@ FULL_TO_COMPACT: dict[str, str] = {
     "family_status": "fs",
     "spouse_career_field": "scf",
     "spouse_career_other": "sco",
+    "spouse_monthly_income_usd": "smi",
     "num_dependents": "nd",
     "num_children": "nc",
     "child_age_ranges": "car",

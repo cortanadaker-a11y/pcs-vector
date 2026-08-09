@@ -1467,6 +1467,7 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         num_children=num_children,
         has_pets=has_pets,
         max_monthly_budget=int(form_data.get("max_monthly_budget") or 0),
+        spouse_monthly_income_usd=form_data.get("spouse_monthly_income_usd"),
     )
 
     dity_mode = dity_ctx.get("recommended_mode") if dity_ctx.get("applicable") else None

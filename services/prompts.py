@@ -95,10 +95,10 @@ REQUIRED 8 SECTIONS (keep exact headings)
 ## 8. Prioritized Next Steps
 
 SECTION GUIDELINES
-- Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives (2nd/3rd choice with when to switch), contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide.
-- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in dollars or weeks, and relevant programs. When you first mention a program, spell it out then give the acronym: Military Spouse Career Advancement Account (MyCAA), Military Spouse Employment Partnership (MSEP), Army Community Service (ACS). Same for Child Development Center (CDC) and Family Child Care (FCC). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
+- Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives (2nd/3rd choice with when to switch), contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide. For spouse income gap: only use dollar amounts if family_cashflow_bridge.spouse_income_provided is true; otherwise speak only in weeks (e.g. 4–8 week gap) with no invented dollars.
+- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in **weeks** (and dollars only if spouse income was provided). Relevant programs: spell out first — Military Spouse Career Advancement Account (MyCAA), Military Spouse Employment Partnership (MSEP), Army Community Service (ACS), Child Development Center (CDC), Family Child Care (FCC). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
 - Section 3: Clean comparison table with accurate BAH/OHA surplus/shortfall. On-post shows $0 surplus (BAH absorbed) for CONUS. **Required:** include a second short table or bullet block of **realistic monthly off-post utility costs** using `off_post_utility_costs` / `off_post_utility_table_markdown` from the payload (electric, gas/heat, water/trash, internet, total by recommended area/zip). Add rent + mid utilities so they see true monthly cost. Include market timing, one negotiation note, and one lease red flag. State on-post vs off-post trade-off in one plain sentence under the tables.
-- Section 4: **Never say distance is unknown** if `move_context.approximate_miles_one_way` is present — use that mile figure. Explicit government HHG vs Personally Procured Move (PPM)/Do-It-Yourself (DITY) recommendation with why (miles, weight allowance, DITY interest, vehicles, pets). Include a short clear block (bullets or mini-table) with: distance, authorized weight, recommended mode, planning net (or “near zero — prefer government HHG”), deposit, Temporary Lodging Expense (TLE)/TLA hotel estimate, spouse gap if any, 30-day cash pressure, cash cushion, and Dislocation Allowance (DLA) as money they keep when entitled (not a travel advance). Weight tickets for PPM. Natural voice — not a robotic formula dump.
+- Section 4: **Never say distance is unknown** if `move_context.approximate_miles_one_way` is present — use that mile figure. Explicit government HHG vs Personally Procured Move (PPM)/Do-It-Yourself (DITY) recommendation with why (miles, weight allowance, DITY interest, vehicles, pets). Include a short clear block (bullets or mini-table) with: distance, authorized weight, recommended mode, planning net (or “near zero — prefer government HHG”), deposit, Temporary Lodging Expense (TLE)/TLA hotel estimate, 30-day cash pressure, cash cushion, and Dislocation Allowance (DLA) as money they keep when entitled (not a travel advance). **Spouse income gap dollars only if** `family_cashflow_bridge.spouse_income_provided` is true — otherwise use `spouse_gap_language` (weeks only, no fabricated $). Weight tickets for PPM. Natural voice.
 - Section 5: Three phases — **Days 1–5**, **Days 6–15**, **Days 16–30**. Each phase must include exactly **Gate:** If [condition] by day [X] — otherwise [consequence]. Then **Soldier** and **Spouse / partner** bullets (max 2 each) written as teamwork, not orders ("you handle X / I'll take Y" energy). Gates must be concrete (housing app in, childcare slot confirmed) — not vague.
 - Section 6: One paragraph — schools, pets, seasonal realities, 1–2 lease red flags specific to the gaining area.
 - Section 7: Three decision triggers with hard conditions, a realistic "wing it" scenario (what default failure looks like in dollars/time), and one 90-day watch item. Do **not** include a commander brief line.
@@ -126,7 +126,7 @@ DATA FIDELITY
 - Use payload BAH or OHA/COLA package, rents, zips, move miles, DITY math, and cash-flow figures.
 - Honor recommended DITY mode; if short-move note favors government HHG, say so.
 - Address stated concerns as risks or mitigations — not a checklist recap.
-- Never paste internal commander-brief templates verbatim — write a natural one-line brief naming their real priority.
+- **Spouse income:** If `family.spouse_monthly_income_usd` is null/absent OR `family_cashflow_bridge.do_not_invent_spouse_income_dollars` is true, **never invent** spouse gap dollars (no $3,000 / $4,500 / etc.). Use weeks and qualitative language only. If income was provided, use the cash-flow gap figures.
 
 PRE-OUTPUT CHECK (do not print)
 ☐ Sounds like one NCO advising one family?
@@ -171,6 +171,7 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         num_children=num_children,
         has_pets=has_pets,
         max_monthly_budget=int(form_data.get("max_monthly_budget") or 0),
+        spouse_monthly_income_usd=form_data.get("spouse_monthly_income_usd"),
     )
     soldier_ctx = build_soldier_context(
         profile,
@@ -280,6 +281,12 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
             "num_dependents": form_data.get("num_dependents"),
             "num_children": form_data.get("num_children", 0),
             "child_age_ranges": form_data.get("child_age_ranges", []),
+            "spouse_monthly_income_usd": (
+                int(form_data["spouse_monthly_income_usd"])
+                if form_data.get("spouse_monthly_income_usd")
+                not in (None, "", 0, "0")
+                else None
+            ),
             "pets": form_data.get("has_pets"),
             "pet_types": form_data.get("pet_types", []),
             "pet_details": form_data.get("pet_details", ""),
@@ -338,6 +345,8 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "First mention of ACS/CDC/FCC/MyCAA/MSEP/TMO/etc. must spell the name out. "
         "Section 4: USE the mile distance from move_context (do not say unknown). "
         "Present HHG vs PPM pick + cash/DLA numbers in a clean short bullet or mini-table. "
+        "SPOUSE INCOME RULE: only use dollar gap figures if family_cashflow_bridge.spouse_income_provided is true; "
+        "otherwise weeks-only language and no invented spouse income dollars. "
         "Section 5: Days 1–5 / 6–15 / 16–30 with **Gate:** (testable condition + consequence). "
         "Section 7: wing-it scenario in dollars/time + 90-day watch (no commander brief). "
         "Section 8: verb-first actions ordered by impact + spouse_share_line verbatim. "
