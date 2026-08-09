@@ -1880,6 +1880,7 @@ MOVE_ROUTE_MILES: dict[tuple[str, str], int] = {
     ("Fort Bragg, NC", "Fort Drum, NY"): 780,
     ("Fort Drum, NY", "Fort Bragg, NC"): 780,
     ("Fort Hood, TX", "Fort Drum, NY"): 1580,
+    ("Fort Drum, NY", "Fort Hood, TX"): 1580,
     ("Fort Gordon, GA", "Fort Bragg, NC"): 320,
     ("Fort Bragg, NC", "Fort Gordon, GA"): 320,
     ("Fort Hood, TX", "Fort Gordon, GA"): 860,
