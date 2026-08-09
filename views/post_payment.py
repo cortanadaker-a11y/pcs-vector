@@ -15,18 +15,10 @@ from services.stripe_payment import get_price_display
 
 
 def render_payment_confirmation_banner() -> None:
-    """Compact confirmation shown above the report after payment and generation succeed."""
+    """Compact confirmation after payment and plan generation succeed."""
     order_ref = get_order_reference()
     amount = st.session_state.get("payment_amount_display") or get_price_display()
-    completed_at = st.session_state.get("payment_completed_at", "")
-
-    caption = f"Order **{order_ref}** · **{amount}** paid"
-    if completed_at:
-        caption += f" · {completed_at}"
-
-    delivery_email = st.session_state.get("form_data", {}).get("email", "")
-    email_note = f" · PDF will be emailed to **{delivery_email}**" if delivery_email else ""
-    st.success(f"Payment confirmed · {caption}{email_note}", icon="✅")
+    st.success(f"Payment confirmed · **{order_ref}** · **{amount}**", icon="✅")
 
 
 def render_order_reference_recovery() -> None:

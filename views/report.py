@@ -1,11 +1,16 @@
-"""Report view page for PCS Vector."""
+"""Report / post-purchase view for PCS Vector.
+
+After payment the full plan lives in the PDF (download + email).
+This page stays short: confirmation, housing snapshot, delivery, done.
+"""
+
+from __future__ import annotations
 
 import json
 from datetime import datetime
 
 import streamlit as st
 
-from components.sidebar import navigate_to
 from components.form_state import (
     budget_display,
     priority_summary,
@@ -15,16 +20,19 @@ from components.form_state import (
     resolved_housing_must_haves,
     resolved_spouse_career,
 )
+from components.html_utils import safe_html
 from components.payment_handler import (
     attempt_generate_from_order_reference,
     ensure_form_data_restored,
+    get_order_reference,
     is_payment_verified,
     require_payment,
 )
+from components.report_delivery import auto_email_pdf_after_generation, render_pdf_delivery_status
+from components.sidebar import navigate_to
 from services.pdf_generator import PDFGenerationError, build_pdf_metadata, generate_pdf_report
 from services.report_generator import GrokAPIError, generate_report
 from views.payment_gate import render_payment_required
-from components.report_delivery import auto_email_pdf_after_generation, render_pdf_delivery_status
 from views.post_payment import (
     generate_report_with_loading,
     render_order_reference_recovery,
@@ -55,8 +63,7 @@ def _render_submitted_summary() -> None:
                 f"- **Rank:** {rank_display}  \n"
                 f"- **From:** {resolved_current_installation(data)}  \n"
                 f"- **To:** {gaining}  \n"
-                f"- **Window:** {data.get('move_window', '—')}  \n"
-                f"- **Flexibility:** {data.get('move_flexibility', '—')}"
+                f"- **Window:** {data.get('move_window', '—')}"
             )
 
             st.markdown("**Family**")
@@ -65,10 +72,7 @@ def _render_submitted_summary() -> None:
             if children and data.get("child_age_ranges"):
                 child_line += f" ({', '.join(data['child_age_ranges'])})"
             if data.get("has_pets") == "Yes — we have pets":
-                pets = ", ".join(data.get("pet_types") or [])
-                if data.get("pet_details"):
-                    pets = f"{pets} — {data['pet_details']}" if pets else data["pet_details"]
-                pets = pets or "Yes"
+                pets = ", ".join(data.get("pet_types") or []) or "Yes"
             else:
                 pets = "No"
 
@@ -79,30 +83,18 @@ def _render_submitted_summary() -> None:
             )
 
         with col2:
-            st.markdown("**Housing**")
+            st.markdown("**Housing & priorities**")
             st.markdown(
                 f"- **Preference:** {data.get('housing_preference', '—')}  \n"
                 f"- **Budget:** {budget_display(data)}  \n"
                 f"- **Must-haves:** {resolved_housing_must_haves(data)}"
             )
-
-            st.markdown("**Priorities**")
             for label, value in priority_summary(data).items():
                 st.markdown(f"- {label}: **{value}**")
 
-            st.markdown("**Logistics**")
-            st.markdown(
-                f"- **Vehicles:** {data.get('num_vehicles', '—')}  \n"
-                f"- **DITY / PPM:** {data.get('dity_interest', '—')}"
-            )
-
         concerns = resolved_concerns(data)
-        if concerns != "None noted" or data.get("other_priorities"):
-            st.markdown("**Notes**")
-            if data.get("other_priorities"):
-                st.markdown(f"- *Other priorities:* {data['other_priorities']}")
-            if concerns != "None noted":
-                st.markdown(f"- *Concerns:* {concerns}")
+        if concerns != "None noted":
+            st.markdown(f"**Concerns:** {concerns}")
 
 
 @st.cache_data(show_spinner=False)
@@ -125,7 +117,7 @@ def _build_pdf_bytes(report: str) -> bytes:
         with st.spinner("Preparing your PDF…"):
             return _cached_pdf(report, metadata_json)
     except PDFGenerationError as exc:
-        st.warning(f"PDF export issue: {exc}. Try regenerating the report.")
+        st.warning(f"PDF export issue: {exc}. Try regenerating.")
         try:
             return generate_pdf_report(report, metadata)
         except PDFGenerationError:
@@ -162,64 +154,52 @@ def _family_display_name(form_data: dict) -> str:
     return f"{first} {last}".strip()
 
 
-def _render_report_header(form_data: dict) -> None:
+def _render_success_header(form_data: dict) -> None:
     family = _family_display_name(form_data)
     gaining = resolved_gaining_installation(form_data)
-    if family:
-        st.markdown(f"## {family}'s PCS Strategic Plan")
-        st.caption(f"Personalized for your move to **{gaining}** · share the PDF with your spouse")
-    else:
-        st.markdown("## Your PCS Strategic Plan")
-        st.caption(f"Personalized for your move to **{gaining}** · share the PDF with your spouse")
+    title = f"{family}'s PCS plan is ready" if family else "Your PCS plan is ready"
+    st.markdown(f"## {title}")
     st.markdown(
-        """
-        <div class="pcs-report-howto">
-            <strong>How to use this plan:</strong>
-            Read Section 1 together → hit every <em>Gate</em> before you sign →
-            run Section 5 day-by-day → use Section 8 as your short checklist.
-            Always verify BAH/OHA and entitlements with finance / TMO.
-        </div>
-        """,
+        f"Personalized for **{safe_html(gaining)}**. "
+        "Your full 8-section plan is in the PDF — download it or open the email.",
         unsafe_allow_html=True,
     )
 
 
 def _render_bah_summary_banner(form_data: dict) -> None:
-    """On-screen BAH callout (mirrors PDF top-right calculator comparison)."""
+    """Compact housing snapshot (full detail is in the PDF)."""
     try:
-        from services.pdf_generator import build_pdf_metadata
-
         meta = build_pdf_metadata(form_data)
-        callout = str(meta.get("bah_callout") or "").strip()
-        if not callout:
-            return
         gain = meta.get("bah_gaining_amount")
         delta = meta.get("bah_monthly_delta")
         system = str(meta.get("housing_system") or "BAH")
         if system == "OHA":
-            amount_label = "OHA + COLA package"
+            amount_label = "OHA + COLA"
         elif system == "BAH_PLUS_COLA":
-            amount_label = "BAH + COLA package"
+            amount_label = "BAH + COLA"
         else:
-            amount_label = "BAH at new post"
+            amount_label = "BAH"
         amount = f"${int(gain):,}/mo" if gain is not None else "—"
-        delta_html = ""
         if delta is not None:
             d = int(delta)
             if d > 0:
                 delta_html = f'<div class="pcs-bah-report-delta up">+${d:,}/mo vs current post</div>'
             elif d < 0:
-                delta_html = f'<div class="pcs-bah-report-delta down">−${abs(d):,}/mo vs current post</div>'
+                delta_html = (
+                    f'<div class="pcs-bah-report-delta down">−${abs(d):,}/mo vs current post</div>'
+                )
             else:
-                delta_html = '<div class="pcs-bah-report-delta flat">Same total as current post</div>'
-        from components.html_utils import safe_html
+                delta_html = (
+                    '<div class="pcs-bah-report-delta flat">Same total as current post</div>'
+                )
+        else:
+            delta_html = ""
 
         st.markdown(
             f"""
             <div class="pcs-bah-report-banner">
-                <div class="pcs-bah-report-amount">{safe_html(amount)} {safe_html(amount_label)}</div>
+                <div class="pcs-bah-report-amount">{safe_html(amount)} {safe_html(amount_label)} at new post</div>
                 {delta_html}
-                <div class="pcs-bah-report-text">{safe_html(callout)}</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -228,18 +208,14 @@ def _render_bah_summary_banner(form_data: dict) -> None:
         return
 
 
-def _render_spouse_share_callout(report: str) -> None:
-    lines = [ln.strip() for ln in report.strip().splitlines() if ln.strip()]
-    if not lines:
-        return
-    last = lines[-1]
-    if "we're targeting" not in last.lower():
-        return
+def _render_howto_compact() -> None:
     st.markdown(
-        f"""
-        <div class="pcs-spouse-share-callout">
-            <div class="pcs-spouse-share-label">Share with your spouse</div>
-            <div class="pcs-spouse-share-text">{last}</div>
+        """
+        <div class="pcs-report-howto">
+            <strong>How to use the PDF:</strong>
+            Read Section 1 with your spouse → hit every Gate before you sign →
+            run Section 5 day-by-day → use Section 8 as your short checklist.
+            Verify BAH/OHA with finance / TMO.
         </div>
         """,
         unsafe_allow_html=True,
@@ -247,7 +223,7 @@ def _render_spouse_share_callout(report: str) -> None:
 
 
 def render_report() -> None:
-    """Render the Grok-generated PCS strategic plan."""
+    """Post-purchase: confirm payment, deliver PDF — do not dump the full report body."""
 
     if st.session_state.get("report_error"):
         st.error(st.session_state.report_error)
@@ -264,7 +240,6 @@ def render_report() -> None:
         return
 
     if is_payment_verified() and not form_submitted:
-        # Try all restore paths (including external stores) before showing recovery UI.
         if ensure_form_data_restored():
             form_data = st.session_state.get("form_data", {})
             form_submitted = form_data.get("form_submitted")
@@ -291,100 +266,122 @@ def render_report() -> None:
         st.markdown("## Your report")
         st.markdown(
             "No plan is ready in this browser session yet. Takes about **3–5 minutes** to fill the form, "
-            "then one-time checkout unlocks your personalized 8-section plan and PDF."
+            "then one-time checkout unlocks your personalized plan PDF."
         )
         with st.container(border=True):
             st.markdown(
                 "**What you'll get**  \n"
-                "- Clear housing call (on-post vs off-post) with BAH/OHA math  \n"
-                "- Spouse career + childcare timeline  \n"
-                "- First 30 days with decision gates  \n"
-                "- PDF you can forward to your spouse tonight"
+                "- Clear housing call with BAH/OHA math  \n"
+                "- Spouse career + first 30 days  \n"
+                "- PDF emailed so you can share with your spouse"
             )
         col_a, col_b = st.columns(2)
         with col_a:
-            if st.button("Build your plan →", type="primary", use_container_width=True, key="report_empty_build"):
+            if st.button(
+                "Build your plan →",
+                type="primary",
+                use_container_width=True,
+                key="report_empty_build",
+            ):
                 navigate_to("input")
         with col_b:
-            if st.button("Already paid? Retrieve", use_container_width=True, key="report_empty_retrieve"):
+            if st.button(
+                "Already paid? Retrieve",
+                use_container_width=True,
+                key="report_empty_retrieve",
+            ):
                 navigate_to("retrieve")
         return
 
-    # Paid: generate immediately (loading UI) then show report + PDF on the same page.
+    # Paid path: generate plan for PDF/email only — keep the page simple.
     report = _generate_report_if_paid()
 
     if not report:
         if is_payment_verified():
-            st.warning(
-                "We couldn't generate your report. Use Regenerate below or edit your details."
-            )
+            st.warning("We couldn't generate your report yet. Use Regenerate or edit your details.")
+            if st.button("Regenerate plan", type="primary", use_container_width=True, key="regen_fail"):
+                if require_payment():
+                    try:
+                        with st.spinner("Generating your plan…"):
+                            st.session_state.report_markdown = generate_report(
+                                st.session_state.form_data
+                            )
+                        st.session_state.report_error = None
+                        st.rerun()
+                    except GrokAPIError as exc:
+                        st.session_state.report_error = str(exc)
+                        st.error(str(exc))
         _render_footer_nav()
         return
 
-    render_payment_confirmation_banner()
-    _render_report_header(form_data)
-    _render_bah_summary_banner(form_data)
-
     date_stamp = datetime.now().strftime("%Y%m%d")
-    md_filename = f"pcs-vector-report-{date_stamp}.md"
     pdf_filename = f"pcs-vector-report-{date_stamp}.pdf"
-
     pdf_bytes = _build_pdf_bytes(report)
     pdf_ready = bool(pdf_bytes)
 
     if pdf_ready:
         auto_email_pdf_after_generation(pdf_bytes, pdf_filename)
 
-    # Primary actions first — PDF is the main deliverable
-    col_pdf, col_md, col_regen = st.columns([1.4, 1, 1])
-    with col_pdf:
-        st.download_button(
-            label="Download PDF",
-            data=pdf_bytes if pdf_ready else b"",
-            file_name=pdf_filename,
-            mime="application/pdf",
-            type="primary",
-            use_container_width=True,
-            disabled=not pdf_ready,
-        )
-    with col_md:
-        if require_payment():
-            st.download_button(
-                label="Download text",
-                data=report,
-                file_name=md_filename,
-                mime="text/markdown",
-                use_container_width=True,
-            )
-    with col_regen:
-        if st.button("Regenerate", use_container_width=True):
-            if not require_payment():
-                st.error("Payment verification failed. Complete checkout again.")
-            else:
-                try:
-                    with st.spinner("Regenerating your report…"):
-                        st.session_state.report_markdown = generate_report(
-                            st.session_state.form_data
-                        )
-                    st.session_state.report_error = None
-                    st.rerun()
-                except GrokAPIError as exc:
-                    st.session_state.report_error = str(exc)
-                    st.error(str(exc))
+    render_payment_confirmation_banner()
+    _render_success_header(form_data)
+    _render_bah_summary_banner(form_data)
+    _render_howto_compact()
+
+    # Primary action: PDF download
+    st.download_button(
+        label="Download your PDF plan",
+        data=pdf_bytes if pdf_ready else b"",
+        file_name=pdf_filename,
+        mime="application/pdf",
+        type="primary",
+        use_container_width=True,
+        disabled=not pdf_ready,
+        key="report_download_pdf",
+    )
 
     if pdf_ready:
         render_pdf_delivery_status(pdf_bytes, pdf_filename)
+    else:
+        st.error("PDF could not be built. Tap Regenerate below, or contact support with your order reference.")
+
+    order_ref = get_order_reference()
+    st.caption(
+        f"Save order **{order_ref}** — use **Retrieve report** anytime on a new phone or browser."
+    )
 
     _render_submitted_summary()
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    with st.container(border=True):
-        st.markdown(report)
+    with st.expander("Need a new copy or having trouble?", expanded=False):
+        st.caption("Only use regenerate if the PDF is missing or clearly wrong — it uses another AI generation.")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("Regenerate plan", use_container_width=True, key="report_regen"):
+                if not require_payment():
+                    st.error("Payment verification failed. Complete checkout again.")
+                else:
+                    try:
+                        with st.spinner("Regenerating your plan…"):
+                            st.session_state.report_markdown = generate_report(
+                                st.session_state.form_data
+                            )
+                        st.session_state.report_error = None
+                        st.session_state.pop("pdf_email_sent_for_order", None)
+                        st.rerun()
+                    except GrokAPIError as exc:
+                        st.session_state.report_error = str(exc)
+                        st.error(str(exc))
+        with col_b:
+            if require_payment() and report:
+                st.download_button(
+                    label="Download plain text backup",
+                    data=report,
+                    file_name=f"pcs-vector-report-{date_stamp}.md",
+                    mime="text/markdown",
+                    use_container_width=True,
+                    key="report_download_md",
+                )
 
-    _render_spouse_share_callout(report)
-    st.caption(
-        "Generated for PCS Vector. Always verify BAH and entitlements with your finance office."
-    )
+    st.caption("Always verify BAH/OHA and entitlements with your finance office.")
     _render_footer_nav()
 
 
