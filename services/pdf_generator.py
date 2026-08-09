@@ -946,7 +946,7 @@ def _parse_markdown_to_flowables(
             elif "we're targeting" in lower and len(text) < 420:
                 section_buffer.append(Spacer(1, 0.06 * inch))
                 section_buffer.append(_build_spouse_share_box(text, styles))
-            elif re.search(r"commander brief", lower) and len(text) < 500:
+            elif re.search(r"commander brief", lower) and len(text) < 900:
                 m = re.search(
                     r"commander brief[:\s]+[\"“']?(.+?)[\"”']?\s*$",
                     text,
