@@ -48,12 +48,10 @@ BOLD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 ITALIC_PATTERN = re.compile(r"(?<!\*)\*([^*]+?)\*(?!\*)")
 TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 
-# Inject each topic once where it adds the most value (no cover-strip duplicates).
-# Cover strip already has TLE/TLA + BAH/OHA glossary — do not re-inject those here.
+# Cover strip: TLE/TLA | DLA (once). Later sections: only non-overlapping topics.
 _INJECT_AFTER_SECTION: dict[int, list[str]] = {
-    1: ["dla", "bah_start"],  # money you keep + when housing pay starts
-    4: ["hhg_vs_ppm", "cash_cushion"],  # move mode + cash plan
-    5: ["decision_discipline"],  # how to treat gates (once)
+    4: ["financial_numbers"],  # personalized HHG/PPM + cash from this Soldier's inputs
+    5: ["decision_discipline"],
 }
 
 
@@ -342,7 +340,7 @@ def _callout_tle_tla(
     housing_system: str | None = None,
     to_installation: str | None = None,
 ) -> Table:
-    """Standard TLE vs TLA plain-English callout (always on the PDF)."""
+    """TLE vs TLA — compact cover-strip panel (pairs with DLA box)."""
     oconus = (housing_system or "") in ("OHA", "BAH_PLUS_COLA")
     loc = (to_installation or "").lower()
     if any(x in loc for x in ("korea", "germany", "japan", "italy", "hawaii", "hi", "pr", "camp ", "usag")):
@@ -350,26 +348,19 @@ def _callout_tle_tla(
 
     if oconus:
         body = (
-            "<b>Your move looks OCONUS-related — think TLA, not TLE.</b><br/><br/>"
-            "<b>TLA</b> (Temporary Lodging <i>Allowance</i>) — hotel money while you "
-            "settle <b>overseas</b> (and some non-foreign OCONUS). Rules and day limits "
-            "differ by country; work it through finance / housing before you book long stays.<br/><br/>"
-            "<b>TLE</b> (Temporary Lodging <i>Expense</i>) — the CONUS (stateside) version. "
-            "Usually shorter (often ~10 days). Do <b>not</b> claim TLE for an OCONUS lodging "
-            "period just because the acronym looks similar.<br/><br/>"
-            "<b>Rule of thumb:</b> Stateside hotel during PCS → TLE. Overseas hotel → TLA."
+            "<b>This move is OCONUS-related — think TLA first.</b><br/><br/>"
+            "<b>TLA</b> = hotel money while you settle <b>overseas</b> "
+            "(rules vary by country; ask finance/housing).<br/><br/>"
+            "<b>TLE</b> = the <b>stateside</b> hotel allowance (usually shorter, ~10 days).<br/><br/>"
+            "<b>Rule:</b> Overseas hotel → TLA. Stateside hotel → TLE. Do not mix claims."
         )
-        title = "KNOW THIS: TLA vs TLE (OCONUS)"
+        title = "KNOW THIS: TLA vs TLE"
     else:
         body = (
-            "<b>TLE</b> (Temporary Lodging <i>Expense</i>) — hotel money for "
-            "<b>CONUS</b> moves (stateside). Usually up to about 10 days; claim through "
-            "finance with receipts. This is <b>not</b> BAH.<br/><br/>"
-            "<b>TLA</b> (Temporary Lodging <i>Allowance</i>) — hotel money for "
-            "<b>OCONUS</b> moves (overseas, and some non-foreign OCONUS posts). "
-            "Different rule set and often a different day window.<br/><br/>"
-            "<b>Rule of thumb:</b> CONUS = TLE. Overseas = TLA. Mixing them up is a "
-            "common claim rejection — ask finance which one applies to <i>your</i> orders."
+            "<b>TLE</b> = hotel money for <b>CONUS</b> (stateside) PCS lodging. "
+            "Usually ~10 days; claim with receipts. <b>Not</b> the same as BAH.<br/><br/>"
+            "<b>TLA</b> = hotel money for <b>OCONUS</b> (overseas) moves — different rules.<br/><br/>"
+            "<b>Rule:</b> CONUS = TLE. Overseas = TLA. Ask finance which one applies to your orders."
         )
         title = "KNOW THIS: TLE vs TLA"
     return _make_callout(title, body, styles, width=width, variant="amber")
@@ -430,10 +421,10 @@ def _callout_dla(
     styles: dict[str, ParagraphStyle],
     width: float,
 ) -> Table:
-    """Dislocation Allowance vs Travel Advance — high-value finance decision."""
+    """Dislocation Allowance vs Travel Advance — cover-strip companion to TLE/TLA."""
     amount = metadata.get("dla_usd")
-    with_deps = bool(metadata.get("bah_with_dependents") or metadata.get("dla_with_dependents"))
-    grade = str(metadata.get("dla_pay_grade") or metadata.get("rank") or "").split()[0] or "your grade"
+    with_deps = bool(metadata.get("dla_with_dependents"))
+    grade = str(metadata.get("dla_pay_grade") or "E-5")
     dep_label = "with dependents relocating" if with_deps else "without dependents relocating"
 
     if amount is not None:
@@ -444,53 +435,42 @@ def _callout_dla(
         except Exception:
             amt_str = f"${float(amount):,.2f}"
         amount_line = (
-            f"<b>Your planning DLA:</b> {amt_str} "
-            f"({_escape(grade)}, {dep_label}). "
-            "Non-taxable; not receipt-based. Final amount is set by finance / orders."
+            f"<b>Your DLA (planning):</b> {amt_str}<br/>"
+            f"<font size='7'>({_escape(grade)}, {dep_label} · non-taxable · verify with finance)</font>"
         )
     else:
-        amount_line = (
-            "<b>Your DLA</b> is a flat amount based on pay grade and whether authorized "
-            "dependents are relocating. Confirm the exact figure with finance."
-        )
+        amount_line = "<b>Your DLA</b> = flat rate by grade + dependents relocating (ask finance)."
 
     body = (
-        f"<b>What DLA is:</b> Dislocation Allowance is a one-time payment to help with "
-        f"PCS move-in costs the government does not fully reimburse elsewhere "
-        f"(deposits, setup, misc). It is <b>yours to keep</b> when authorized — "
-        f"not a loan.<br/><br/>"
+        f"<b>DLA</b> = one-time payment for move-in costs (deposits, setup). "
+        f"When authorized, it is <b>yours to keep</b> — not a loan.<br/><br/>"
         f"{amount_line}<br/><br/>"
-        f"<b>DLA vs Travel Advance — do not confuse them:</b><br/>"
-        f"• <b>DLA → almost always take it</b> when you are entitled. It is an "
-        f"<b>allowance you keep</b> (subject to normal entitlement rules).<br/>"
-        f"• <b>Travel Advance → only if you truly need cash now.</b> It is a "
-        f"<b>loan against your travel settlement</b>. Finance will "
-        f"<b>recoup it from your pay (wage garnishment / LES deductions)</b> "
-        f"until the advance is paid back.<br/><br/>"
-        f"<b>Practical rule:</b> Take DLA. Skip the travel advance unless you cannot "
-        f"cover the move without borrowed cash — and budget the payback."
+        f"<b>DLA vs Travel Advance:</b><br/>"
+        f"• <b>DLA → take it</b> if entitled. Allowance you keep.<br/>"
+        f"• <b>Travel Advance → only if you need cash now.</b> "
+        f"It is a <b>loan</b>; finance <b>takes it back from your pay</b> until repaid.<br/><br/>"
+        f"<b>Rule:</b> Take DLA. Skip the advance unless you cannot fund the move without it."
     )
     return _make_callout(
-        "MONEY MOVE: DLA vs Travel Advance",
+        "KNOW THIS: DLA vs Travel Advance",
         body,
         styles,
         width=width,
-        variant="navy",
+        variant="amber",
     )
 
 
-def _callout_hhg_vs_ppm(styles: dict[str, ParagraphStyle], width: float) -> Table:
-    """Government HHG vs PPM/DITY with weight-ticket discipline."""
+def _callout_hhg_vs_ppm(
+    styles: dict[str, ParagraphStyle],
+    width: float,
+    metadata: dict[str, Any] | None = None,
+) -> Table:
+    """Government HHG vs PPM — generic fallback if no personal numbers."""
     body = (
-        "<b>Government HHG</b> — the government (or contracted movers) packs and hauls "
-        "your household goods. Lower stress; less control of dates; you do not get a "
-        "PPM incentive payment.<br/><br/>"
-        "<b>PPM / DITY</b> — you move the goods (yourself or a hired truck). The "
-        "government may pay you based on <b>authorized weight × distance</b>. That is "
-        "not free money until costs are covered.<br/><br/>"
-        "<b>Weight tickets (required for PPM):</b> empty truck + loaded truck at "
-        "certified scales. No tickets → no full payment. Run real numbers with "
-        "<b>TMO</b> before you commit — short moves often favor government HHG."
+        "<b>Government HHG</b> — movers haul your household goods. Lower stress; no PPM payout.<br/><br/>"
+        "<b>PPM / DITY</b> — you move it; payment is based on weight × distance after costs.<br/><br/>"
+        "<b>Weight tickets required for PPM:</b> empty + loaded at certified scales. No tickets → weak payment. "
+        "Confirm with <b>TMO</b> before you commit."
     )
     return _make_callout(
         "KNOW THIS: HHG vs PPM + weight tickets",
@@ -501,8 +481,87 @@ def _callout_hhg_vs_ppm(styles: dict[str, ParagraphStyle], width: float) -> Tabl
     )
 
 
+def _callout_financial_numbers(
+    metadata: dict[str, Any],
+    styles: dict[str, ParagraphStyle],
+    width: float,
+) -> Table:
+    """Personalized HHG/PPM + cash figures for this Soldier (section 4)."""
+    from services.dla_rates import format_dla_usd
+
+    miles = metadata.get("move_miles")
+    weight = metadata.get("hhg_weight_lbs")
+    mode = str(metadata.get("dity_recommended_mode") or "")
+    dity_net = metadata.get("dity_net_usd")
+    dity_interest = str(metadata.get("dity_interest") or "")
+    cash_pressure = metadata.get("cash_pressure_usd")
+    cushion = metadata.get("cash_cushion_usd")
+    deposit = metadata.get("deposit_usd")
+    tle_est = metadata.get("tle_est_usd")
+    spouse_gap = metadata.get("spouse_gap_usd")
+    dla = metadata.get("dla_usd")
+
+    # HHG / PPM recommendation line
+    if dity_interest.lower().startswith("no"):
+        move_line = (
+            "<b>Your inputs:</b> you prefer a <b>government HHG</b> move — "
+            "keep that path unless TMO shows a clear PPM win after expenses."
+        )
+    elif miles and int(miles) > 0 and weight:
+        mode_label = "partial PPM/DITY" if mode == "partial" else "full PPM/DITY" if mode == "full" else "PPM/DITY"
+        net_bit = ""
+        if dity_net is not None:
+            net_bit = f" Planning net after expenses ≈ <b>{format_dla_usd(int(dity_net))}</b> (estimate)."
+        move_line = (
+            f"<b>Your move math:</b> ~<b>{int(miles):,}</b> miles · "
+            f"~<b>{int(weight):,}</b> lb weight allowance · lean <b>{mode_label}</b>.{net_bit} "
+            f"Get empty + loaded <b>weight tickets</b> the day you load. Confirm with TMO."
+        )
+    elif miles and int(miles) > 0:
+        move_line = (
+            f"<b>Distance on file:</b> ~<b>{int(miles):,}</b> miles. "
+            f"Ask TMO for a written PPM vs government HHG comparison before you commit."
+        )
+    else:
+        move_line = (
+            "<b>HHG vs PPM:</b> Get exact mileage and weight allowance from <b>TMO</b>. "
+            "Short or complex family moves often favor government HHG; long clean hauls can favor PPM."
+        )
+
+    cash_bits = []
+    if deposit is not None:
+        cash_bits.append(f"deposit/move-in ~{format_dla_usd(int(deposit))}")
+    if tle_est is not None:
+        cash_bits.append(f"TLE/TLA hotels ~{format_dla_usd(int(tle_est))}")
+    if spouse_gap is not None and int(spouse_gap) > 0:
+        cash_bits.append(f"spouse income gap ~{format_dla_usd(int(spouse_gap))}")
+    if dla is not None:
+        cash_bits.append(f"DLA offset ~{format_dla_usd(float(dla))} (if paid)")
+
+    if cash_pressure is not None and cushion is not None:
+        cash_line = (
+            f"<b>30-day cash pressure (planning):</b> ~<b>{format_dla_usd(int(cash_pressure))}</b>. "
+            f"Hold at least <b>{format_dla_usd(int(cushion))}</b> liquid before you leave."
+        )
+        if cash_bits:
+            cash_line += " Includes " + "; ".join(cash_bits) + "."
+    else:
+        cash_line = (
+            "<b>Cash before you leave:</b> deposits, hotels (TLE/TLA), food until pay hits, "
+            "pet fees, and any spouse gap. Use the section text above for the breakdown."
+        )
+
+    body = f"{move_line}<br/><br/>{cash_line}<br/><br/><font size='7'>Estimates only — verify with TMO and finance.</font>"
+    return _make_callout(
+        "YOUR NUMBERS: move mode + cash",
+        body,
+        styles,
+        width=width,
+        variant="green",
+    )
+
+
 def _callout_dity_ppm(styles: dict[str, ParagraphStyle], width: float) -> Table:
-    """Legacy alias — prefer hhg_vs_ppm for new injections."""
     return _callout_hhg_vs_ppm(styles, width)
 
 
@@ -510,8 +569,7 @@ def _callout_cash_cushion(styles: dict[str, ParagraphStyle], width: float) -> Ta
     body = (
         "Plan cash for: deposits, first month's rent, TLE/TLA hotels, "
         "food until pay hits, pet fees, and any spouse income gap.<br/><br/>"
-        "The report's cash-pressure number is a planning target — "
-        "not a guarantee. Finance office rules still apply."
+        "Figures in this plan are targets — finance office rules still apply."
     )
     return _make_callout("CASH BEFORE YOU LEAVE", body, styles, width=width, variant="amber")
 
@@ -553,8 +611,10 @@ def _get_insight_callout(
         return _callout_bah_start(styles, width)
     if key == "dla":
         return _callout_dla(metadata, styles, width)
+    if key == "financial_numbers":
+        return _callout_financial_numbers(metadata, styles, width)
     if key in ("hhg_vs_ppm", "dity_ppm"):
-        return _callout_hhg_vs_ppm(styles, width)
+        return _callout_hhg_vs_ppm(styles, width, metadata)
     if key == "cash_cushion":
         return _callout_cash_cushion(styles, width)
     if key == "decision_discipline":
@@ -566,7 +626,7 @@ def _build_quick_reference_strip(
     metadata: dict[str, Any],
     styles: dict[str, ParagraphStyle],
 ) -> Table:
-    """Once-only glossary under cover: TLE/TLA + BAH/OHA (not repeated later)."""
+    """Page-1 pair: TLE/TLA (left) + DLA vs Travel Advance (right) — matched columns."""
     half = (CONTENT_WIDTH - 0.12 * inch) / 2
     left = _callout_tle_tla(
         styles,
@@ -574,7 +634,7 @@ def _build_quick_reference_strip(
         housing_system=str(metadata.get("housing_system") or ""),
         to_installation=str(metadata.get("to_installation") or ""),
     )
-    right = _callout_housing_allowances(metadata, styles, half)
+    right = _callout_dla(metadata, styles, half)
     row = Table([[left, right]], colWidths=[half, half])
     row.setStyle(
         TableStyle(
@@ -730,15 +790,12 @@ def _build_cover_block(
             flowables.append(meta_table)
 
     howto_inner = [
-        [Paragraph("HOW TO USE THIS PLAN (5 minutes)", styles["howto_label"])],
+        [Paragraph("HOW TO READ THIS PLAN", styles["howto_label"])],
         [
             Paragraph(
-                "<b>1.</b> Read Section 1 with your spouse — agree on the main call. "
-                "<b>2.</b> Treat every <b>Decision Gate</b> as a hard stop before you sign or spend. "
-                "<b>3.</b> Run Section 5 day-by-day in the first month. "
-                "<b>4.</b> Section 8 is your short checklist. "
-                "Callout boxes (once each): TLE/TLA, BAH or OHA, "
-                "<b>DLA vs Travel Advance</b>, BAH start vs report date, HHG vs PPM.",
+                "Open it with your spouse. <b>Section 1</b> is the main call — agree on it first. "
+                "A <b>Decision Gate</b> means stop until that condition is true (do not sign or spend past it). "
+                "Use <b>Section 5</b> for the first 30 days and <b>Section 8</b> as your short checklist.",
                 styles["howto"],
             )
         ],
@@ -1066,30 +1123,16 @@ def _parse_markdown_to_flowables(
             elif "we're targeting" in lower and len(text) < 420:
                 section_buffer.append(Spacer(1, 0.06 * inch))
                 section_buffer.append(_build_spouse_share_box(text, styles))
-            elif re.search(r"commander brief", lower) and len(text) < 900:
-                m = re.search(
-                    r"commander brief[:\s]+[\"“']?(.+?)[\"”']?\s*$",
-                    text,
-                    re.I,
-                )
+            elif re.search(r"commander brief", lower):
+                # Drop commander brief entirely — keep any useful text before it.
+                m = re.search(r"commander brief\b", text, re.I)
                 if m:
-                    brief_body = m.group(1).strip().strip("\"'“”")
                     prefix = text[: m.start()].strip()
-                    if prefix and len(prefix) > 40:
+                    if prefix and len(prefix) > 50:
                         section_buffer.append(
                             Paragraph(_format_inline(prefix), styles["body"])
                         )
-                    section_buffer.append(
-                        _make_callout(
-                            "COMMANDER BRIEF (one line you can use)",
-                            _format_inline(brief_body),
-                            styles,
-                            width=CONTENT_WIDTH,
-                            variant="navy",
-                        )
-                    )
-                else:
-                    section_buffer.append(Paragraph(_format_inline(text), styles["body"]))
+                # else: paragraph was only the brief — omit
             else:
                 section_buffer.append(Paragraph(_format_inline(text), styles["body"]))
         else:
@@ -1341,9 +1384,53 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
 
     # DLA: with-dependents rate when dependents relocate (num_deps > 0)
     from services.dla_rates import get_dla_rate
+    from services.dity_calculator import HHG_WEIGHT_ALLOWANCE_LBS, build_dity_estimate
+    from services.family_cashflow import build_cashflow_bridge
+    from services.installation_data import build_move_context, get_bah_estimate, resolve_installation
 
     dla_with = num_deps > 0
     dla_info = get_dla_rate(pay_grade or "E-5", with_dependents=dla_with)
+
+    # Personalized DITY / cash figures for the financial section callout
+    profile = resolve_installation(gaining)
+    move_ctx = build_move_context(current or "", gaining)
+    miles = move_ctx.get("approximate_miles_one_way")
+    num_children = int(form_data.get("num_children") or 0)
+    has_pets = form_data.get("has_pets") == "Yes — we have pets"
+    dity_interest = str(form_data.get("dity_interest") or "Maybe — run the numbers for me")
+    dity_ctx = build_dity_estimate(
+        pay_grade or "E-5",
+        miles if isinstance(miles, int) else None,
+        dity_interest=dity_interest,
+        num_vehicles=str(form_data.get("num_vehicles") or "1"),
+        num_children=num_children,
+        has_pets=has_pets,
+    )
+    bah_monthly = int(gaining_pkg.get("housing_monthly_usd") or get_bah_estimate(pay_grade or "E-5", profile) or 0)
+    rent_low, rent_high = profile.housing.avg_3br_rent_range
+    cashflow = build_cashflow_bridge(
+        spouse_career_field=str(form_data.get("spouse_career_field") or ""),
+        bah_monthly=bah_monthly,
+        rent_low=rent_low,
+        rent_high=rent_high,
+        move_window=str(form_data.get("move_window") or ""),
+        dity_estimate=dity_ctx,
+        num_children=num_children,
+        has_pets=has_pets,
+        max_monthly_budget=int(form_data.get("max_monthly_budget") or 0),
+    )
+
+    dity_mode = dity_ctx.get("recommended_mode") if dity_ctx.get("applicable") else None
+    dity_net = None
+    if dity_ctx.get("applicable") and dity_mode in ("partial", "full"):
+        bucket = dity_ctx.get(f"{dity_mode}_dity") or {}
+        dity_net = bucket.get("estimated_net_usd")
+    elif dity_ctx.get("applicable") and dity_mode == "government":
+        dity_net = 0
+
+    weight_lbs = dity_ctx.get("authorized_weight_lbs") or HHG_WEIGHT_ALLOWANCE_LBS.get(
+        pay_grade or "E-5", 12000
+    )
 
     return {
         "family_name": family_name,
@@ -1369,4 +1456,14 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         "dla_with_dependents": dla_with,
         "dla_pay_grade": dla_info.get("pay_grade"),
         "dla_effective_date": dla_info.get("effective_date"),
+        "move_miles": miles,
+        "hhg_weight_lbs": weight_lbs,
+        "dity_interest": dity_interest,
+        "dity_recommended_mode": dity_mode,
+        "dity_net_usd": dity_net,
+        "cash_pressure_usd": cashflow.get("estimated_30_day_cash_pressure_usd"),
+        "cash_cushion_usd": cashflow.get("recommended_cash_cushion_usd"),
+        "deposit_usd": cashflow.get("estimated_deposit_and_fees_usd"),
+        "tle_est_usd": cashflow.get("estimated_tle_cost_usd"),
+        "spouse_gap_usd": cashflow.get("estimated_spouse_income_gap_usd"),
     }

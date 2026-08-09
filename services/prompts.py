@@ -97,10 +97,10 @@ SECTION GUIDELINES
 - Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives (2nd/3rd choice with when to switch), contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide.
 - Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in dollars or weeks, and relevant programs (MyCAA, MSEP, ACS). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
 - Section 3: Clean comparison table with accurate BAH/OHA surplus/shortfall. On-post shows $0 surplus (BAH absorbed) for CONUS. Include market timing, one negotiation note, and one lease red flag from local knowledge. State on-post vs off-post trade-off in one plain sentence under the table.
-- Section 4: Explicit **government HHG vs PPM/DITY** recommendation with why (miles, vehicles, pets, window). Mention weight tickets for PPM. 30-day cash pressure, recommended cushion, what the cushion buys, and 6-month upside in plain dollars. One sentence on BAH/OHA start vs report date risk if relevant. One original sentence on why this beats free checklists (don't paste boilerplate).
+- Section 4: Explicit **government HHG vs PPM/DITY** recommendation with why (use payload miles, weight allowance, DITY interest, vehicles, pets). State planning net or “near zero — prefer HHG” when short move. Mention weight tickets for PPM. Use payload cash-flow figures (deposit, TLE, spouse gap, 30-day pressure, cushion). Mention **DLA** as money they keep when entitled — not a travel advance. One original sentence on why this beats free checklists.
 - Section 5: Three phases — **Days 1–5**, **Days 6–15**, **Days 16–30**. Each phase must include exactly **Gate:** If [condition] by day [X] — otherwise [consequence]. Then **Soldier Tasks** and **Spouse Tasks** (max 2 bullets each). Gates must be testable (housing app submitted, childcare slot confirmed, license packet mailed) — not vague.
 - Section 6: One paragraph — schools, pets, seasonal realities, 1–2 lease red flags specific to the gaining area.
-- Section 7: Three decision triggers with hard conditions, a realistic "wing it" scenario (what default failure looks like in dollars/time), one 90-day watch item, and a commander brief in quotes that names their primary priority by name — never generic "housing/childcare timing".
+- Section 7: Three decision triggers with hard conditions, a realistic "wing it" scenario (what default failure looks like in dollars/time), and one 90-day watch item. Do **not** include a commander brief line.
 - Section 8: 6–8 numbered actions (verb + object + timing). Order by impact. End with the spouse-share sentence from the payload verbatim.
 
 FORMAT
@@ -328,7 +328,7 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "Section 4: pick HHG or PPM with why; weight tickets if PPM; cash pressure + cushion; "
         "mention BAH/OHA start vs report date if a gap could hurt them. "
         "Section 5: Days 1–5 / 6–15 / 16–30 with **Gate:** (testable condition + consequence). "
-        "Section 7: wing-it scenario in dollars/time + 90-day watch + commander brief naming priority. "
+        "Section 7: wing-it scenario in dollars/time + 90-day watch (no commander brief). "
         "Section 8: verb-first actions ordered by impact + spouse_share_line verbatim. "
         "Match spouse_career_field exactly. Match move_window urgency. No empty 'plan ahead' filler."
     )
