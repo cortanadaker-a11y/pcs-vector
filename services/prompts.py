@@ -96,13 +96,21 @@ REQUIRED 8 SECTIONS (keep exact headings)
 
 SECTION GUIDELINES
 - Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives (2nd/3rd choice with when to switch), contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide.
-- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in dollars or weeks, and relevant programs (MyCAA, MSEP, ACS). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
-- Section 3: Clean comparison table with accurate BAH/OHA surplus/shortfall. On-post shows $0 surplus (BAH absorbed) for CONUS. Include market timing, one negotiation note, and one lease red flag from local knowledge. State on-post vs off-post trade-off in one plain sentence under the table.
+- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in dollars or weeks, and relevant programs. When you first mention a program, spell it out then give the acronym: Military Spouse Career Advancement Account (MyCAA), Military Spouse Employment Partnership (MSEP), Army Community Service (ACS). Same for Child Development Center (CDC) and Family Child Care (FCC). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
+- Section 3: Clean comparison table with accurate BAH/OHA surplus/shortfall. On-post shows $0 surplus (BAH absorbed) for CONUS. **Required:** include a second short table or bullet block of **realistic monthly off-post utility costs** using `off_post_utility_costs` / `off_post_utility_table_markdown` from the payload (electric, gas/heat, water/trash, internet, total by recommended area/zip). Add rent + mid utilities so they see true monthly cost. Include market timing, one negotiation note, and one lease red flag. State on-post vs off-post trade-off in one plain sentence under the tables.
 - Section 4: Explicit **government HHG vs PPM/DITY** recommendation with why (use payload miles, weight allowance, DITY interest, vehicles, pets). State planning net or “near zero — prefer HHG” when short move. Mention weight tickets for PPM. Use payload cash-flow figures (deposit, TLE, spouse gap, 30-day pressure, cushion). Mention **DLA** as money they keep when entitled — not a travel advance. One original sentence on why this beats free checklists.
 - Section 5: Three phases — **Days 1–5**, **Days 6–15**, **Days 16–30**. Each phase must include exactly **Gate:** If [condition] by day [X] — otherwise [consequence]. Then **Soldier** and **Spouse / partner** bullets (max 2 each) written as teamwork, not orders ("you handle X / I'll take Y" energy). Gates must be concrete (housing app in, childcare slot confirmed) — not vague.
 - Section 6: One paragraph — schools, pets, seasonal realities, 1–2 lease red flags specific to the gaining area.
 - Section 7: Three decision triggers with hard conditions, a realistic "wing it" scenario (what default failure looks like in dollars/time), and one 90-day watch item. Do **not** include a commander brief line.
-- Section 8: 6–8 numbered actions (verb + object + timing). Order by impact. End with the spouse_share_line from the payload **verbatim** — do not rewrite it into tasking language.
+- Section 8: 7–10 numbered actions (verb + object + timing). Order by impact. **Must include** (worded naturally, not as a separate sub-list):
+  (a) update mailing address (USPS change-of-address + DEERS/ID card / finance / bank / subscriptions),
+  (b) update or shop auto/renters insurance for the new state/post (and cancel old policies on the right date).
+  Also cover housing, TMO/finance, spouse job/childcare as relevant. End with the spouse_share_line from the payload **verbatim**.
+
+ACRONYMS (required)
+- On **first use** of any military acronym, write the full name then the acronym in parentheses. After that, the acronym alone is fine.
+- Always expand at least once when used: ACS, CDC, CDC waitlist, FCC, MyCAA, MSEP, EFMP, TMO, LES, BAH, OHA, COLA, DLA, HHG, PPM, DITY, TLE, TLA, DoDEA, NAF, PCS, DEERS.
+- Examples: "Army Community Service (ACS)", "Child Development Center (CDC)", "Family Child Care (FCC)", "Military Spouse Career Advancement Account (MyCAA)".
 
 FORMAT
 Return ONLY markdown. Start with # PCS Vector Strategic Plan, then all 8 sections. Complete every section — never truncate. No preamble. No code fences.
@@ -325,7 +333,9 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         "Section 1: sentence 1 = first name + clear call; sentence 2 = why it fits priority; "
         "cite move window + one concern/must-have; name the #2 option and when to switch. "
         "Section 2: field-specific timeline + bottleneck; no generic 'apply to jobs.' "
-        "Section 3: table + one trade-off sentence (what you gain vs give up). "
+        "Section 3: housing table + **off-post utility cost table from payload** (by area/zip) + trade-off sentence. "
+        "Section 8: must include mailing-address update and insurance update/change. "
+        "First mention of ACS/CDC/FCC/MyCAA/MSEP/TMO/etc. must spell the name out. "
         "Section 4: pick HHG or PPM with why; weight tickets if PPM; cash pressure + cushion; "
         "mention BAH/OHA start vs report date if a gap could hurt them. "
         "Section 5: Days 1–5 / 6–15 / 16–30 with **Gate:** (testable condition + consequence). "

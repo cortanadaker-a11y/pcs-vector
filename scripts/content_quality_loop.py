@@ -267,7 +267,8 @@ def score(report: str, form: dict) -> dict:
         "has_spouse_share": (
             "we're targeting" in report.lower()
             or "we're in this together" in report.lower()
-            or "hey — we're in this" in report.lower()
+            or "for both of us on the move" in report.lower()
+            or "shared playbook" in report.lower()
         ),
         "gates": gates,
         "has_gates": gates >= 2,

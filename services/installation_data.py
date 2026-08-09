@@ -1975,10 +1975,34 @@ def get_bah_reference(pay_grade: str, profile: InstallationProfile) -> dict:
 
 def build_installation_context(profile: InstallationProfile, pay_grade: str) -> dict:
     """Serialize installation reference data for the Grok prompt."""
+    from services.utility_costs import (
+        format_utility_table_markdown,
+        get_utility_costs_for_installation,
+    )
+
     bah_ref = get_bah_reference(pay_grade, profile)
     bah = bah_ref["monthly_usd"]
     rent_low, rent_high = profile.housing.avg_3br_rent_range
     base_data = get_installation_data(profile.display_name) or {}
+    theater = base_data.get("theater") or getattr(profile, "theater", None)
+    is_oconus = theater == "OCONUS" or profile.state in (
+        "HI",
+        "AK",
+        "South Korea",
+        "Germany",
+        "Japan",
+        "Italy",
+        "PR",
+    )
+    # State field may still be "TX" for CONUS; check notes for OCONUS installs
+    name_l = profile.display_name.lower()
+    if any(x in name_l for x in ("camp humphreys", "korea", "usag", "germany", "japan", "zama", "italy")):
+        is_oconus = True
+    utility_costs = get_utility_costs_for_installation(
+        profile.display_name,
+        climate_hint=profile.climate_note or profile.housing.utility_note,
+        is_oconus=is_oconus,
+    )
     return {
         "installation": profile.display_name,
         "short_name": profile.short_name,
@@ -2003,6 +2027,8 @@ def build_installation_context(profile: InstallationProfile, pay_grade: str) -> 
         "on_post_cons": list(profile.housing.on_post_cons),
         "off_post_areas_to_research": list(profile.housing.off_post_areas),
         "utility_note": profile.housing.utility_note,
+        "off_post_utility_costs": utility_costs,
+        "off_post_utility_table_markdown": format_utility_table_markdown(utility_costs),
         "school_districts": list(profile.school_districts),
         "spouse_employment_leads": list(profile.spouse_employment_notes),
         "childcare_waitlist_notes": list(profile.childcare_notes),

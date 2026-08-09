@@ -50,6 +50,7 @@ TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 
 # Cover strip: TLE/TLA | DLA (once). Later sections: only non-overlapping topics.
 _INJECT_AFTER_SECTION: dict[int, list[str]] = {
+    3: ["off_post_utilities"],  # realistic monthly utility ranges by area
     4: ["financial_numbers"],  # personalized HHG/PPM + cash from this Soldier's inputs
 }
 
@@ -480,6 +481,60 @@ def _callout_hhg_vs_ppm(
     )
 
 
+def _callout_off_post_utilities(
+    metadata: dict[str, Any],
+    styles: dict[str, ParagraphStyle],
+    width: float,
+) -> Table:
+    """Realistic utility ranges for recommended off-post areas."""
+    areas = metadata.get("utility_areas") or []
+    as_of = str(metadata.get("utility_as_of") or "2026 planning")
+    if not areas:
+        body = (
+            "Off-post, plan extra for electric, gas/heat, water/trash, and internet. "
+            "Ask the landlord for last year's bills before you sign — on-post often folds "
+            "most of this into housing."
+        )
+        return _make_callout(
+            "OFF-POST UTILITIES (plan these on top of rent)",
+            body,
+            styles,
+            width=width,
+            variant="green",
+        )
+
+    lines = []
+    for a in areas[:3]:
+        name = a.get("name") or "Off-post area"
+        tot = a.get("total_utilities_usd_mo") or {}
+        e = a.get("electric_usd_mo") or {}
+        g = a.get("gas_or_heat_usd_mo") or {}
+        note = a.get("season_note") or ""
+        lines.append(
+            f"<b>{_escape(str(name))}</b> — total about "
+            f"<b>${int(tot.get('low', 0))}–${int(tot.get('high', 0))}/mo</b> "
+            f"(electric ${int(e.get('low', 0))}–${int(e.get('high', 0))}; "
+            f"heat/gas ${int(g.get('low', 0))}–${int(g.get('high', 0))}; "
+            f"plus water/trash + internet)."
+        )
+        if note:
+            lines.append(f"<i>{_escape(str(note))}</i>")
+
+    body = (
+        "These are planning ranges for a typical 3-bedroom off-post rental — "
+        "<b>on top of rent</b>, not instead of BAH/OHA.<br/><br/>"
+        + "<br/>".join(lines)
+        + f"<br/><br/><font size='7'>{_escape(as_of)}. Confirm with local providers and prior bills.</font>"
+    )
+    return _make_callout(
+        "OFF-POST UTILITIES (by area)",
+        body,
+        styles,
+        width=width,
+        variant="green",
+    )
+
+
 def _callout_financial_numbers(
     metadata: dict[str, Any],
     styles: dict[str, ParagraphStyle],
@@ -592,6 +647,8 @@ def _get_insight_callout(
         return _callout_bah_start(styles, width)
     if key == "dla":
         return _callout_dla(metadata, styles, width)
+    if key == "off_post_utilities":
+        return _callout_off_post_utilities(metadata, styles, width)
     if key == "financial_numbers":
         return _callout_financial_numbers(metadata, styles, width)
     if key in ("hhg_vs_ppm", "dity_ppm"):
@@ -1426,6 +1483,14 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         pay_grade or "E-5", 12000
     )
 
+    from services.utility_costs import get_utility_costs_for_installation
+
+    is_oconus = (gaining_pkg.get("housing_system") or "") in ("OHA", "BAH_PLUS_COLA")
+    utility_ctx = get_utility_costs_for_installation(
+        gaining,
+        is_oconus=is_oconus,
+    )
+
     return {
         "family_name": family_name,
         "rank": rank,
@@ -1460,4 +1525,6 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         "deposit_usd": cashflow.get("estimated_deposit_and_fees_usd"),
         "tle_est_usd": cashflow.get("estimated_tle_cost_usd"),
         "spouse_gap_usd": cashflow.get("estimated_spouse_income_gap_usd"),
+        "utility_areas": utility_ctx.get("areas") or [],
+        "utility_as_of": utility_ctx.get("as_of"),
     }
