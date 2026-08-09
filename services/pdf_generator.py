@@ -50,9 +50,10 @@ TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 
 # After which section numbers we inject insight callouts
 _INJECT_AFTER_SECTION: dict[int, list[str]] = {
-    1: ["tle_tla"],  # early: temporary lodging confusion is common
+    1: ["tle_tla", "bah_start"],  # lodging + pay-start timing
     3: ["housing_allowances"],  # after housing strategy
-    4: ["dity_ppm", "cash_cushion"],  # financial section
+    4: ["hhg_vs_ppm", "cash_cushion"],  # HHG/PPM + cash
+    5: ["decision_discipline"],  # reinforce gates during first 30 days
 }
 
 
@@ -404,22 +405,58 @@ def _callout_housing_allowances(
             "<b>BAH</b> (Basic Allowance for Housing) is a <b>flat monthly</b> amount "
             "based on your duty zip, pay grade, and with/without dependents. "
             "You keep the difference if rent is lower — and cover the gap if higher.<br/><br/>"
-            "BAH is not the same as TLE (hotel). BAH starts when you report / "
-            "meet eligibility; TLE is temporary lodging during the move."
+            "BAH is not the same as TLE (hotel). See the <b>BAH start vs report date</b> "
+            "box for when money actually hits."
         )
         title = "KNOW THIS: BAH in plain English"
     return _make_callout(title, body, styles, width=width, variant="green")
 
 
-def _callout_dity_ppm(styles: dict[str, ParagraphStyle], width: float) -> Table:
+def _callout_bah_start(styles: dict[str, ParagraphStyle], width: float) -> Table:
+    """BAH / OHA start date vs report date — common finance confusion."""
     body = (
-        "<b>PPM / DITY</b> means you move your household goods yourself "
-        "(or hire help) and the government pays you based on weight and distance — "
-        "not a free truck.<br/><br/>"
-        "Run the numbers with <b>TMO</b> before you commit. Fuel, truck rental, "
-        "and time can erase the profit on short moves. Keep weight tickets."
+        "<b>Report date</b> = the day you must be at the new unit (on your orders).<br/><br/>"
+        "<b>BAH / OHA start</b> = when housing money begins on your LES — often tied to "
+        "departure from the old duty station, arrival, or when you stop government "
+        "quarters, depending on your situation.<br/><br/>"
+        "These are <b>not always the same day</b>. A gap can leave you covering rent or "
+        "hotels out of pocket. Ask finance: <i>“When does my BAH/OHA start relative to "
+        "my report date and TLE/TLA?”</i> before you sign a lease."
     )
-    return _make_callout("KNOW THIS: DITY / PPM", body, styles, width=width, variant="green")
+    return _make_callout(
+        "KNOW THIS: BAH/OHA start vs report date",
+        body,
+        styles,
+        width=width,
+        variant="amber",
+    )
+
+
+def _callout_hhg_vs_ppm(styles: dict[str, ParagraphStyle], width: float) -> Table:
+    """Government HHG vs PPM/DITY with weight-ticket discipline."""
+    body = (
+        "<b>Government HHG</b> — the government (or contracted movers) packs and hauls "
+        "your household goods. Lower stress; less control of dates; you do not get a "
+        "PPM incentive payment.<br/><br/>"
+        "<b>PPM / DITY</b> — you move the goods (yourself or a hired truck). The "
+        "government may pay you based on <b>authorized weight × distance</b>. That is "
+        "not free money until costs are covered.<br/><br/>"
+        "<b>Weight tickets (required for PPM):</b> empty truck + loaded truck at "
+        "certified scales. No tickets → no full payment. Run real numbers with "
+        "<b>TMO</b> before you commit — short moves often favor government HHG."
+    )
+    return _make_callout(
+        "KNOW THIS: HHG vs PPM + weight tickets",
+        body,
+        styles,
+        width=width,
+        variant="green",
+    )
+
+
+def _callout_dity_ppm(styles: dict[str, ParagraphStyle], width: float) -> Table:
+    """Legacy alias — prefer hhg_vs_ppm for new injections."""
+    return _callout_hhg_vs_ppm(styles, width)
 
 
 def _callout_cash_cushion(styles: dict[str, ParagraphStyle], width: float) -> Table:
@@ -430,6 +467,24 @@ def _callout_cash_cushion(styles: dict[str, ParagraphStyle], width: float) -> Ta
         "not a guarantee. Finance office rules still apply."
     )
     return _make_callout("CASH BEFORE YOU LEAVE", body, styles, width=width, variant="amber")
+
+
+def _callout_decision_discipline(styles: dict[str, ParagraphStyle], width: float) -> Table:
+    body = (
+        "Every <b>Decision Gate</b> in this plan is a hard stop — not a suggestion. "
+        "If the gate fails (housing not locked, childcare open, license not filed), "
+        "use the backup in the gate line the same day. Do not hope it works out.<br/><br/>"
+        "Soldier owns orders, finance, TMO, and unit in-processing. "
+        "Spouse owns job/school/childcare track when that is the family plan. "
+        "Talk once a day for the first two weeks so tasks do not collide."
+    )
+    return _make_callout(
+        "HOW TO USE THE GATES",
+        body,
+        styles,
+        width=width,
+        variant="green",
+    )
 
 
 def _get_insight_callout(
@@ -447,10 +502,14 @@ def _get_insight_callout(
         )
     if key == "housing_allowances":
         return _callout_housing_allowances(metadata, styles, width)
-    if key == "dity_ppm":
-        return _callout_dity_ppm(styles, width)
+    if key == "bah_start":
+        return _callout_bah_start(styles, width)
+    if key in ("hhg_vs_ppm", "dity_ppm"):
+        return _callout_hhg_vs_ppm(styles, width)
     if key == "cash_cushion":
         return _callout_cash_cushion(styles, width)
+    if key == "decision_discipline":
+        return _callout_decision_discipline(styles, width)
     return None
 
 
@@ -629,7 +688,8 @@ def _build_cover_block(
                 "<b>2.</b> Treat every <b>Decision Gate</b> as a hard stop before you sign or spend. "
                 "<b>3.</b> Run Section 5 day-by-day in the first month. "
                 "<b>4.</b> Section 8 is your short checklist. "
-                "Gray side boxes explain terms (TLE vs TLA, BAH vs OHA) in plain English.",
+                "Amber/green boxes explain TLE vs TLA, BAH/OHA start vs report date, "
+                "HHG vs PPM/weight tickets, and how to treat Decision Gates.",
                 styles["howto"],
             )
         ],

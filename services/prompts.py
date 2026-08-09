@@ -73,6 +73,15 @@ ANTI-TEMPLATE & PERSONALIZATION
 - No children: keep childcare minimal or skip it. One child with IEP: refer to that child only — don't generalize to siblings.
 - Student spouse: MyCAA and enrollment deadlines — not job-hunting timelines.
 - Use real local details (zip codes, districts, commute notes) from installation data when available.
+- Name the Soldier by first name in section 1. Rank and family shape should change advice (junior NCO = day-one simplicity; senior NCO/officer = family coordination + commander touchpoints).
+- Every major recommendation must include a trade-off: what you gain AND what you give up (money, time, flexibility, stress).
+
+INSIGHT STANDARD (what "good" looks like)
+- Specific beats generic: "Hope Mills 28348 under $2,100" not "find affordable housing nearby."
+- Dependencies: housing choice affects spouse commute and school zone — say the link out loud.
+- Money with context: surplus/shortfall, cash pressure, and what breaks if they ignore it.
+- Timelines with dates relative to THEIR window (30 days vs 3–6 months), not a one-size checklist.
+- Avoid empty phrases: "do your research," "communicate with your spouse," "plan ahead," "settle in" with no verb + object + timing.
 
 REQUIRED 8 SECTIONS (keep exact headings)
 ## 1. Executive Summary & Recommended Strategy
@@ -85,14 +94,14 @@ REQUIRED 8 SECTIONS (keep exact headings)
 ## 8. Prioritized Next Steps
 
 SECTION GUIDELINES
-- Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives, contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide.
-- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income, and relevant programs (MyCAA, MSEP, ACS). End with the real bottleneck in plain language.
-- Section 3: Clean comparison table with accurate BAH surplus/shortfall. On-post shows $0 surplus (BAH absorbed). Include market timing and a negotiation note.
-- Section 4: Clear DITY or government HHG stance. 30-day cash pressure, recommended cushion, what the cushion buys, and 6-month upside in plain dollars — keep it tight, no repeated ROI lines. One original sentence on why this beats free checklists (don't paste boilerplate).
-- Section 5: Three phases — **Days 1–5**, **Days 6–15**, **Days 16–30**. Each phase must include exactly **Gate:** If [condition] by day [X] — otherwise [consequence]. Then **Soldier Tasks** and **Spouse Tasks** (max 2 bullets each).
-- Section 6: One paragraph — schools, pets, seasonal realities, 1–2 lease red flags.
-- Section 7: Three decision triggers, a realistic "wing it" scenario, one 90-day watch item, and a commander brief in quotes that names their primary priority by name — never generic "housing/childcare timing".
-- Section 8: 6–8 numbered actions (verb + object + timing). End with the spouse-share sentence from the payload verbatim.
+- Section 1: 4–6 sentences. Sentence one = your call. Sentence two = why it fits their stated priority. Then ranked alternatives (2nd/3rd choice with when to switch), contingency, and the single biggest risk — say what actually breaks if they ignore it (lost money, wrong school zone, slipped timeline). Decisive and human, not a briefing slide.
+- Section 2: Up to 2 paragraphs. What this move means for the family, realistic time to first income in dollars or weeks, and relevant programs (MyCAA, MSEP, ACS). End with the real bottleneck in plain language. If no spouse career / single, keep short and redirect to Soldier settling tasks.
+- Section 3: Clean comparison table with accurate BAH/OHA surplus/shortfall. On-post shows $0 surplus (BAH absorbed) for CONUS. Include market timing, one negotiation note, and one lease red flag from local knowledge. State on-post vs off-post trade-off in one plain sentence under the table.
+- Section 4: Explicit **government HHG vs PPM/DITY** recommendation with why (miles, vehicles, pets, window). Mention weight tickets for PPM. 30-day cash pressure, recommended cushion, what the cushion buys, and 6-month upside in plain dollars. One sentence on BAH/OHA start vs report date risk if relevant. One original sentence on why this beats free checklists (don't paste boilerplate).
+- Section 5: Three phases — **Days 1–5**, **Days 6–15**, **Days 16–30**. Each phase must include exactly **Gate:** If [condition] by day [X] — otherwise [consequence]. Then **Soldier Tasks** and **Spouse Tasks** (max 2 bullets each). Gates must be testable (housing app submitted, childcare slot confirmed, license packet mailed) — not vague.
+- Section 6: One paragraph — schools, pets, seasonal realities, 1–2 lease red flags specific to the gaining area.
+- Section 7: Three decision triggers with hard conditions, a realistic "wing it" scenario (what default failure looks like in dollars/time), one 90-day watch item, and a commander brief in quotes that names their primary priority by name — never generic "housing/childcare timing".
+- Section 8: 6–8 numbered actions (verb + object + timing). Order by impact. End with the spouse-share sentence from the payload verbatim.
 
 FORMAT
 Return ONLY markdown. Start with # PCS Vector Strategic Plan, then all 8 sections. Complete every section — never truncate. No preamble. No code fences.
@@ -311,11 +320,15 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         f"Address the family personally{' as ' + family_name if family_name else ''} in section 1. "
         f"Tailor to a {rank or 'military'} family, "
         f"{form_data.get('num_children', 0)} child(ren), spouse: {resolved_spouse_career(form_data)}.\n"
-        "Natural NCO advisor voice — conversational, not templated. "
-        "Section 1: sentence 1 = name + clear call; sentence 2 = why it fits priority; cite move window and one concern/must-have. "
-        "Section 4: cash pressure, cushion, 6-month upside, one original checklist-beat sentence. "
-        "Section 5: Days 1–5 / 6–15 / 16–30 with **Gate:** format (bold Gate label). "
-        "Section 7: wing-it scenario + 90-day watch + commander brief naming primary priority. "
-        "Section 8: verb-first actions + spouse_share_line verbatim. "
-        "Match spouse_career_field exactly. Match move_window urgency."
+        "Natural NCO advisor voice — conversational, not templated, civilian-friendly for the spouse. "
+        "Section 1: sentence 1 = first name + clear call; sentence 2 = why it fits priority; "
+        "cite move window + one concern/must-have; name the #2 option and when to switch. "
+        "Section 2: field-specific timeline + bottleneck; no generic 'apply to jobs.' "
+        "Section 3: table + one trade-off sentence (what you gain vs give up). "
+        "Section 4: pick HHG or PPM with why; weight tickets if PPM; cash pressure + cushion; "
+        "mention BAH/OHA start vs report date if a gap could hurt them. "
+        "Section 5: Days 1–5 / 6–15 / 16–30 with **Gate:** (testable condition + consequence). "
+        "Section 7: wing-it scenario in dollars/time + 90-day watch + commander brief naming priority. "
+        "Section 8: verb-first actions ordered by impact + spouse_share_line verbatim. "
+        "Match spouse_career_field exactly. Match move_window urgency. No empty 'plan ahead' filler."
     )

@@ -238,6 +238,26 @@ def score(report: str, form: dict) -> dict:
             if t.lower() in report.lower()
         )
 
+    # Insightfulness signals (content quality loop 3+)
+    has_hhg_ppm = bool(
+        re.search(r"\b(HHG|PPM|DITY|weight ticket)", report, re.I)
+    )
+    has_tradeoff = bool(
+        re.search(
+            r"\b(trade-?off|instead of|backup|if that fails|switch to|rather than)\b",
+            report,
+            re.I,
+        )
+    )
+    generic_hits = len(
+        re.findall(
+            r"\b(do your research|plan ahead|communicate with your spouse|"
+            r"settle in|it is important to|make sure to)\b",
+            report,
+            re.I,
+        )
+    )
+
     banned = BANNED.findall(report)
     meta = {
         "chars": len(report),
@@ -252,6 +272,9 @@ def score(report: str, form: dict) -> dict:
         "zips": zips,
         "has_locality": zips >= 1 or "county" in report.lower() or "district" in report.lower(),
         "has_you": len(re.findall(r"\byou\b|\byour\b", report, re.I)) >= 10,
+        "has_hhg_ppm": has_hhg_ppm,
+        "has_tradeoff": has_tradeoff,
+        "generic_hits": generic_hits,
         "has_name": has_name,
         "has_post": has_post,
         "banned_hits": banned,
@@ -296,21 +319,28 @@ def score(report: str, form: dict) -> dict:
         fail.append("spouse_share")
     if not meta["oconus_ok"]:
         fail.append("oconus_depth")
+    if not meta["has_hhg_ppm"]:
+        fail.append("hhg_ppm")
+    if meta["generic_hits"] >= 3:
+        fail.append("generic")
     meta["fail_flags"] = fail
     meta["pass"] = len(fail) == 0
     # Soft quality score 0–100
     pts = 0
-    pts += 15 if meta["char_ok"] else 5
-    pts += 15 if meta["sections"] >= 8 else max(0, meta["sections"] * 2)
+    pts += 12 if meta["char_ok"] else 4
+    pts += 12 if meta["sections"] >= 8 else max(0, meta["sections"] * 2)
     pts += 10 if meta["has_gates"] else 0
     pts += 10 if meta["has_money"] else 0
-    pts += 10 if meta["has_locality"] else 0
-    pts += 10 if meta["has_spouse_share"] else 0
+    pts += 8 if meta["has_locality"] else 0
+    pts += 8 if meta["has_spouse_share"] else 0
     pts += 10 if meta["has_name"] and meta["has_post"] else 0
-    pts += 10 if not banned and not meta["template_opener"] else 0
+    pts += 8 if not banned and not meta["template_opener"] else 0
     pts += 5 if meta["has_you"] else 0
     pts += 5 if meta["oconus_ok"] else 0
-    meta["score"] = min(100, pts)
+    pts += 6 if meta["has_hhg_ppm"] else 0
+    pts += 6 if meta["has_tradeoff"] else 0
+    pts -= min(10, meta["generic_hits"] * 3)
+    meta["score"] = max(0, min(100, pts))
     return meta
 
 
