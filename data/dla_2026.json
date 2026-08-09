@@ -1,0 +1,39 @@
+{
+  "effective_date": "2026-01-01",
+  "source": "DoD Dislocation Allowance rates effective 1 Jan 2026 (JTR / DTMO MAP). Verify with finance.",
+  "notes": {
+    "with_dependents": "Authorized dependents are relocating with the PCS — not merely listed in DEERS.",
+    "partial_dla_usd": 1002.71,
+    "partial_note": "Partial DLA when PCS authorized but HHG not shipped (e.g. into government quarters without a full HHG move)."
+  },
+  "rates_usd": {
+    "O-10": { "without_dependents": 5187.33, "with_dependents": 6385.58 },
+    "O-9": { "without_dependents": 5187.33, "with_dependents": 6385.58 },
+    "O-8": { "without_dependents": 5187.33, "with_dependents": 6385.58 },
+    "O-7": { "without_dependents": 5187.33, "with_dependents": 6385.58 },
+    "O-7+": { "without_dependents": 5187.33, "with_dependents": 6385.58 },
+    "O-6": { "without_dependents": 4758.96, "with_dependents": 5749.63 },
+    "O-5": { "without_dependents": 4583.51, "with_dependents": 5542.06 },
+    "O-4": { "without_dependents": 4247.61, "with_dependents": 4885.43 },
+    "O-3": { "without_dependents": 3404.11, "with_dependents": 4041.88 },
+    "O-2": { "without_dependents": 2700.31, "with_dependents": 3451.28 },
+    "O-1": { "without_dependents": 2273.82, "with_dependents": 3085.23 },
+    "O-3E": { "without_dependents": 3675.83, "with_dependents": 4343.80 },
+    "O-2E": { "without_dependents": 3124.87, "with_dependents": 3919.27 },
+    "O-1E": { "without_dependents": 2687.09, "with_dependents": 3621.10 },
+    "W-5": { "without_dependents": 4315.51, "with_dependents": 4715.58 },
+    "W-4": { "without_dependents": 3832.45, "with_dependents": 4323.11 },
+    "W-3": { "without_dependents": 3221.08, "with_dependents": 3960.78 },
+    "W-2": { "without_dependents": 2860.70, "with_dependents": 3643.75 },
+    "W-1": { "without_dependents": 2394.55, "with_dependents": 3151.31 },
+    "E-9": { "without_dependents": 3147.54, "with_dependents": 4149.51 },
+    "E-8": { "without_dependents": 2888.97, "with_dependents": 3824.94 },
+    "E-7": { "without_dependents": 2468.19, "with_dependents": 3551.31 },
+    "E-6": { "without_dependents": 2389.42, "with_dependents": 3548.02 },
+    "E-5": { "without_dependents": 2389.42, "with_dependents": 3548.02 },
+    "E-4": { "without_dependents": 2389.42, "with_dependents": 3548.02 },
+    "E-3": { "without_dependents": 2355.48, "with_dependents": 3548.02 },
+    "E-2": { "without_dependents": 2025.26, "with_dependents": 3548.02 },
+    "E-1": { "without_dependents": 1870.58, "with_dependents": 3548.02 }
+  }
+}

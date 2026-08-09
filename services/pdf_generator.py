@@ -48,12 +48,12 @@ BOLD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 ITALIC_PATTERN = re.compile(r"(?<!\*)\*([^*]+?)\*(?!\*)")
 TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 
-# After which section numbers we inject insight callouts
+# Inject each topic once where it adds the most value (no cover-strip duplicates).
+# Cover strip already has TLE/TLA + BAH/OHA glossary — do not re-inject those here.
 _INJECT_AFTER_SECTION: dict[int, list[str]] = {
-    1: ["tle_tla", "bah_start"],  # lodging + pay-start timing
-    3: ["housing_allowances"],  # after housing strategy
-    4: ["hhg_vs_ppm", "cash_cushion"],  # HHG/PPM + cash
-    5: ["decision_discipline"],  # reinforce gates during first 30 days
+    1: ["dla", "bah_start"],  # money you keep + when housing pay starts
+    4: ["hhg_vs_ppm", "cash_cushion"],  # move mode + cash plan
+    5: ["decision_discipline"],  # how to treat gates (once)
 }
 
 
@@ -380,48 +380,41 @@ def _callout_housing_allowances(
     styles: dict[str, ParagraphStyle],
     width: float,
 ) -> Table:
-    """BAH / OHA / COLA in plain English, tuned to this Soldier's system."""
+    """BAH / OHA / COLA in plain English — shown once on cover strip only."""
     system = str(metadata.get("housing_system") or "BAH")
     if system == "OHA":
         body = (
-            "<b>OHA</b> (Overseas Housing Allowance) pays your <b>actual rent</b> "
-            "up to a ceiling for your grade and location, plus a utility allowance. "
-            "It is not a flat BAH-style payment — keep the lease and receipts.<br/><br/>"
-            "<b>COLA</b> helps with higher grocery and daily costs. It changes with "
-            "pay grade, years of service, number of dependents, and the local index.<br/><br/>"
-            "Verify current ceilings on your LES and with housing / finance."
+            "<b>OHA</b> pays <b>actual rent</b> up to a grade/location ceiling + utilities "
+            "(not a flat BAH check). Keep lease and receipts.<br/><br/>"
+            "<b>COLA</b> offsets higher daily costs; amount moves with grade, YOS, "
+            "dependents, and the local index. Verify on LES / finance."
         )
         title = "YOUR POST: OHA + COLA (not BAH)"
     elif system == "BAH_PLUS_COLA":
         body = (
-            "<b>BAH</b> covers housing (flat rate by zip and dependents). "
-            "Hawaii / some territories also pay <b>COLA</b> for higher living costs — "
-            "separate from BAH, non-taxable overseas COLA rules apply.<br/><br/>"
-            "This is <b>not</b> foreign OHA. You do not submit rent receipts for BAH."
+            "<b>BAH</b> = flat housing by zip + dependents. "
+            "Plus <b>COLA</b> for higher living costs (HI / some territories). "
+            "Not foreign OHA — no rent receipts for BAH."
         )
         title = "YOUR POST: BAH + COLA"
     else:
         body = (
-            "<b>BAH</b> (Basic Allowance for Housing) is a <b>flat monthly</b> amount "
-            "based on your duty zip, pay grade, and with/without dependents. "
-            "You keep the difference if rent is lower — and cover the gap if higher.<br/><br/>"
-            "BAH is not the same as TLE (hotel). See the <b>BAH start vs report date</b> "
-            "box for when money actually hits."
+            "<b>BAH</b> is a <b>flat monthly</b> amount by duty zip, grade, and "
+            "with/without dependents. Lower rent = you keep the gap; higher rent = you cover it.<br/><br/>"
+            "BAH ≠ TLE (hotel). When BAH starts can differ from your report date — see that box later."
         )
         title = "KNOW THIS: BAH in plain English"
     return _make_callout(title, body, styles, width=width, variant="green")
 
 
 def _callout_bah_start(styles: dict[str, ParagraphStyle], width: float) -> Table:
-    """BAH / OHA start date vs report date — common finance confusion."""
+    """BAH / OHA start date vs report date — once after executive summary."""
     body = (
-        "<b>Report date</b> = the day you must be at the new unit (on your orders).<br/><br/>"
-        "<b>BAH / OHA start</b> = when housing money begins on your LES — often tied to "
-        "departure from the old duty station, arrival, or when you stop government "
-        "quarters, depending on your situation.<br/><br/>"
-        "These are <b>not always the same day</b>. A gap can leave you covering rent or "
-        "hotels out of pocket. Ask finance: <i>“When does my BAH/OHA start relative to "
-        "my report date and TLE/TLA?”</i> before you sign a lease."
+        "<b>Report date</b> = day you must be at the new unit (orders).<br/><br/>"
+        "<b>BAH / OHA start</b> = when housing money hits your LES — often tied to "
+        "leaving the old post, arrival, or leaving government quarters.<br/><br/>"
+        "These are <b>not always the same day</b>. Ask finance before you sign a lease: "
+        "<i>“When does my BAH/OHA start vs report date and TLE/TLA?”</i>"
     )
     return _make_callout(
         "KNOW THIS: BAH/OHA start vs report date",
@@ -429,6 +422,60 @@ def _callout_bah_start(styles: dict[str, ParagraphStyle], width: float) -> Table
         styles,
         width=width,
         variant="amber",
+    )
+
+
+def _callout_dla(
+    metadata: dict[str, Any],
+    styles: dict[str, ParagraphStyle],
+    width: float,
+) -> Table:
+    """Dislocation Allowance vs Travel Advance — high-value finance decision."""
+    amount = metadata.get("dla_usd")
+    with_deps = bool(metadata.get("bah_with_dependents") or metadata.get("dla_with_dependents"))
+    grade = str(metadata.get("dla_pay_grade") or metadata.get("rank") or "").split()[0] or "your grade"
+    dep_label = "with dependents relocating" if with_deps else "without dependents relocating"
+
+    if amount is not None:
+        try:
+            from services.dla_rates import format_dla_usd
+
+            amt_str = format_dla_usd(float(amount))
+        except Exception:
+            amt_str = f"${float(amount):,.2f}"
+        amount_line = (
+            f"<b>Your planning DLA:</b> {amt_str} "
+            f"({_escape(grade)}, {dep_label}). "
+            "Non-taxable; not receipt-based. Final amount is set by finance / orders."
+        )
+    else:
+        amount_line = (
+            "<b>Your DLA</b> is a flat amount based on pay grade and whether authorized "
+            "dependents are relocating. Confirm the exact figure with finance."
+        )
+
+    body = (
+        f"<b>What DLA is:</b> Dislocation Allowance is a one-time payment to help with "
+        f"PCS move-in costs the government does not fully reimburse elsewhere "
+        f"(deposits, setup, misc). It is <b>yours to keep</b> when authorized — "
+        f"not a loan.<br/><br/>"
+        f"{amount_line}<br/><br/>"
+        f"<b>DLA vs Travel Advance — do not confuse them:</b><br/>"
+        f"• <b>DLA → almost always take it</b> when you are entitled. It is an "
+        f"<b>allowance you keep</b> (subject to normal entitlement rules).<br/>"
+        f"• <b>Travel Advance → only if you truly need cash now.</b> It is a "
+        f"<b>loan against your travel settlement</b>. Finance will "
+        f"<b>recoup it from your pay (wage garnishment / LES deductions)</b> "
+        f"until the advance is paid back.<br/><br/>"
+        f"<b>Practical rule:</b> Take DLA. Skip the travel advance unless you cannot "
+        f"cover the move without borrowed cash — and budget the payback."
+    )
+    return _make_callout(
+        "MONEY MOVE: DLA vs Travel Advance",
+        body,
+        styles,
+        width=width,
+        variant="navy",
     )
 
 
@@ -504,6 +551,8 @@ def _get_insight_callout(
         return _callout_housing_allowances(metadata, styles, width)
     if key == "bah_start":
         return _callout_bah_start(styles, width)
+    if key == "dla":
+        return _callout_dla(metadata, styles, width)
     if key in ("hhg_vs_ppm", "dity_ppm"):
         return _callout_hhg_vs_ppm(styles, width)
     if key == "cash_cushion":
@@ -517,7 +566,7 @@ def _build_quick_reference_strip(
     metadata: dict[str, Any],
     styles: dict[str, ParagraphStyle],
 ) -> Table:
-    """Two side-by-side callouts under the cover: TLE/TLA + housing type."""
+    """Once-only glossary under cover: TLE/TLA + BAH/OHA (not repeated later)."""
     half = (CONTENT_WIDTH - 0.12 * inch) / 2
     left = _callout_tle_tla(
         styles,
@@ -688,8 +737,8 @@ def _build_cover_block(
                 "<b>2.</b> Treat every <b>Decision Gate</b> as a hard stop before you sign or spend. "
                 "<b>3.</b> Run Section 5 day-by-day in the first month. "
                 "<b>4.</b> Section 8 is your short checklist. "
-                "Amber/green boxes explain TLE vs TLA, BAH/OHA start vs report date, "
-                "HHG vs PPM/weight tickets, and how to treat Decision Gates.",
+                "Callout boxes (once each): TLE/TLA, BAH or OHA, "
+                "<b>DLA vs Travel Advance</b>, BAH start vs report date, HHG vs PPM.",
                 styles["howto"],
             )
         ],
@@ -835,6 +884,16 @@ def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
     else:
         deps_label = ""
 
+    dla_amt = metadata.get("dla_usd")
+    dla_label = ""
+    if dla_amt is not None:
+        try:
+            from services.dla_rates import format_dla_usd
+
+            dla_label = format_dla_usd(float(dla_amt))
+        except Exception:
+            dla_label = f"${float(dla_amt):,.2f}"
+
     fields = [
         ("Prepared for", metadata.get("family_name", "")),
         ("Rank", metadata.get("rank", "")),
@@ -843,6 +902,7 @@ def _metadata_lines(metadata: dict[str, Any]) -> list[list[Any]]:
         ("Moving to", metadata.get("to_installation", "")),
         ("Move window", metadata.get("move_window", "")),
         ("Primary priority", metadata.get("primary_priority", "")),
+        ("DLA (planning)", dla_label),
     ]
     styles = _build_styles()
     for label, value in fields:
@@ -1279,6 +1339,12 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         current_package=current_pkg,
     )
 
+    # DLA: with-dependents rate when dependents relocate (num_deps > 0)
+    from services.dla_rates import get_dla_rate
+
+    dla_with = num_deps > 0
+    dla_info = get_dla_rate(pay_grade or "E-5", with_dependents=dla_with)
+
     return {
         "family_name": family_name,
         "rank": rank,
@@ -1299,4 +1365,8 @@ def build_pdf_metadata(form_data: dict[str, Any]) -> dict[str, Any]:
         "housing_system": gaining_pkg.get("housing_system"),
         "cola_monthly_usd": gaining_pkg.get("cola_monthly_usd"),
         "cola_index": gaining_pkg.get("cola_index"),
+        "dla_usd": dla_info.get("dla_usd"),
+        "dla_with_dependents": dla_with,
+        "dla_pay_grade": dla_info.get("pay_grade"),
+        "dla_effective_date": dla_info.get("effective_date"),
     }
