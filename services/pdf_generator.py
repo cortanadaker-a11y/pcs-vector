@@ -48,11 +48,9 @@ BOLD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 ITALIC_PATTERN = re.compile(r"(?<!\*)\*([^*]+?)\*(?!\*)")
 TABLE_SEP_PATTERN = re.compile(r"^\|[\s\-:|]+\|$")
 
-# Cover strip: TLE/TLA | DLA (once). Later sections: only non-overlapping topics.
-_INJECT_AFTER_SECTION: dict[int, list[str]] = {
-    3: ["off_post_utilities"],  # realistic monthly utility ranges by area
-    4: ["financial_numbers"],  # personalized HHG/PPM + cash from this Soldier's inputs
-}
+# Cover strip only for glossary callouts. Section 3–4 numbers live in the report body
+# (utilities table + DITY/cash math) so we do not repeat them in side boxes.
+_INJECT_AFTER_SECTION: dict[int, list[str]] = {}
 
 
 class PDFGenerationError(Exception):

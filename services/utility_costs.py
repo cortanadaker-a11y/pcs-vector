@@ -12,6 +12,29 @@ from typing import Any
 # electric_low/high, gas_or_heat_low/high, water_trash_low/high, internet_low/high (USD/mo)
 # total_low/high = sum of lows / sum of highs for quick BAH math.
 _UTILITY_BY_INSTALL: dict[str, dict[str, Any]] = {
+    "Fort Sam Houston, TX": {
+        "areas": [
+            {
+                "name": "San Antonio NE / Schertz / Universal City",
+                "zips": ["78154", "78148", "78233"],
+                "electric": (120, 250),
+                "gas_or_heat": (20, 55),
+                "water_trash": (55, 100),
+                "internet": (60, 95),
+                "season_note": "Summer AC is the spike; many leases exclude electric — read the lease.",
+            },
+            {
+                "name": "Converse / Live Oak corridor",
+                "zips": ["78109", "78233"],
+                "electric": (115, 240),
+                "gas_or_heat": (20, 55),
+                "water_trash": (50, 95),
+                "internet": (55, 90),
+                "season_note": "Confirm JBSA gate (Sam Houston vs Randolph) against commute fuel cost.",
+            },
+        ],
+        "as_of": "2026 planning (San Antonio / JBSA)",
+    },
     "Fort Hood, TX": {
         "areas": [
             {

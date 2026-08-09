@@ -1908,31 +1908,101 @@ MOVE_ROUTE_MILES: dict[tuple[str, str], int] = {
 }
 
 
+def _coords_for_installation(label: str) -> tuple[float, float] | None:
+    """Lat/lon for known posts (rich profiles + common-post overrides)."""
+    canonical = _canonical_installation_name(label) or label
+    if canonical in INSTALLATIONS:
+        p = INSTALLATIONS[canonical]
+        if p.latitude and p.longitude:
+            return float(p.latitude), float(p.longitude)
+    # Posts that appear on the form but lack a full rich profile
+    overrides: dict[str, tuple[float, float]] = {
+        "Fort Sam Houston, TX": (29.4577, -98.4396),
+        "Joint Base San Antonio, TX": (29.4498, -98.5040),
+        "Camp Atterbury, IN": (39.3517, -86.0300),
+        "Dugway Proving Ground, UT": (40.1999, -112.9352),
+        "Fort Knox, KY": (37.8915, -85.9747),
+        "Fort Riley, KS": (39.0558, -96.7850),
+        "Fort Carson, CO": (38.7375, -104.7886),
+        "Fort Leavenworth, KS": (39.3456, -94.9186),
+        "Fort Polk, LA": (31.0502, -93.2066),
+        "Fort Irwin, CA": (35.2628, -116.6847),
+        "Fort Huachuca, AZ": (31.5552, -110.3495),
+        "Fort Wainwright, AK": (64.8378, -147.7164),
+        "Redstone Arsenal, AL": (34.6842, -86.6539),
+        "White Sands Missile Range, NM": (32.3865, -106.4880),
+        "Aberdeen Proving Ground, MD": (39.4723, -76.1305),
+        "Fort Meade, MD": (39.1043, -76.7430),
+        "Fort Leonard Wood, MO": (37.7400, -92.1270),
+        "Fort Jackson, SC": (34.0194, -80.8900),
+        "Fort Eustis, VA": (37.1624, -76.5788),
+        "Fort Lee, VA": (37.2350, -77.3328),
+        "Camp Humphreys, South Korea": (36.9681, 127.0334),
+        "Camp Casey, South Korea": (37.9219, 127.0547),
+        "USAG Bavaria, Germany": (49.6986, 11.7744),
+        "USAG Wiesbaden, Germany": (50.0497, 8.3256),
+        "USAG Rheinland-Pfalz, Germany": (49.4369, 7.6000),
+        "Camp Zama, Japan": (35.4900, 139.3950),
+        "Schofield Barracks, HI": (21.4950, -158.0620),
+        "Fort Shafter, HI": (21.3456, -157.8860),
+        "Fort Buchanan, PR": (18.4135, -66.1220),
+    }
+    return overrides.get(canonical)
+
+
+def _haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
+    """Great-circle distance in statute miles (planning estimate; TMO has road miles)."""
+    import math
+
+    r = 3958.8  # Earth radius miles
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlmb = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlmb / 2) ** 2
+    # Road miles ≈ 1.2× great-circle for CONUS planning
+    return max(50, int(round(2 * r * math.asin(math.sqrt(a)) * 1.18)))
+
+
 def build_move_context(current_label: str, gaining_label: str) -> dict:
     """Return move-distance context for DITY/TLE planning."""
     current = _canonical_installation_name(current_label) or current_label
     gaining = _canonical_installation_name(gaining_label) or gaining_label
-    miles = MOVE_ROUTE_MILES.get((current, gaining))
+    miles = MOVE_ROUTE_MILES.get((current, gaining)) or MOVE_ROUTE_MILES.get(
+        (gaining, current)
+    )
+    distance_source = "known_route"
+    if miles is None:
+        c1, c2 = _coords_for_installation(current), _coords_for_installation(gaining)
+        if c1 and c2:
+            miles = _haversine_miles(c1[0], c1[1], c2[0], c2[1])
+            distance_source = "estimated_from_coordinates"
     if miles is None:
         return {
             "origin": current_label,
             "destination": gaining_label,
             "approximate_miles_one_way": None,
+            "distance_source": "unknown",
             "dity_planning_note": (
                 "Verify distance with TMO; for CONUS moves over 500 miles, "
                 "full or partial DITY often nets $1,500–5,000 after expenses."
             ),
         }
     driving_days = max(2, round(miles / 500))
+    estimate_note = ""
+    if distance_source == "estimated_from_coordinates":
+        estimate_note = (
+            " (planning estimate from post locations — confirm road miles with TMO)."
+        )
     return {
         "origin": current_label,
         "destination": gaining_label,
         "approximate_miles_one_way": miles,
         "estimated_driving_days": driving_days,
+        "distance_source": distance_source,
         "dity_planning_note": (
-            f"~{miles} miles one-way ({driving_days} driving days). "
-            "Partial DITY (HHG only) often nets $1,200–3,000; full DITY can add "
-            "$1,500–4,000 if weight allowance is maximized — verify with TMO."
+            f"~{miles:,} miles one-way ({driving_days} driving days){estimate_note} "
+            "Use this distance for PPM/DITY planning; partial DITY often nets $1,200–3,000 "
+            "and full DITY more when weight allowance is maximized — verify with TMO."
         ),
     }
 
