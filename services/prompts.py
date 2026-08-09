@@ -97,10 +97,18 @@ SECTION GUIDELINES
 FORMAT
 Return ONLY markdown. Start with # PCS Vector Strategic Plan, then all 8 sections. Complete every section — never truncate. No preamble. No code fences.
 
+OCONUS (when payload theater is OCONUS or gaining post is Korea/Germany/Japan/Italy/Hawaii/PR)
+- Do NOT treat foreign posts like CONUS BAH. Foreign posts use **OHA** (rent ceiling + utilities; pays actual rent up to max) plus **COLA** (spendable-income formula; varies by grade, YOS, dependents).
+- Hawaii / Puerto Rico: BAH + COLA (not OHA). Call that out explicitly.
+- Name command sponsorship, DoDEA schools, and on-post waitlists when relevant.
+- Use housing_package figures from the payload when present (OHA rent max, utilities, COLA estimate).
+- Section 3 table should label columns OHA / COLA — never invent fake BAH for foreign posts.
+
 DATA FIDELITY
-- Use payload BAH, rents, zips, move miles, DITY math, and cash-flow figures.
+- Use payload BAH or OHA/COLA package, rents, zips, move miles, DITY math, and cash-flow figures.
 - Honor recommended DITY mode; if short-move note favors government HHG, say so.
 - Address stated concerns as risks or mitigations — not a checklist recap.
+- Never paste internal commander-brief templates verbatim — write a natural one-line brief naming their real priority.
 
 PRE-OUTPUT CHECK (do not print)
 ☐ Sounds like one NCO advising one family?
@@ -198,18 +206,60 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
         gaining=gaining,
     )
 
+    # OHA / COLA package for OCONUS (and HI/PR) — drives accurate housing section
+    housing_package: dict[str, Any] = {}
+    try:
+        from services.housing_allowances import get_housing_package, resolve_num_dependents
+
+        with_deps = True
+        fs = str(form_data.get("family_status") or "")
+        if fs.lower().startswith("single"):
+            with_deps = False
+        deps_n = resolve_num_dependents(
+            with_dependents=with_deps,
+            num_dependents=form_data.get("num_dependents"),
+            family_status=fs,
+            num_children=num_children,
+        )
+        pkg = get_housing_package(
+            gaining,
+            form_data.get("rank_pay_grade", "E-5"),
+            with_dependents=deps_n > 0,
+            years_of_service=form_data.get("years_of_service", 4),
+            num_dependents=deps_n,
+        )
+        housing_package = {
+            "housing_system": pkg.get("housing_system"),
+            "housing_monthly_usd": pkg.get("housing_monthly_usd"),
+            "oha_rent_max_usd": pkg.get("oha_rent_max_usd"),
+            "oha_utility_usd": pkg.get("oha_utility_usd"),
+            "cola_monthly_usd": pkg.get("cola_monthly_usd"),
+            "cola_index": pkg.get("cola_index"),
+            "total_monthly_usd": pkg.get("total_monthly_usd"),
+            "num_dependents": deps_n,
+            "years_of_service": pkg.get("years_of_service"),
+            "disclaimer": pkg.get("disclaimer"),
+        }
+    except Exception:
+        housing_package = {}
+
     payload = {
         "generated_at": datetime.now().strftime("%B %d, %Y"),
         "family_name": family_name,
         "move": {
             "rank_pay_grade": rank,
+            "years_of_service": form_data.get("years_of_service"),
             "current_installation": resolved_current_installation(form_data),
             "gaining_installation": gaining,
             "move_window": form_data.get("move_window"),
             "move_flexibility": form_data.get("move_flexibility"),
+            "theater": getattr(profile, "theater", None)
+            or (install_ctx.get("theater") if isinstance(install_ctx, dict) else None),
         },
         "family": {
             "spouse_career": resolved_spouse_career(form_data),
+            "family_status": form_data.get("family_status"),
+            "num_dependents": form_data.get("num_dependents"),
             "num_children": form_data.get("num_children", 0),
             "child_age_ranges": form_data.get("child_age_ranges", []),
             "pets": form_data.get("has_pets"),
@@ -221,6 +271,7 @@ def build_user_prompt(form_data: dict[str, Any]) -> str:
             "budget_mode": form_data.get("budget_mode"),
             "max_monthly_budget": form_data.get("max_monthly_budget", 0),
             "must_haves": resolved_housing_must_haves(form_data),
+            "housing_package": housing_package,
         },
         "priorities": priority_summary(form_data),
         "other_priorities": form_data.get("other_priorities", ""),

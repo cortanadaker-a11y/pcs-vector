@@ -122,24 +122,29 @@ def build_soldier_context(
 
 
 def _command_briefing_line(priority: str, short_name: str, pay_grade: str) -> str:
-    """Template for the one-line commander conversation."""
+    """Natural one-line commander conversation (never paste as boilerplate)."""
     if "Spouse career" in priority:
         return (
-            f"Commander brief: 'We are executing a {short_name} PCS with spouse employment "
-            f"as the critical path — requesting {pay_grade} reporting flexibility only if "
-            f"licensure/childcare slips past day 21.'"
+            f"Commander brief: 'We're executing a {short_name} PCS with spouse employment "
+            f"as the main priority — requesting {pay_grade} reporting flexibility only if "
+            f"licensure or childcare slips past day 21.'"
         )
     if "Minimizing total costs" in priority:
         return (
-            f"Commander brief: 'Move is cost-optimized via on-post/TLE/DITY sequencing — "
-            f"no forecast impact to readiness; will confirm housing lock by day 10.'"
+            f"Commander brief: 'Housing and TLE are locked to protect the family budget "
+            f"at {short_name} — no readiness impact expected; will confirm lease by day 10.'"
         )
     if "Fastest" in priority:
         return (
-            f"Commander brief: 'Reporting on time; parallel-tracking housing and in-processing "
-            f"to minimize family disruption — housing decision by day 7.'"
+            f"Commander brief: 'Reporting on time to {short_name}; housing and in-processing "
+            f"are lined up together so the family is not waiting — housing decision by day 7.'"
+        )
+    if "School" in priority:
+        return (
+            f"Commander brief: 'PCS plan for {short_name} is driven by school zoning — "
+            f"we will not sign a lease until districts confirm placement.'"
         )
     return (
-        f"Commander brief: 'PCS plan locked for {short_name} — primary risk is housing/childcare "
-        f"timing; mitigation in place before reporting date.'"
+        f"Commander brief: 'PCS plan locked for {short_name} — family housing and "
+        f"settling timeline are the main risks, and we have mitigations before report date.'"
     )

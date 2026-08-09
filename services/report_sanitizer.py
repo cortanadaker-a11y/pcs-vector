@@ -22,6 +22,22 @@ _REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bsequenced process\b", re.I), "step-by-step plan"),
     (re.compile(r"\bsequencing\b", re.I), "timing"),
     (re.compile(r"\bsequenced\b", re.I), "timed"),
+    # Legacy commander-brief paste that leaked into many older generations
+    (
+        re.compile(
+            r"Move is cost-optimized via on-post/TLE/DITY(?:\s+(?:timing|sequencing))?"
+            r"[^.\"']*",
+            re.I,
+        ),
+        "Housing and TLE are locked to protect the family budget",
+    ),
+    (
+        re.compile(
+            r"primary risk is housing/childcare timing(?:; mitigation in place before reporting date)?",
+            re.I,
+        ),
+        "family housing and settling timeline are the main risks, with mitigations before report date",
+    ),
     (re.compile(r"  +"), " "),
 )
 

@@ -10,3 +10,4 @@ __pycache__/
 data/checkout_forms/
 data/checkout_drafts/
 data/order_index/
+test_output/
