@@ -12,8 +12,7 @@ from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
     INTEREST_OPTIONS,
-    build_one_click_submit_html,
-    build_prefill_url,
+    build_redirect_to_form_html,
     build_referral_row,
     format_dependents_label,
     format_rank_label,
@@ -24,9 +23,7 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def _clean_email(raw: str | None) -> str:
-    """Normalize pasted emails (strip spaces / invisible chars)."""
     text = (raw or "").strip()
-    # Remove zero-width / non-breaking spaces from mobile paste
     for ch in ("\u200b", "\u200c", "\u200d", "\ufeff", "\xa0"):
         text = text.replace(ch, "")
     return text.strip()
@@ -96,7 +93,6 @@ def _render_referral_hook() -> None:
         st.divider()
         st.markdown("##### How we reach you")
 
-        # st.form guarantees widget values are captured with the submit click
         with st.form("referral_form", clear_on_submit=False):
             n1, n2 = st.columns(2)
             with n1:
@@ -133,7 +129,6 @@ def _render_referral_hook() -> None:
             )
 
         if submitted:
-            # Prefer session_state — most reliable with forms
             first_name = str(st.session_state.get("referral_first_name") or first_name or "")
             last_name = str(st.session_state.get("referral_last_name") or last_name or "")
             email_address = _clean_email(
@@ -165,25 +160,18 @@ def _render_referral_hook() -> None:
             else:
                 st.session_state.referral_lead = {**row, "calculator": live}
 
-                script_ok, _script_msg = submit_referral_via_apps_script(row)
+                # Optional Sheet webhook (if configured)
+                submit_referral_via_apps_script(row)
 
+                # One click → jump to Google Form with fields already filled
                 st.html(
-                    build_one_click_submit_html(row),
+                    build_redirect_to_form_html(row),
                     unsafe_allow_javascript=True,
                 )
-
-                if script_ok:
-                    st.success(
-                        f"You’re in — referral saved for **{row['Destination']}**."
-                    )
-                else:
-                    st.success(
-                        f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
-                    )
-                    st.caption(
-                        "If it doesn’t show in Form Responses within a minute, "
-                        f"[open this pre-filled form]({build_prefill_url(row)}) and click Submit once."
-                    )
+                st.info(
+                    "Taking you to the Google Form with your info filled in… "
+                    "Click **Submit** on that page to finish."
+                )
 
 
 def _render_faq() -> None:
