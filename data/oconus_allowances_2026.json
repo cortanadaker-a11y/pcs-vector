@@ -341,6 +341,33 @@
       "cola_index": 124,
       "cola_index_effective": "2025-03-16",
       "currency_note": "Non-foreign OCONUS: BAH (bah_2026.json) plus OCONUS COLA from spendable-income formula. Not OHA."
+    },
+    "Joint Base Elmendorf-Richardson, AK": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA (Alaska)",
+      "locality": "Anchorage (incl Eagle River / JBER)",
+      "cola_code": "AK001",
+      "cola_index": 128,
+      "cola_index_effective": "2026-01-01",
+      "currency_note": "Non-foreign OCONUS: BAH plus OCONUS COLA (Alaska). Not OHA. Verify current index on DTMO / LES."
+    },
+    "Fort Wainwright, AK": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA (Alaska)",
+      "locality": "Fairbanks",
+      "cola_code": "AK049",
+      "cola_index": 130,
+      "cola_index_effective": "2026-01-01",
+      "currency_note": "Non-foreign OCONUS: BAH plus OCONUS COLA (Fairbanks). Not OHA. Verify current index on DTMO / LES."
+    },
+    "Fort Greely, AK": {
+      "housing_system": "BAH_PLUS_COLA",
+      "country": "USA (Alaska)",
+      "locality": "Delta Junction / Greely",
+      "cola_code": "AK049",
+      "cola_index": 130,
+      "cola_index_effective": "2026-01-01",
+      "currency_note": "Non-foreign OCONUS: BAH plus OCONUS COLA (interior Alaska). Not OHA. Verify current index on DTMO / LES."
     }
   }
 }

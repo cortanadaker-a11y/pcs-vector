@@ -289,6 +289,127 @@ _UTILITY_BY_INSTALL: dict[str, dict[str, Any]] = {
         ],
         "as_of": "2026 planning (Korea off-post; OHA utility allowance separate)",
     },
+    "Camp Casey, South Korea": {
+        "areas": [
+            {
+                "name": "Dongducheon / off-post near Casey",
+                "zips": [],
+                "electric": (75, 170),
+                "gas_or_heat": (70, 220),
+                "water_trash": (30, 65),
+                "internet": (30, 55),
+                "season_note": "Cold winters; many unaccompanied tours. Confirm which utilities the landlord includes.",
+            },
+        ],
+        "as_of": "2026 planning (Korea north of Seoul; OHA utility allowance separate)",
+    },
+    "Camp Zama, Japan": {
+        "areas": [
+            {
+                "name": "Zama / Sagamihara corridor",
+                "zips": [],
+                "electric": (90, 200),
+                "gas_or_heat": (50, 160),
+                "water_trash": (35, 80),
+                "internet": (40, 75),
+                "season_note": "Japanese leases often split utilities; ask for prior-year bills. OHA utility allowance is separate.",
+            },
+        ],
+        "as_of": "2026 planning (Camp Zama / Kanagawa)",
+    },
+    "USAG Italy, Italy": {
+        "areas": [
+            {
+                "name": "Vicenza / nearby villages",
+                "zips": [],
+                "electric": (95, 190),
+                "gas_or_heat": (70, 200),
+                "water_trash": (35, 80),
+                "internet": (35, 65),
+                "season_note": "Winter heating matters; many Italian leases exclude utilities — get last 12 months of bills.",
+            },
+        ],
+        "as_of": "2026 planning (Vicenza; OHA utility allowance separate)",
+    },
+    "Fort Shafter, HI": {
+        "areas": [
+            {
+                "name": "Honolulu / Salt Lake / Aiea",
+                "zips": ["96818", "96701"],
+                "electric": (180, 360),
+                "gas_or_heat": (10, 30),
+                "water_trash": (60, 120),
+                "internet": (70, 110),
+                "season_note": "Hawaii electric is high year-round; AC and dryer drive the bill.",
+            },
+        ],
+        "as_of": "2026 planning (Oahu / Shafter)",
+    },
+    "Fort Buchanan, PR": {
+        "areas": [
+            {
+                "name": "Guaynabo / Bayamón / San Juan metro",
+                "zips": ["00966", "00959"],
+                "electric": (140, 280),
+                "gas_or_heat": (10, 35),
+                "water_trash": (40, 90),
+                "internet": (50, 90),
+                "season_note": "AC is the big cost; hurricane season can affect insurance and generator planning.",
+            },
+        ],
+        "as_of": "2026 planning (San Juan metro)",
+    },
+    "Joint Base Elmendorf-Richardson, AK": {
+        "areas": [
+            {
+                "name": "Anchorage NE / Eagle River",
+                "zips": ["99504", "99577"],
+                "electric": (110, 200),
+                "gas_or_heat": (120, 320),
+                "water_trash": (55, 110),
+                "internet": (70, 120),
+                "season_note": "Winter heating dominates; block heaters and higher fuel costs are real.",
+            },
+            {
+                "name": "Anchorage midtown / south",
+                "zips": ["99503", "99515"],
+                "electric": (105, 190),
+                "gas_or_heat": (110, 300),
+                "water_trash": (55, 105),
+                "internet": (70, 115),
+                "season_note": "Ask for last winter’s heating bills before you sign.",
+            },
+        ],
+        "as_of": "2026 planning (Anchorage / JBER)",
+    },
+    "Fort Wainwright, AK": {
+        "areas": [
+            {
+                "name": "Fairbanks / North Pole",
+                "zips": ["99701", "99705"],
+                "electric": (120, 220),
+                "gas_or_heat": (150, 400),
+                "water_trash": (50, 100),
+                "internet": (65, 110),
+                "season_note": "Interior Alaska winters are extreme — heating can dwarf every other utility.",
+            },
+        ],
+        "as_of": "2026 planning (Fairbanks)",
+    },
+    "Fort Greely, AK": {
+        "areas": [
+            {
+                "name": "Delta Junction / on-post area",
+                "zips": ["99737"],
+                "electric": (130, 240),
+                "gas_or_heat": (160, 420),
+                "water_trash": (45, 95),
+                "internet": (60, 120),
+                "season_note": "Very limited off-post options; heating and connectivity are the main cost risks.",
+            },
+        ],
+        "as_of": "2026 planning (Delta Junction / Greely)",
+    },
     "USAG Wiesbaden, Germany": {
         "areas": [
             {

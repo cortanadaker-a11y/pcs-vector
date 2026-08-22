@@ -304,8 +304,8 @@ INSTALLATION_DATA: dict[str, dict[str, Any]] = {
     "Fort Greely, AK": {
         "state": "AK",
         "priority": "Low",
-        "theater": "CONUS",
-        "notes": "Missile defense site. Very small community; extreme cold; most families on-post. COLA and PPM rules apply.",
+        "theater": "OCONUS",
+        "notes": "Missile defense site. Very small community; extreme cold; most families on-post. Non-foreign OCONUS COLA + PPM rules apply.",
         "major_areas": [
             "Delta Junction",
             "On-post housing",
@@ -656,8 +656,8 @@ INSTALLATION_DATA: dict[str, dict[str, Any]] = {
     "Fort Wainwright, AK": {
         "state": "AK",
         "priority": "Medium",
-        "theater": "CONUS",
-        "notes": "Special case — Alaska PCS. COLA and PPM weight restrictions apply; extreme cold, darkness, and limited road network off-post.",
+        "theater": "OCONUS",
+        "notes": "Alaska PCS — non-foreign OCONUS COLA and PPM weight rules apply; extreme cold, darkness, and limited road network off-post.",
         "major_areas": [
             "Fairbanks (north and west)",
             "North Pole",
@@ -688,8 +688,8 @@ INSTALLATION_DATA: dict[str, dict[str, Any]] = {
     "Joint Base Elmendorf-Richardson, AK": {
         "state": "AK",
         "priority": "Medium",
-        "theater": "CONUS",
-        "notes": "Joint Army/Air Force. Anchorage metro; COLA and extreme winter logistics; dual-service spouse employment possible.",
+        "theater": "OCONUS",
+        "notes": "Joint Army/Air Force. Anchorage metro; non-foreign OCONUS COLA and extreme winter logistics; dual-service spouse employment possible.",
         "major_areas": [
             "Anchorage (northeast / Eagle River)",
             "JBER on-post",

@@ -382,19 +382,40 @@ def render_bah_calculator() -> None:
             """
         )
 
+        # Always show OCONUS / HI / PR / AK package parts so COLA/OHA are visible
         if system == "OHA":
             util_oha = pkg.get("oha_utility_usd")
+            cola_note = (
+                f"COLA index {pkg.get('cola_index')}"
+                if pkg.get("cola_index") is not None
+                else "No COLA at this locality"
+            )
             _render_html(
                 f"""
                 <div class="pcs-out-split">
                     <div class="pcs-out-split-item"><span>OHA rent max</span><strong>{_money_html(oha_rent)}</strong></div>
                     <div class="pcs-out-split-item"><span>OHA utilities</span><strong>{_money_html(int(util_oha) if util_oha else None)}</strong></div>
-                    <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong></div>
+                    <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong>
+                    <div style="font-size:0.7rem;color:#6b6b66;margin-top:0.2rem;">{safe_html(cola_note)}</div></div>
                 </div>
                 """
             )
-        elif system == "BAH_PLUS_COLA" and cola:
-            st.caption(f"COLA {_money(cola)}/mo is for daily costs — not rent.")
+        elif system == "BAH_PLUS_COLA":
+            cola_note = (
+                f"Index {pkg.get('cola_index')} · daily costs, not rent"
+                if pkg.get("cola_index") is not None
+                else "Daily costs, not rent"
+            )
+            _render_html(
+                f"""
+                <div class="pcs-out-split">
+                    <div class="pcs-out-split-item"><span>BAH</span><strong>{_money_html(housing)}</strong></div>
+                    <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong>
+                    <div style="font-size:0.7rem;color:#6b6b66;margin-top:0.2rem;">{safe_html(cola_note)}</div></div>
+                    <div class="pcs-out-split-item"><span>Total</span><strong>{_money_html(total)}</strong></div>
+                </div>
+                """
+            )
 
         if current and cur and cur.get("found") and delta is not None:
             tone = "up" if delta > 0 else ("down" if delta < 0 else "flat")
@@ -486,22 +507,36 @@ def render_bah_calculator() -> None:
             if commute:
                 st.caption(commute)
             if areas:
-                st.caption((util_ctx.get("as_of") or "2026") + " · typical 3BR utilities")
+                st.caption(
+                    (util_ctx.get("as_of") or "2026")
+                    + " · typical 3-bedroom off-post ranges (electric, heat/gas, water/trash, internet)"
+                )
+                if not util_ctx.get("found", True):
+                    st.caption("Using a regional estimate — local bills can differ.")
                 rows = []
-                for a in areas[:4]:
+                for a in areas[:5]:
                     tot = a.get("total_utilities_usd_mo") or {}
                     e = a.get("electric_usd_mo") or {}
                     gas = a.get("gas_or_heat_usd_mo") or {}
+                    w = a.get("water_trash_usd_mo") or {}
+                    net = a.get("internet_usd_mo") or {}
                     rows.append(
                         {
                             "Area": a.get("name", "—"),
                             "Electric": f"${e.get('low', 0)}–${e.get('high', 0)}",
-                            "Heat": f"${gas.get('low', 0)}–${gas.get('high', 0)}",
-                            "Total": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
+                            "Heat / gas": f"${gas.get('low', 0)}–${gas.get('high', 0)}",
+                            "Water / trash": f"${w.get('low', 0)}–${w.get('high', 0)}",
+                            "Internet": f"${net.get('low', 0)}–${net.get('high', 0)}",
+                            "Total / mo": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
                         }
                     )
                 st.dataframe(rows, use_container_width=True, hide_index=True)
                 if areas[0].get("season_note"):
                     st.caption(areas[0]["season_note"])
+                if system == "OHA":
+                    st.caption(
+                        "OHA already includes a utilities allowance in your package above — "
+                        "use this table to compare real-world bills."
+                    )
 
-        st.caption("Planning figures · verify LES / finance before you sign.")
+        st.caption("Planning figures · verify LES / finance / DTMO before you sign.")

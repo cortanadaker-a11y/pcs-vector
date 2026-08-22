@@ -96,7 +96,7 @@ def _render_faq() -> None:
             "**Free?** Yes.\n\n"
             "**BAH** — Flat U.S. housing pay. Keep the leftover if rent is lower.\n\n"
             "**OHA** — Overseas: actual rent up to a max, plus utilities.\n\n"
-            "**COLA** — Extra for higher daily costs overseas / HI / PR. Not for rent.\n\n"
+            "**COLA** — Extra for higher daily costs overseas, Alaska, Hawaii, and Puerto Rico. Not for rent.\n\n"
             "**DLA** — One-time move money when authorized. Confirm with finance.\n\n"
             "**Rent estimates** — Planning ranges by family size (1–4 bedrooms), not official rates.\n\n"
             "**Official?** Allowances from DoD tables — verify on your LES before you sign."
