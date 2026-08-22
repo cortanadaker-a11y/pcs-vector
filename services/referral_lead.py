@@ -145,13 +145,13 @@ def _apps_script_url() -> str:
 
 def _entry_map() -> dict[str, str]:
     secret_keys = {
+        "Email address": "entry_email_address",
         "Destination": "entry_destination",
         "First Name": "entry_first_name",
         "Last Name": "entry_last_name",
         "Rank": "entry_rank",
         "Number of Dependents": "entry_dependents",
         "Rent/Buy/Not Sure": "entry_rent_buy_not_sure",
-        "Email address": "entry_email_address",
     }
     mapping = dict(_DEFAULT_ENTRIES)
     for header, secret_key in secret_keys.items():
