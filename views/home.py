@@ -8,14 +8,13 @@ from components.bah_calculator import get_calculator_snapshot, render_bah_calcul
 from components.content import TRUST_SIGNALS
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
-from services.referral_lead import (  # noqa: I001
+from services.referral_lead import (
     INTEREST_OPTIONS,
     REFERRAL_COLUMNS,
     build_prefill_url,
     build_referral_row,
     format_dependents_label,
     format_rank_label,
-    format_rent_range,
     google_form_configured,
     submit_referral_to_google_form,
 )
@@ -34,19 +33,14 @@ def _render_header() -> None:
 
 
 def _calc_fields_from_snap(snap: dict) -> dict[str, str]:
-    """Pull Destination / Rank / Dependents / Rent Range from calculator snapshot."""
-    grade = str(snap.get("pay_grade") or "E-5")
+    """Carry-over fields from what the Soldier entered in the calculator."""
+    grade = str(snap.get("pay_grade") or "")
     num_deps = int(snap.get("num_dependents") or 0)
     return {
         "destination": str(snap.get("gaining_installation") or "").strip(),
-        "rank": format_rank_label(grade, PAY_GRADE_TO_RANK.get(grade)),
+        "rank": format_rank_label(grade, PAY_GRADE_TO_RANK.get(grade)) if grade else "",
         "dependents": format_dependents_label(
             with_dependents=num_deps > 0, num_dependents=num_deps
-        ),
-        "rent_range": format_rent_range(
-            snap.get("market_rent_low_usd"),
-            snap.get("market_rent_high_usd"),
-            snap.get("market_rent_mid_usd"),
         ),
     }
 
@@ -70,30 +64,28 @@ def _render_referral_hook() -> None:
 
     with st.container(border=True):
         if not calc["destination"]:
-            st.info("Run the calculator above first — Destination, Rank, and Dependents come from there.")
+            st.info("Use the calculator above first — your New post, Rank, and Dependents carry over automatically.")
 
-        # Always mirror calculator (no re-entry for Destination / Rank / Dependents)
         st.markdown("##### From your calculator")
-        m1, m2 = st.columns(2)
-        with m1:
+        c1, c2, c3 = st.columns(3)
+        with c1:
             st.markdown(f"**Destination**  \n{calc['destination'] or '—'}")
+        with c2:
             st.markdown(f"**Rank**  \n{calc['rank'] or '—'}")
-        with m2:
+        with c3:
             st.markdown(f"**Dependents**  \n{calc['dependents'] or '—'}")
-            if calc["rent_range"]:
-                st.markdown(f"**Rent range**  \n{calc['rent_range']}")
 
         st.divider()
-        st.markdown("##### Your contact info")
+        st.markdown("##### How we reach you")
 
-        c1, c2 = st.columns(2)
-        with c1:
+        n1, n2 = st.columns(2)
+        with n1:
             first_name = st.text_input(
                 "First Name",
                 key="referral_first_name",
                 placeholder="First name",
             )
-        with c2:
+        with n2:
             last_name = st.text_input(
                 "Last Name",
                 key="referral_last_name",
@@ -113,18 +105,6 @@ def _render_referral_hook() -> None:
             key="referral_rent_buy_not_sure",
         )
 
-        # Prefill rent range from calculator; allow tweak
-        if calc["rent_range"] and st.session_state.get("referral_rent_range_src") != calc["rent_range"]:
-            st.session_state.referral_rent_range = calc["rent_range"]
-            st.session_state.referral_rent_range_src = calc["rent_range"]
-
-        rent_range = st.text_input(
-            "Rent Range",
-            key="referral_rent_range",
-            placeholder="$1,200–$1,650/mo",
-            help="Filled from the calculator — change if you want a different target.",
-        )
-
         st.caption("Free · Built For Soldiers; By Soldiers")
 
         if st.button(
@@ -142,7 +122,6 @@ def _render_referral_hook() -> None:
                 last_name=last_name or "",
                 rank=live_calc["rank"],
                 rent_buy_not_sure=str(rent_buy_not_sure or ""),
-                rent_range=(rent_range or live_calc["rent_range"] or ""),
                 dependents=live_calc["dependents"],
                 email_address=email_address or "",
             )
@@ -176,12 +155,12 @@ def _render_referral_hook() -> None:
                     )
                     if msg:
                         st.caption(msg)
-                    st.caption("Answers are pre-filled. Click Submit on the Form.")
+                    st.caption("Your calculator answers are pre-filled. Click Submit on the Form.")
 
                 with st.expander("What we captured", expanded=False):
                     st.json(
                         {
-                            k: row[k]
+                            k: row.get(k, "")
                             for k in list(REFERRAL_COLUMNS)
                             + ["Dependents", "Email address"]
                         }

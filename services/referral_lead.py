@@ -3,39 +3,38 @@
 Live Form:
   https://docs.google.com/forms/d/e/1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/viewform
 
-Form questions → entry IDs (from FB_PUBLIC_LOAD_DATA_):
+Form questions → entry IDs:
   Destination          → entry.159372216
   First Name           → entry.1546051705
   Last Name            → entry.1445033394
   Rank                 → entry.1001940560
   Rent/Buy/Not Sure    → entry.1608004035
-  Rent Range           → entry.132029913
 
-Not on Form yet (still collected in-app for follow-up):
-  Dependents, Email address — add these questions, then re-share viewform to map IDs.
+(Rent Range removed from the app — do not send.)
+Not on Form yet (still collected in-app): Dependents, Email address.
 """
 
 from __future__ import annotations
 
 import logging
 import os
+import re
 from typing import Any
+from urllib.parse import urlencode
 
 import requests
 
 logger = logging.getLogger("pcs_vector.referral")
 
-# Exact Google Form question titles (Sheet column headers after link)
+# Fields we POST / prefill to the Google Form
 REFERRAL_COLUMNS = (
     "Destination",
     "First Name",
     "Last Name",
     "Rank",
     "Rent/Buy/Not Sure",
-    "Rent Range",
 )
 
-# Extra in-app fields (add matching Form questions when ready)
 EXTRA_COLUMNS = (
     "Dependents",
     "Email address",
@@ -43,7 +42,6 @@ EXTRA_COLUMNS = (
 
 INTEREST_OPTIONS = ("Rent", "Buy", "Not sure")
 
-# Defaults from published Form (override via secrets if IDs ever change)
 _DEFAULT_FORM_ACTION = (
     "https://docs.google.com/forms/d/e/"
     "1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/formResponse"
@@ -54,7 +52,6 @@ _DEFAULT_ENTRIES = {
     "Last Name": "entry.1445033394",
     "Rank": "entry.1001940560",
     "Rent/Buy/Not Sure": "entry.1608004035",
-    "Rent Range": "entry.132029913",
 }
 
 
@@ -65,14 +62,12 @@ def build_referral_row(
     last_name: str,
     rank: str,
     rent_buy_not_sure: str,
-    rent_range: str = "",
     dependents: str = "",
     email_address: str = "",
 ) -> dict[str, str]:
     """Return a row dict keyed by Form question titles (+ extras)."""
     interest = (rent_buy_not_sure or "").strip()
     if interest not in INTEREST_OPTIONS:
-        # Accept close variants
         low = interest.lower()
         if "rent" in low:
             interest = "Rent"
@@ -80,17 +75,15 @@ def build_referral_row(
             interest = "Buy"
         else:
             interest = "Not sure"
-    row = {
+    return {
         "Destination": (destination or "").strip(),
         "First Name": (first_name or "").strip(),
         "Last Name": (last_name or "").strip(),
         "Rank": (rank or "").strip(),
         "Rent/Buy/Not Sure": interest,
-        "Rent Range": (rent_range or "").strip(),
         "Dependents": (dependents or "").strip(),
         "Email address": (email_address or "").strip(),
     }
-    return row
 
 
 def format_dependents_label(*, with_dependents: bool, num_dependents: int) -> str:
@@ -108,16 +101,6 @@ def format_rank_label(pay_grade: str | None, rank_name: str | None = None) -> st
     if grade and name and name != grade:
         return f"{grade} — {name}"
     return grade or name or ""
-
-
-def format_rent_range(low: int | None, high: int | None, mid: int | None = None) -> str:
-    if low is not None and high is not None:
-        if mid is not None:
-            return f"${int(low):,}–${int(high):,}/mo (mid ~${int(mid):,})"
-        return f"${int(low):,}–${int(high):,}/mo"
-    if mid is not None:
-        return f"~${int(mid):,}/mo"
-    return ""
 
 
 def _from_secrets(path: str) -> str | None:
@@ -153,14 +136,12 @@ def _form_action_url() -> str:
 
 
 def _entry_map() -> dict[str, str]:
-    """Map Form question title → entry.ID (secrets override defaults)."""
     secret_keys = {
         "Destination": "entry_destination",
         "First Name": "entry_first_name",
         "Last Name": "entry_last_name",
         "Rank": "entry_rank",
         "Rent/Buy/Not Sure": "entry_rent_buy_not_sure",
-        "Rent Range": "entry_rent_range",
         "Dependents": "entry_dependents",
         "Email address": "entry_email_address",
     }
@@ -176,11 +157,9 @@ def _entry_map() -> dict[str, str]:
 
 def build_prefill_url(row: dict[str, str]) -> str:
     """Build a Google Form pre-filled link (Soldier clicks Submit once)."""
-    from urllib.parse import urlencode
-
     view = _form_action_url().replace("/formResponse", "/viewform")
     entries = _entry_map()
-    params = {"usp": "pp_url"}
+    params: dict[str, str] = {"usp": "pp_url"}
     for header in REFERRAL_COLUMNS:
         eid = entries.get(header)
         if eid:
@@ -193,13 +172,13 @@ def build_prefill_url(row: dict[str, str]) -> str:
 
 
 def submit_referral_to_google_form(row: dict[str, str]) -> tuple[bool, str]:
-    """POST mapped fields to Google Form. Skips extras with no entry ID yet."""
+    """POST mapped calculator + contact fields to Google Form."""
     url = _form_action_url()
     if not url or "formResponse" not in url:
         return False, "Google Form is not configured yet."
 
     entries = _entry_map()
-    payload = {}
+    payload: dict[str, str] = {}
     for header in REFERRAL_COLUMNS:
         eid = entries.get(header)
         if eid:
@@ -207,19 +186,16 @@ def submit_referral_to_google_form(row: dict[str, str]) -> tuple[bool, str]:
 
     for header in EXTRA_COLUMNS:
         eid = entries.get(header)
-        if eid and header in row:
+        if eid and row.get(header):
             payload[eid] = row.get(header, "")
 
     if not payload:
         return False, "No Google Form entry IDs configured."
 
     try:
-        # Prefetch viewform for fbzx cookie/session (helps some Forms)
         view = url.replace("/formResponse", "/viewform")
         session = requests.Session()
         html = session.get(view, timeout=15).text
-        import re
-
         fbzx_m = re.search(r'name="fbzx"\s+value="([^"]+)"', html)
         if fbzx_m:
             payload["fbzx"] = fbzx_m.group(1)
@@ -246,7 +222,6 @@ def submit_referral_to_google_form(row: dict[str, str]) -> tuple[bool, str]:
         if resp.status_code >= 400:
             logger.warning("Google Form submit failed: %s %s", resp.status_code, resp.text[:200])
             return False, f"Form submit failed (HTTP {resp.status_code})."
-        # Some Forms return 200 without the confirmation string
         return True, "Submitted to Google Form."
     except requests.RequestException as exc:
         logger.exception("Google Form submit error")
@@ -261,7 +236,6 @@ __all__ = [
     "build_referral_row",
     "format_dependents_label",
     "format_rank_label",
-    "format_rent_range",
     "google_form_configured",
     "submit_referral_to_google_form",
 ]
