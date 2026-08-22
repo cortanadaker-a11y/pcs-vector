@@ -1,4 +1,4 @@
-"""Sidebar for PCS Vector (single-page calculator)."""
+"""Sidebar for PCS Vector."""
 
 from __future__ import annotations
 
@@ -29,8 +29,8 @@ def render_sidebar() -> str:
         st.caption("Built For Soldiers; By Soldiers")
         st.divider()
         st.markdown(
-            f"Free BAH / OHA / COLA calculator · **{len(SUPPORTED_INSTALLATIONS)}** posts · "
-            "utilities · DLA · buy/rent referral"
+            f"Free calculator for housing money at **{len(SUPPORTED_INSTALLATIONS)}** Army posts — "
+            "BAH, OHA, COLA, utilities, DLA, and help finding a place to buy or rent."
         )
-        st.caption("Always verify with finance / DTMO.")
+        st.caption("Always double-check numbers with finance before you sign anything.")
     return "home"

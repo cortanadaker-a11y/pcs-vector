@@ -29,8 +29,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
     menu_items={
         "About": (
-            "PCS Vector helps soon-to-PCS Soldiers evaluate housing allowances, "
-            "utilities, and local costs — Built For Soldiers; By Soldiers."
+            "PCS Vector helps Soldiers who are about to PCS understand housing money "
+            "and local costs. Built For Soldiers; By Soldiers."
         ),
     },
 )
