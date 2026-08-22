@@ -8,8 +8,7 @@ from components.bah_calculator import get_calculator_snapshot, render_bah_calcul
 from components.content import TRUST_SIGNALS
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
-from services.installation_data import SUPPORTED_INSTALLATIONS
-from services.referral_lead import (
+from services.referral_lead import (  # noqa: I001
     INTEREST_OPTIONS,
     REFERRAL_COLUMNS,
     build_prefill_url,
@@ -34,36 +33,35 @@ def _render_header() -> None:
     )
 
 
+def _calc_fields_from_snap(snap: dict) -> dict[str, str]:
+    """Pull Destination / Rank / Dependents / Rent Range from calculator snapshot."""
+    grade = str(snap.get("pay_grade") or "E-5")
+    num_deps = int(snap.get("num_dependents") or 0)
+    return {
+        "destination": str(snap.get("gaining_installation") or "").strip(),
+        "rank": format_rank_label(grade, PAY_GRADE_TO_RANK.get(grade)),
+        "dependents": format_dependents_label(
+            with_dependents=num_deps > 0, num_dependents=num_deps
+        ),
+        "rent_range": format_rent_range(
+            snap.get("market_rent_low_usd"),
+            snap.get("market_rent_high_usd"),
+            snap.get("market_rent_mid_usd"),
+        ),
+    }
+
+
 def _render_referral_hook() -> None:
     snap = get_calculator_snapshot() or {}
-    dest_default = snap.get("gaining_installation") or ""
-    grade_default = snap.get("pay_grade") or "E-5"
-    num_deps = int(snap.get("num_dependents") or 0)
-    with_deps = num_deps > 0
-    deps_default = format_dependents_label(
-        with_dependents=with_deps, num_dependents=num_deps
-    )
-    rank_default = format_rank_label(
-        grade_default, PAY_GRADE_TO_RANK.get(str(grade_default))
-    )
-    rent_range_default = format_rent_range(
-        snap.get("market_rent_low_usd"),
-        snap.get("market_rent_high_usd"),
-        snap.get("market_rent_mid_usd"),
-    )
-
-    installs = list(SUPPORTED_INSTALLATIONS)
-    if dest_default and dest_default not in installs:
-        installs = [dest_default] + installs
+    calc = _calc_fields_from_snap(snap)
 
     st.markdown(
         """
         <div class="pcs-ref-card">
-            <div class="pcs-ref-kicker">Free · takes under a minute</div>
+            <div class="pcs-ref-kicker">Free · under a minute</div>
             <h3 class="pcs-ref-title">Ready to find a place?</h3>
             <p class="pcs-ref-body">
-                You’ve got the money picture. Tell us where you’re headed and we’ll
-                connect you with someone who helps Soldiers rent or buy — no cost to you.
+                We’ll connect you with someone who helps Soldiers rent or buy.
             </p>
         </div>
         """,
@@ -71,27 +69,22 @@ def _render_referral_hook() -> None:
     )
 
     with st.container(border=True):
-        # Always take Rank + Dependents from the live calculator (no re-entry)
-        rank = rank_default
-        dependents = deps_default
+        if not calc["destination"]:
+            st.info("Run the calculator above first — Destination, Rank, and Dependents come from there.")
 
-        st.caption(
-            f"From calculator: {rank or '—'} · {dependents}"
-            + (f" · {dest_default}" if dest_default else "")
-        )
+        # Always mirror calculator (no re-entry for Destination / Rank / Dependents)
+        st.markdown("##### From your calculator")
+        m1, m2 = st.columns(2)
+        with m1:
+            st.markdown(f"**Destination**  \n{calc['destination'] or '—'}")
+            st.markdown(f"**Rank**  \n{calc['rank'] or '—'}")
+        with m2:
+            st.markdown(f"**Dependents**  \n{calc['dependents'] or '—'}")
+            if calc["rent_range"]:
+                st.markdown(f"**Rent range**  \n{calc['rent_range']}")
 
-        if "referral_destination" not in st.session_state and dest_default:
-            st.session_state.referral_destination = dest_default
-        # Keep rent range in sync with calculator when it changes
-        if rent_range_default:
-            st.session_state.referral_rent_range = rent_range_default
-
-        destination = st.selectbox(
-            "Destination",
-            options=installs,
-            key="referral_destination",
-            help="Your new post from the calculator (change only if needed).",
-        )
+        st.divider()
+        st.markdown("##### Your contact info")
 
         c1, c2 = st.columns(2)
         with c1:
@@ -120,14 +113,19 @@ def _render_referral_hook() -> None:
             key="referral_rent_buy_not_sure",
         )
 
+        # Prefill rent range from calculator; allow tweak
+        if calc["rent_range"] and st.session_state.get("referral_rent_range_src") != calc["rent_range"]:
+            st.session_state.referral_rent_range = calc["rent_range"]
+            st.session_state.referral_rent_range_src = calc["rent_range"]
+
         rent_range = st.text_input(
             "Rent Range",
             key="referral_rent_range",
             placeholder="$1,200–$1,650/mo",
-            help="From the calculator’s typical rent band for your family size.",
+            help="Filled from the calculator — change if you want a different target.",
         )
 
-        st.caption("Free referral · Built For Soldiers; By Soldiers · We won’t spam you.")
+        st.caption("Free · Built For Soldiers; By Soldiers")
 
         if st.button(
             "Get my free housing referral →",
@@ -135,42 +133,28 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             key="referral_submit",
         ):
-            # Re-read calculator snapshot at submit so rank/deps stay current
             live = get_calculator_snapshot() or snap
-            live_grade = live.get("pay_grade") or grade_default
-            live_deps_n = int(live.get("num_dependents") or 0)
-            live_rank = format_rank_label(
-                str(live_grade), PAY_GRADE_TO_RANK.get(str(live_grade))
-            )
-            live_deps = format_dependents_label(
-                with_dependents=live_deps_n > 0, num_dependents=live_deps_n
-            )
-            live_dest = live.get("gaining_installation") or destination
-            live_rent = format_rent_range(
-                live.get("market_rent_low_usd"),
-                live.get("market_rent_high_usd"),
-                live.get("market_rent_mid_usd"),
-            ) or (rent_range or "")
+            live_calc = _calc_fields_from_snap(live)
 
             row = build_referral_row(
-                destination=str(destination or live_dest or ""),
+                destination=live_calc["destination"],
                 first_name=first_name or "",
                 last_name=last_name or "",
-                rank=live_rank,
+                rank=live_calc["rank"],
                 rent_buy_not_sure=str(rent_buy_not_sure or ""),
-                rent_range=live_rent,
-                dependents=live_deps,
+                rent_range=(rent_range or live_calc["rent_range"] or ""),
+                dependents=live_calc["dependents"],
                 email_address=email_address or "",
             )
 
-            if not row["First Name"] or not row["Last Name"]:
+            if not live_calc["destination"]:
+                st.error("Set New post in the calculator above first.")
+            elif not row["First Name"] or not row["Last Name"]:
                 st.error("Enter your first and last name.")
             elif not row["Email address"] or "@" not in row["Email address"]:
                 st.error("Enter a valid email address.")
-            elif not row["Destination"]:
-                st.error("Pick a destination.")
             else:
-                st.session_state.referral_lead = {**row, "calculator": snap}
+                st.session_state.referral_lead = {**row, "calculator": live}
                 prefill = build_prefill_url(row)
 
                 ok = False
@@ -192,9 +176,7 @@ def _render_referral_hook() -> None:
                     )
                     if msg:
                         st.caption(msg)
-                    st.caption(
-                        "Your answers are pre-filled. Click Submit on the Form page."
-                    )
+                    st.caption("Answers are pre-filled. Click Submit on the Form.")
 
                 with st.expander("What we captured", expanded=False):
                     st.json(
