@@ -31,13 +31,13 @@ def _money(n: int | None) -> str:
 
 
 def _money_html(n: int | None) -> str:
-    """Money for HTML blocks — avoid Streamlit LaTeX ($...$) mangling."""
-    return _money(n).replace("$", "&#36;")
+    """Money for st.html() blocks (real $ — not markdown/LaTeX)."""
+    return _money(n)
 
 
-def _html_dollars(text: str) -> str:
-    """Neutralize $ in pre-built HTML/text so markdown won't treat it as LaTeX."""
-    return (text or "").replace("$", "&#36;")
+def _render_html(block: str) -> None:
+    """Render HTML without Streamlit markdown/LaTeX (fixes broken $ and raw tags)."""
+    st.html(block)
 
 
 def _deps_label(n: int) -> str:
@@ -318,13 +318,11 @@ def render_bah_calculator() -> None:
             )
             fit_tone = "tight"
 
-        gap_html = (
-            safe_html(move_gap_label)
-            if move_gap_label == "Covered by DLA"
-            else _html_dollars(move_gap_label)
+        gap_html = safe_html(move_gap_label) if move_gap_label == "Covered by DLA" else _money_html(
+            arrive["net"]
         )
 
-        st.markdown(
+        _render_html(
             f"""
             <div class="pcs-sticky-results">
                 <div class="pcs-out-label">{safe_html(gaining)} · {safe_html(system_chip)}</div>
@@ -352,8 +350,7 @@ def render_bah_calculator() -> None:
                     <div><b>Cash gap</b><br>{gap_html}</div>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # What-if: low / mid / high rent against the same allowance
@@ -378,27 +375,25 @@ def render_bah_calculator() -> None:
                 f'<div class="pcs-scen-left">{left_lbl}<span> left</span></div>'
                 f"</div>"
             )
-        st.markdown(
+        _render_html(
             f"""
             <div class="pcs-scen-wrap">
                 <div class="pcs-scen-title">If you rent low / mid / high — leftover from {safe_html(primary_k)}</div>
                 <div class="pcs-scen-grid">{scen_html}</div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         if system == "OHA":
             util_oha = pkg.get("oha_utility_usd")
-            st.markdown(
+            _render_html(
                 f"""
                 <div class="pcs-out-split">
                     <div class="pcs-out-split-item"><span>Rent ceiling</span><strong>{_money_html(oha_rent)}</strong></div>
                     <div class="pcs-out-split-item"><span>OHA utilities</span><strong>{_money_html(int(util_oha) if util_oha else None)}</strong></div>
                     <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong></div>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
         elif system == "BAH_PLUS_COLA" and cola:
             st.caption(f"COLA {_money(cola)}/mo is for day-to-day costs — don’t spend it on rent.")
@@ -467,7 +462,7 @@ def render_bah_calculator() -> None:
                 )
 
             checks_html = "".join(f"<li>{c}</li>" for c in checks)
-            st.markdown(
+            _render_html(
                 f"""
                 <div class="pcs-bah-delta pcs-bah-delta-{tone} pcs-out-compare">
                     <div class="pcs-out-compare-title">Allowance: {safe_html(current)} → {safe_html(gaining)}</div>
@@ -503,8 +498,7 @@ def render_bah_calculator() -> None:
                     <div class="pcs-out-checks-title">Your next moves</div>
                     <ul class="pcs-out-checks">{checks_html}</ul>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
         else:
             checks = []
@@ -526,14 +520,13 @@ def render_bah_calculator() -> None:
                 checks.append(f"Move-in cash beyond DLA: ~{_money_html(arrive['net'])}")
             checks.append("Set Coming from to compare allowances and local rents to your current post")
             checks_html = "".join(f"<li>{c}</li>" for c in checks)
-            st.markdown(
+            _render_html(
                 f"""
                 <div class="pcs-out-arrive">
                     <div class="pcs-out-checks-title">Your next moves</div>
                     <ul class="pcs-out-checks">{checks_html}</ul>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
         info = get_installation_data(gaining) or {}
