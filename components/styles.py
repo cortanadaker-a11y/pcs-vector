@@ -1745,26 +1745,34 @@ CUSTOM_CSS = """
     }
 
     .pcs-ref-head {
-        margin: 0.1rem 0 0.55rem 0;
-        padding-bottom: 0.65rem;
-        border-bottom: 1px solid var(--pcs-border);
+        margin: 0.1rem 0 0.75rem 0;
+        padding: 1rem 1.1rem 0.95rem 1.1rem;
         scroll-margin-top: 0.75rem;
+        border-radius: 14px;
+        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 55%, #345947 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 28px rgba(28, 28, 26, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        color: #fff;
     }
 
     .pcs-ref-kicker {
-        font-size: 0.68rem;
+        display: inline-block;
+        font-size: 0.66rem;
         font-weight: 800;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: var(--pcs-accent);
-        margin-bottom: 0.28rem;
+        color: #1a2e28;
+        background: #a8d4bc;
+        border-radius: 999px;
+        padding: 0.22rem 0.65rem;
+        margin-bottom: 0.55rem;
     }
 
     .pcs-ref-title {
         display: block;
-        font-size: 1.28rem;
+        font-size: 1.32rem;
         font-weight: 800;
-        color: var(--pcs-navy);
+        color: #ffffff;
         margin: 0 0 0.4rem 0;
         letter-spacing: -0.03em;
         line-height: 1.2;
@@ -1772,38 +1780,42 @@ CUSTOM_CSS = """
 
     .pcs-ref-body {
         font-size: 0.92rem;
-        color: var(--pcs-slate);
+        color: rgba(255, 255, 255, 0.88);
         line-height: 1.45;
-        margin: 0 0 0.55rem 0;
+        margin: 0 0 0.7rem 0;
         max-width: 40rem;
     }
 
     .pcs-ref-body strong {
-        color: var(--pcs-navy);
-        font-weight: 700;
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: underline;
+        text-decoration-color: rgba(168, 212, 188, 0.75);
+        text-underline-offset: 0.15em;
     }
 
     .pcs-ref-summary {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 0.2rem 0.35rem;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--pcs-muted);
+        gap: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
         line-height: 1.35;
         margin: 0;
-        padding: 0.35rem 0.55rem;
-        background: #f7f5f1;
-        border: 1px solid var(--pcs-border);
-        border-radius: 8px;
+        padding: 0.4rem 0.7rem;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
         width: fit-content;
         max-width: 100%;
+        backdrop-filter: blur(6px);
     }
 
     .pcs-ref-summary-sep {
-        color: var(--pcs-border);
-        font-weight: 700;
+        color: rgba(168, 212, 188, 0.85);
+        font-weight: 800;
     }
 
     .pcs-ref-meta {
