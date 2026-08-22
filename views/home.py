@@ -6,7 +6,7 @@ import streamlit as st
 
 from components.bah_calculator import get_calculator_snapshot, render_bah_calculator
 from components.content import TRUST_SIGNALS
-from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
+from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.installation_data import SUPPORTED_INSTALLATIONS
 from services.referral_lead import (
@@ -71,20 +71,26 @@ def _render_referral_hook() -> None:
     )
 
     with st.container(border=True):
+        # Always take Rank + Dependents from the live calculator (no re-entry)
+        rank = rank_default
+        dependents = deps_default
+
+        st.caption(
+            f"From calculator: {rank or '—'} · {dependents}"
+            + (f" · {dest_default}" if dest_default else "")
+        )
+
         if "referral_destination" not in st.session_state and dest_default:
             st.session_state.referral_destination = dest_default
-        if "referral_rank" not in st.session_state and rank_default:
-            st.session_state.referral_rank = rank_default
-        if "referral_dependents" not in st.session_state:
-            st.session_state.referral_dependents = deps_default
-        if "referral_rent_range" not in st.session_state and rent_range_default:
+        # Keep rent range in sync with calculator when it changes
+        if rent_range_default:
             st.session_state.referral_rent_range = rent_range_default
 
         destination = st.selectbox(
             "Destination",
             options=installs,
             key="referral_destination",
-            help="Your new post (from the calculator).",
+            help="Your new post from the calculator (change only if needed).",
         )
 
         c1, c2 = st.columns(2)
@@ -101,34 +107,10 @@ def _render_referral_hook() -> None:
                 placeholder="Last name",
             )
 
-        grades = [g for g in RANK_PAY_GRADES if g != "Other"]
-        rank_options = [format_rank_label(g, PAY_GRADE_TO_RANK.get(g)) for g in grades]
-        if rank_default and rank_default not in rank_options:
-            rank_options = [rank_default] + rank_options
-        rank = st.selectbox("Rank", options=rank_options, key="referral_rank")
-
-        dep_options = [
-            "Without dependents",
-            "With dependents (1)",
-            "With dependents (2)",
-            "With dependents (3)",
-            "With dependents (4)",
-            "With dependents (5+)",
-        ]
-        if deps_default not in dep_options:
-            dep_options = [deps_default] + dep_options
-        dependents = st.selectbox(
-            "Dependents",
-            options=dep_options,
-            key="referral_dependents",
-            help="Collected in-app — add this question to the Google Form to sync it.",
-        )
-
         email_address = st.text_input(
             "Email address",
             key="referral_email_address",
             placeholder="you@email.com",
-            help="Collected in-app — add this question to the Google Form to sync it.",
         )
 
         rent_buy_not_sure = st.radio(
@@ -142,7 +124,7 @@ def _render_referral_hook() -> None:
             "Rent Range",
             key="referral_rent_range",
             placeholder="$1,200–$1,650/mo",
-            help="Prefills from the calculator’s typical rent band for your family size.",
+            help="From the calculator’s typical rent band for your family size.",
         )
 
         st.caption("Free referral · Built For Soldiers; By Soldiers · We won’t spam you.")
@@ -153,14 +135,31 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             key="referral_submit",
         ):
+            # Re-read calculator snapshot at submit so rank/deps stay current
+            live = get_calculator_snapshot() or snap
+            live_grade = live.get("pay_grade") or grade_default
+            live_deps_n = int(live.get("num_dependents") or 0)
+            live_rank = format_rank_label(
+                str(live_grade), PAY_GRADE_TO_RANK.get(str(live_grade))
+            )
+            live_deps = format_dependents_label(
+                with_dependents=live_deps_n > 0, num_dependents=live_deps_n
+            )
+            live_dest = live.get("gaining_installation") or destination
+            live_rent = format_rent_range(
+                live.get("market_rent_low_usd"),
+                live.get("market_rent_high_usd"),
+                live.get("market_rent_mid_usd"),
+            ) or (rent_range or "")
+
             row = build_referral_row(
-                destination=str(destination or ""),
+                destination=str(destination or live_dest or ""),
                 first_name=first_name or "",
                 last_name=last_name or "",
-                rank=str(rank or ""),
+                rank=live_rank,
                 rent_buy_not_sure=str(rent_buy_not_sure or ""),
-                rent_range=rent_range or "",
-                dependents=str(dependents or ""),
+                rent_range=live_rent,
+                dependents=live_deps,
                 email_address=email_address or "",
             )
 
