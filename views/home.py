@@ -141,13 +141,14 @@ def _render_referral_hook() -> None:
             live = get_calculator_snapshot() or snap
             live_calc = _calc_fields_from_snap(live)
 
+            live_deps_n = int(live.get("num_dependents") or 0)
             row = build_referral_row(
                 destination=live_calc["destination"],
                 first_name=first_name,
                 last_name=last_name,
                 rank=live_calc["rank"],
                 rent_buy_not_sure=rent_buy_not_sure,
-                dependents=live_calc["dependents"],
+                num_dependents=live_deps_n,
                 email_address=email_address,
             )
 

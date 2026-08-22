@@ -3,11 +3,16 @@
 Live Form:
   https://docs.google.com/forms/d/e/1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/viewform
 
-On submit we send the Soldier to a pre-filled Form URL (Destination, First Name,
-Last Name, Rank, Rent/Buy/Not Sure). That is the reliable Google-supported path.
+Form questions → entry IDs (refreshed):
+  Destination              → entry.159372216
+  First Name               → entry.1546051705
+  Last Name                → entry.1445033394
+  Rank                     → entry.1001940560
+  Number of Dependents     → entry.1983274092
+  Rent/Buy/Not Sure        → entry.1608004035
 
-Optional: Apps Script webhook writes straight to a Sheet (see
-scripts/google_apps_script_referral.js).
+Still missing on Form (add short answer titled exactly "Email address"):
+  Email address
 """
 
 from __future__ import annotations
@@ -22,16 +27,18 @@ import requests
 
 logger = logging.getLogger("pcs_vector.referral")
 
+# Fields sent on the pre-filled Google Form URL
 REFERRAL_COLUMNS = (
     "Destination",
     "First Name",
     "Last Name",
     "Rank",
+    "Number of Dependents",
     "Rent/Buy/Not Sure",
 )
 
+# Collected in-app; mapped once Form has a matching question + entry ID in secrets
 EXTRA_COLUMNS = (
-    "Dependents",
     "Email address",
 )
 
@@ -46,6 +53,7 @@ _DEFAULT_ENTRIES = {
     "First Name": "entry.1546051705",
     "Last Name": "entry.1445033394",
     "Rank": "entry.1001940560",
+    "Number of Dependents": "entry.1983274092",
     "Rent/Buy/Not Sure": "entry.1608004035",
 }
 
@@ -57,9 +65,10 @@ def build_referral_row(
     last_name: str,
     rank: str,
     rent_buy_not_sure: str,
-    dependents: str = "",
+    num_dependents: int = 0,
     email_address: str = "",
 ) -> dict[str, str]:
+    """Row keyed by Form question titles (+ email for Apps Script / future Form field)."""
     interest = (rent_buy_not_sure or "").strip()
     if interest not in INTEREST_OPTIONS:
         low = interest.lower()
@@ -69,14 +78,20 @@ def build_referral_row(
             interest = "Buy"
         else:
             interest = "Not sure"
+    deps_n = max(0, int(num_dependents))
     return {
         "Destination": (destination or "").strip(),
         "First Name": (first_name or "").strip(),
         "Last Name": (last_name or "").strip(),
         "Rank": (rank or "").strip(),
+        # Form field is "Number of Dependents" — send a plain number
+        "Number of Dependents": str(deps_n),
         "Rent/Buy/Not Sure": interest,
-        "Dependents": (dependents or "").strip(),
         "Email address": (email_address or "").strip(),
+        # Friendly label for UI / Apps Script
+        "Dependents": format_dependents_label(
+            with_dependents=deps_n > 0, num_dependents=deps_n
+        ),
     }
 
 
@@ -134,8 +149,8 @@ def _entry_map() -> dict[str, str]:
         "First Name": "entry_first_name",
         "Last Name": "entry_last_name",
         "Rank": "entry_rank",
+        "Number of Dependents": "entry_dependents",
         "Rent/Buy/Not Sure": "entry_rent_buy_not_sure",
-        "Dependents": "entry_dependents",
         "Email address": "entry_email_address",
     }
     mapping = dict(_DEFAULT_ENTRIES)
@@ -163,7 +178,7 @@ def _payload_pairs(row: dict[str, str]) -> list[tuple[str, str]]:
 
 
 def build_prefill_url(row: dict[str, str]) -> str:
-    """Google Form URL with fields already filled from calculator + contact info."""
+    """Google Form URL with calculator + contact fields filled."""
     view = _form_action_url().replace("/formResponse", "/viewform")
     params: dict[str, str] = {"usp": "pp_url"}
     for eid, value in _payload_pairs(row):
@@ -172,7 +187,6 @@ def build_prefill_url(row: dict[str, str]) -> str:
 
 
 def submit_referral_via_apps_script(row: dict[str, str]) -> tuple[bool, str]:
-    """POST JSON to Apps Script web app (optional, most reliable Sheet write)."""
     url = _apps_script_url()
     if not url:
         return False, "Apps Script webhook not configured."
@@ -187,13 +201,11 @@ def submit_referral_via_apps_script(row: dict[str, str]) -> tuple[bool, str]:
 
 
 def build_redirect_to_form_html(row: dict[str, str]) -> str:
-    """Send the browser to the pre-filled Google Form (same tab).
+    """Send the browser to the pre-filled Google Form (same tab)."""
+    import json as _json
 
-    This is the reliable handoff: one click on our button → Form opens with
-    Destination / Name / Rank / Rent-Buy already filled.
-    """
     prefill = build_prefill_url(row)
-    prefill_js = json.dumps(prefill)
+    prefill_js = _json.dumps(prefill)
     return f"""
 <div style="font-family:system-ui,sans-serif;font-size:0.95rem;color:#2a4a3f;padding:0.35rem 0;">
   Opening Google Form with your info filled in…
