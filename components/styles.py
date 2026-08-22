@@ -49,8 +49,24 @@ CUSTOM_CSS = """
 
     .block-container {
         padding-top: 0.35rem !important;
-        padding-bottom: 1.5rem !important;
+        padding-bottom: 2.25rem !important;
         max-width: 820px;
+    }
+
+    /* Primary CTAs — forest fill */
+    div[data-testid="stForm"] button[kind="primary"],
+    button[kind="primary"] {
+        background: linear-gradient(145deg, var(--pcs-navy) 0%, var(--pcs-accent) 100%) !important;
+        border: 1px solid var(--pcs-accent-hover) !important;
+        color: #fff !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.01em;
+        box-shadow: 0 6px 18px rgba(42, 74, 63, 0.28) !important;
+    }
+
+    div[data-testid="stForm"] button[kind="primary"]:hover,
+    button[kind="primary"]:hover {
+        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%) !important;
     }
 
     /* Kill Streamlit's default top gap */
@@ -68,19 +84,70 @@ CUSTOM_CSS = """
     }
 
     .pcs-hero-compact {
-        padding: 2rem 1.85rem 1.65rem 1.85rem !important;
-        margin-bottom: 0.85rem !important;
+        padding: 1.65rem 1.55rem 1.35rem 1.55rem !important;
+        margin-bottom: 0.75rem !important;
     }
 
     .pcs-hero-compact .pcs-brand-title {
-        font-size: 2.75rem;
-        margin-bottom: 0.85rem;
+        font-size: 2.45rem;
+        margin-bottom: 0.55rem;
     }
 
     .pcs-hero-compact .pcs-hero-tag {
-        margin-bottom: 0;
-        font-size: 0.78rem;
-        padding: 0.4rem 0.95rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.74rem;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .pcs-hero-lead {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 36rem;
+        font-weight: 500;
+    }
+
+    .pcs-hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .pcs-hero-pills span {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        padding: 0.28rem 0.65rem;
+    }
+
+    .pcs-calc-intro {
+        margin: 0.05rem 0 0.65rem 0;
+        padding-bottom: 0.55rem;
+        border-bottom: 1px solid var(--pcs-border);
+    }
+
+    .pcs-calc-intro-kicker {
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--pcs-accent);
+        margin-bottom: 0.25rem;
+    }
+
+    .pcs-calc-intro-title {
+        font-size: 1.12rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: -0.02em;
+        line-height: 1.25;
     }
 
     .pcs-sticky-results {
@@ -89,11 +156,11 @@ CUSTOM_CSS = """
         z-index: 998;
         background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
         color: #fff;
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
-        margin: 0.45rem 0 0.55rem 0;
-        box-shadow: 0 10px 28px rgba(28, 28, 26, 0.14);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 0.85rem 1.05rem;
+        margin: 0.65rem 0 0.65rem 0;
+        box-shadow: 0 12px 32px rgba(28, 28, 26, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .pcs-sticky-results-main {
@@ -1822,6 +1889,82 @@ CUSTOM_CSS = """
         font-size: 0.78rem;
         font-weight: 600;
         color: var(--pcs-muted);
+    }
+
+    .pcs-section-bridge {
+        margin: 0.35rem 0 0.55rem 0;
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--pcs-accent);
+    }
+
+    .pcs-faq-label {
+        margin-top: 1rem !important;
+    }
+
+    .pcs-faq-grid {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .pcs-faq-item {
+        display: grid;
+        gap: 0.15rem;
+        padding: 0.55rem 0.7rem;
+        background: #f7f5f1;
+        border: 1px solid var(--pcs-border);
+        border-radius: 10px;
+    }
+
+    .pcs-faq-item strong {
+        color: var(--pcs-navy);
+        font-size: 0.88rem;
+        font-weight: 800;
+    }
+
+    .pcs-faq-item span {
+        color: var(--pcs-slate);
+        font-size: 0.84rem;
+        line-height: 1.4;
+    }
+
+    .pcs-footer {
+        margin: 1.1rem 0 0.35rem 0;
+        padding: 0.85rem 1rem;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #faf9f7 0%, #f0ede7 100%);
+        border: 1px solid var(--pcs-border);
+        font-size: 0.8rem;
+        color: var(--pcs-muted);
+        line-height: 1.45;
+    }
+
+    .pcs-footer strong {
+        color: var(--pcs-navy);
+        font-weight: 800;
+    }
+
+    .pcs-footer span {
+        display: inline;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-hero-compact .pcs-brand-title {
+            font-size: 2.05rem;
+        }
+        .pcs-hero-lead {
+            font-size: 0.88rem;
+        }
+        .pcs-calc-intro-title {
+            font-size: 1.02rem;
+        }
+        .pcs-footer span {
+            display: block;
+            margin-top: 0.2rem;
+        }
     }
 
     .pcs-bottom-line {

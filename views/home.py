@@ -41,6 +41,15 @@ def _render_header() -> None:
         <div class="pcs-hero pcs-hero-compact">
             <div class="pcs-brand-title">PCS Vector</div>
             <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
+            <p class="pcs-hero-lead">
+                See your BAH, OHA, COLA, and move-in cash for your next post —
+                then get matched with a housing pro who knows the area.
+            </p>
+            <div class="pcs-hero-pills">
+                <span>2026 rates</span>
+                <span>68+ posts</span>
+                <span>Free forever</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -209,14 +218,14 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
 
   bar.innerHTML =
     '<div class="pcs-sticky-ref-meta">' +
-      '<div class="pcs-sticky-ref-kicker">Housing help</div>' +
+      '<div class="pcs-sticky-ref-kicker">Free housing match</div>' +
       '<div class="pcs-sticky-ref-line" title="' +
         String(data.destFull).replace(/"/g, "&quot;") +
       '">' +
         String(data.dest) + " · " + String(data.rank) + " · " + String(data.deps) +
       "</div>" +
     "</div>" +
-    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Find a place →</button>';
+    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Get matched →</button>';
 
   root.classList.add("pcs-has-sticky-ref");
 
@@ -298,7 +307,7 @@ def _render_referral_hook() -> None:
     if ready:
         body_html = (
             f"We have verified military experts in <strong>{dest_html}</strong> "
-            f"that can help you find a new home today."
+            f"ready to help you find a home today."
         )
         summary_html = (
             f'<div class="pcs-ref-summary" title="Carried over from your calculator">'
@@ -325,6 +334,7 @@ def _render_referral_hook() -> None:
                 <p class="pcs-ref-body">{body_html}</p>
                 {summary_html}
             </div>
+            <p class="pcs-bah-section-label">Tell us how to reach you</p>
             """,
             unsafe_allow_html=True,
         )
@@ -333,33 +343,33 @@ def _render_referral_hook() -> None:
             n1, n2 = st.columns(2)
             with n1:
                 first_name = st.text_input(
-                    "First Name",
+                    "First name",
                     key="referral_first_name",
-                    placeholder="First name",
+                    placeholder="First",
                 )
             with n2:
                 last_name = st.text_input(
-                    "Last Name",
+                    "Last name",
                     key="referral_last_name",
-                    placeholder="Last name",
+                    placeholder="Last",
                 )
 
             email_address = st.text_input(
-                "Email address",
+                "Email",
                 key="referral_email_address",
                 placeholder="you@email.com",
             )
 
             rent_buy_not_sure = st.radio(
-                "Rent, buy, or not sure?",
+                "Looking to…",
                 options=list(INTEREST_OPTIONS),
                 horizontal=True,
                 key="referral_rent_buy_not_sure",
             )
 
-            st.caption("Free · Built For Soldiers; By Soldiers")
+            st.caption("No spam · free match · Built For Soldiers; By Soldiers")
             submitted = st.form_submit_button(
-                "Get my free housing referral →",
+                "Connect me with a housing pro →",
                 type="primary",
                 use_container_width=True,
                 disabled=not ready,
@@ -405,29 +415,49 @@ def _render_referral_hook() -> None:
                     unsafe_allow_javascript=True,
                 )
                 st.info(
-                    "Taking you to the Google Form with your info filled in… "
-                    "Click **Submit** on that page to finish."
+                    "Opening a pre-filled form… tap **Submit** on the next page to finish."
                 )
 
     _render_sticky_referral_cta(calc)
 
 
 def _render_faq() -> None:
-    with st.expander("FAQ", expanded=False):
+    st.markdown(
+        '<p class="pcs-bah-section-label pcs-faq-label">Quick answers</p>',
+        unsafe_allow_html=True,
+    )
+    with st.expander("What do these numbers mean?", expanded=False):
         st.markdown(
-            "**Free?** Yes.\n\n"
-            "**BAH** — Flat U.S. housing pay. Keep the leftover if rent is lower.\n\n"
-            "**OHA** — Overseas: actual rent up to a max, plus utilities.\n\n"
-            "**COLA** — Extra for higher daily costs overseas, Alaska, Hawaii, and Puerto Rico. Not for rent.\n\n"
-            "**DLA** — One-time move money when authorized. Confirm with finance.\n\n"
-            "**Rent estimates** — Planning ranges by family size (1–4 bedrooms), not official rates.\n\n"
-            "**Official?** Allowances from DoD tables — verify on your LES before you sign."
+            """
+<div class="pcs-faq-grid">
+  <div class="pcs-faq-item"><strong>Is this free?</strong><span>Yes — calculator and housing match.</span></div>
+  <div class="pcs-faq-item"><strong>BAH</strong><span>U.S. housing pay. Flat rate — keep what’s left if rent is lower.</span></div>
+  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas: rent up to a max, plus a utilities allowance.</span></div>
+  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs (OCONUS, AK, HI, PR). Not for rent.</span></div>
+  <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized. Confirm with finance.</span></div>
+  <div class="pcs-faq-item"><strong>Rent ranges</strong><span>Planning estimates by family size — not official quotes.</span></div>
+  <div class="pcs-faq-item"><strong>Official?</strong><span>Built from DoD tables. Always verify on your LES before you sign.</span></div>
+</div>
+            """,
+            unsafe_allow_html=True,
         )
 
 
 def render_home() -> None:
     _render_header()
     render_bah_calculator()
+    st.markdown(
+        '<p class="pcs-section-bridge">Numbers checked? Next — get help finding a place.</p>',
+        unsafe_allow_html=True,
+    )
     _render_referral_hook()
     _render_faq()
-    st.caption("PCS Vector — Built For Soldiers; By Soldiers · Verify with finance before you spend.")
+    st.markdown(
+        """
+        <div class="pcs-footer">
+            <strong>PCS Vector</strong> · Built For Soldiers; By Soldiers
+            <span>· Planning figures only — verify with finance before you spend.</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )

@@ -199,7 +199,17 @@ def render_bah_calculator() -> None:
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
 
     with st.container(border=True):
-        st.markdown('<p class="pcs-bah-section-label">Dependents</p>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="pcs-calc-intro">
+                <div class="pcs-calc-intro-kicker">PCS finance calculator</div>
+                <div class="pcs-calc-intro-title">What will housing look like at your new post?</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown('<p class="pcs-bah-section-label">You &amp; your family</p>', unsafe_allow_html=True)
         dep_mode = st.radio(
             "Dependents",
             options=["With dependents", "Without dependents"],
@@ -229,7 +239,7 @@ def render_bah_calculator() -> None:
         with r3:
             if with_dependents:
                 num_deps = st.selectbox(
-                    "Number of dependents",
+                    "Dependents",
                     options=[1, 2, 3, 4, 5],
                     index=0,
                     format_func=_deps_label,
@@ -238,7 +248,7 @@ def render_bah_calculator() -> None:
             else:
                 num_deps = 0
                 st.selectbox(
-                    "Number of dependents",
+                    "Dependents",
                     options=["None"],
                     disabled=True,
                     key="bah_calc_num_deps_disabled",
@@ -249,13 +259,14 @@ def render_bah_calculator() -> None:
                 "Fort Bragg, NC" if "Fort Bragg, NC" in installations else installations[0]
             )
 
+        st.markdown('<p class="pcs-bah-section-label">Where you are going</p>', unsafe_allow_html=True)
         d1, d2 = st.columns(2)
         with d1:
             current_raw = st.selectbox(
-                "Current post",
+                "Current post (optional)",
                 options=[_NONE_CURRENT] + installations,
                 key="bah_calc_current",
-                help="Optional — compare to your new post.",
+                help="Optional — compare pay and rent pressure to your new post.",
             )
             current = None if current_raw == _NONE_CURRENT else current_raw
         with d2:
@@ -268,7 +279,7 @@ def render_bah_calculator() -> None:
         barracks_on = False
         if not with_dependents:
             barracks_on = st.checkbox(
-                "Barracks + meal card (may lower COLA)",
+                "Barracks + meal card (can lower COLA)",
                 value=False,
                 key="bah_calc_barracks",
             )
@@ -358,15 +369,15 @@ def render_bah_calculator() -> None:
         bed_label = f"{bedrooms}BR"
         if leftover_mid >= 0:
             fit_line = (
-                f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo → "
-                f"about <strong>{_money_html(leftover_mid)}/mo</strong> left from {safe_html(primary_k)}."
+                f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo — "
+                f"<strong>{_money_html(leftover_mid)}/mo</strong> left in {safe_html(primary_k)}."
             )
             fit_tone = "fit"
         else:
             fit_line = (
-                f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo → "
-                f"about <strong>{_money_html(abs(leftover_mid))}/mo</strong> over {safe_html(primary_k)}. "
-                f"Aim closer to {_money_html(market_low)}–{_money_html(market_high)}."
+                f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo — "
+                f"<strong>{_money_html(abs(leftover_mid))}/mo</strong> over {safe_html(primary_k)}. "
+                f"Shop closer to {_money_html(market_low)}–{_money_html(market_high)}."
             )
             fit_tone = "tight"
 
@@ -400,8 +411,8 @@ def render_bah_calculator() -> None:
                 <div class="pcs-sticky-results-grid pcs-sticky-results-grid-4">
                     <div><b>Utilities</b><br>{_money_html(util_n) if util_n else '—'}</div>
                     <div><b>DLA</b><br>{_dla_html(dla_amt)}</div>
-                    <div><b>Move-in</b><br>{_money_html(move_in) if move_in else '—'}</div>
-                    <div><b>After DLA</b><br>{gap_html}</div>
+                    <div><b>Move-in cash</b><br>{_money_html(move_in) if move_in else '—'}</div>
+                    <div><b>Still need</b><br>{gap_html}</div>
                 </div>
             </div>
             """
@@ -411,9 +422,9 @@ def render_bah_calculator() -> None:
         if system == "OHA":
             util_oha = pkg.get("oha_utility_usd")
             if pkg.get("cola_index") is not None:
-                cola_note = f"Cost of Living Allowance · index {pkg.get('cola_index')}"
+                cola_note = f"COLA · index {pkg.get('cola_index')}"
             else:
-                cola_note = "Cost of Living Allowance · none at this locality"
+                cola_note = "No COLA at this locality right now"
             _render_html(
                 f"""
                 <div class="pcs-out-split">
@@ -440,9 +451,9 @@ def render_bah_calculator() -> None:
             )
         elif system == "BAH_PLUS_COLA":
             cola_note = (
-                f"Cost of Living Allowance · index {pkg.get('cola_index')} · not for rent"
+                f"COLA · index {pkg.get('cola_index')} · not for rent"
                 if pkg.get("cola_index") is not None
-                else "Cost of Living Allowance · not for rent"
+                else "COLA · not for rent"
             )
             _render_html(
                 f"""
@@ -499,22 +510,22 @@ def render_bah_calculator() -> None:
 
             tip = ""
             if dla_covers:
-                tip = f"DLA (~{_dla_html(dla_amt)}) can cover typical move-in (~{_money_html(move_in)})."
+                tip = f"DLA (~{_dla_html(dla_amt)}) can cover a typical move-in (~{_money_html(move_in)})."
             elif move_in and arrive["net"]:
-                tip = f"Budget ~{_money_html(arrive['net'])} after DLA for move-in."
+                tip = f"Plan ~{_money_html(arrive['net'])} of your own cash after DLA."
 
-            left = _package_side_html(cur, side_label="Current post")
-            right = _package_side_html(pkg, side_label="New post")
+            left = _package_side_html(cur, side_label="Current")
+            right = _package_side_html(pkg, side_label="New")
             _render_html(
                 f"""
                 <div class="pcs-bah-delta pcs-bah-delta-{tone} pcs-out-compare">
-                    <div class="pcs-out-compare-title">Current vs new post — what each total includes</div>
+                    <div class="pcs-out-compare-title">Current vs new — side by side</div>
                     <div class="pcs-pkg-grid">
                         {left}
                         <div class="pcs-pkg-mid">
                             <div class="pcs-pkg-mid-delta">{_money_html(int(delta))}/mo</div>
-                            <div class="pcs-pkg-mid-sub">{safe_html(pct_txt)} total</div>
-                            <div class="pcs-pkg-mid-sub">{_money_html(int(annual or 0))}/year</div>
+                            <div class="pcs-pkg-mid-sub">{safe_html(pct_txt)}</div>
+                            <div class="pcs-pkg-mid-sub">{_money_html(int(annual or 0))}/yr</div>
                         </div>
                         {right}
                     </div>
@@ -526,23 +537,23 @@ def render_bah_calculator() -> None:
                 """
             )
         else:
-            st.caption("Set Current post to compare both locations.")
+            st.caption("Pick a Current post above to compare both locations side by side.")
 
         info = get_installation_data(gaining) or {}
-        with st.expander(f"Neighborhoods & utilities — {gaining}", expanded=False):
+        with st.expander(f"Local areas & utility ranges — {gaining}", expanded=False):
             notes = (info.get("notes") or "").strip()
             if notes:
                 st.markdown(notes)
             areas_list = info.get("major_areas") or []
             commute = (info.get("commute_notes") or "").strip()
             if areas_list:
-                st.caption("Areas: " + ", ".join(areas_list[:4]))
+                st.caption("Nearby: " + ", ".join(areas_list[:4]))
             if commute:
                 st.caption(commute)
             if areas:
                 st.caption(
                     (util_ctx.get("as_of") or "2026")
-                    + " · typical 3-bedroom off-post ranges (electric, heat/gas, water/trash, internet)"
+                    + " · typical off-post bills (electric, heat/gas, water/trash, internet)"
                 )
                 if not util_ctx.get("found", True):
                     st.caption("Using a regional estimate — local bills can differ.")
@@ -572,4 +583,4 @@ def render_bah_calculator() -> None:
                         "use this table to compare real-world bills."
                     )
 
-        st.caption("Planning figures · verify LES / finance / DTMO before you sign.")
+        st.caption("Planning figures only · verify on your LES / with finance before you sign a lease.")
