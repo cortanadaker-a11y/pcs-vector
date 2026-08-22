@@ -11,12 +11,11 @@ from components.html_utils import safe_html
 from services.referral_lead import (
     INTEREST_OPTIONS,
     REFERRAL_COLUMNS,
+    build_browser_autosubmit_html,
     build_prefill_url,
     build_referral_row,
     format_dependents_label,
     format_rank_label,
-    google_form_configured,
-    submit_referral_to_google_form,
 )
 
 
@@ -134,37 +133,21 @@ def _render_referral_hook() -> None:
                 st.error("Enter a valid email address.")
             else:
                 st.session_state.referral_lead = {**row, "calculator": live}
-                prefill = build_prefill_url(row)
 
-                ok = False
-                msg = ""
-                if google_form_configured():
-                    ok, msg = submit_referral_to_google_form(row)
+                # Auto-submit from the Soldier's browser (no second button)
+                import streamlit.components.v1 as components
 
-                if ok:
-                    st.success(
-                        f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
-                    )
-                else:
-                    st.success("Almost done — confirm on the Google Form (1 click).")
-                    st.link_button(
-                        "Submit housing referral on Google Form →",
-                        prefill,
-                        type="primary",
-                        use_container_width=True,
-                    )
-                    if msg:
-                        st.caption(msg)
-                    st.caption("Your calculator answers are pre-filled. Click Submit on the Form.")
-
-                with st.expander("What we captured", expanded=False):
-                    st.json(
-                        {
-                            k: row.get(k, "")
-                            for k in list(REFERRAL_COLUMNS)
-                            + ["Dependents", "Email address"]
-                        }
-                    )
+                components.html(
+                    build_browser_autosubmit_html(row),
+                    height=40,
+                )
+                st.success(
+                    f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
+                )
+                st.caption(
+                    "If nothing shows up in your Form responses, "
+                    f"[open the pre-filled form]({build_prefill_url(row)}) and hit Submit once."
+                )
 
 
 def _render_faq() -> None:

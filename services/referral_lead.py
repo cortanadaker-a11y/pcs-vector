@@ -16,6 +16,7 @@ Not on Form yet (still collected in-app): Dependents, Email address.
 
 from __future__ import annotations
 
+import html as html_lib
 import logging
 import os
 import re
@@ -156,7 +157,7 @@ def _entry_map() -> dict[str, str]:
 
 
 def build_prefill_url(row: dict[str, str]) -> str:
-    """Build a Google Form pre-filled link (Soldier clicks Submit once)."""
+    """Build a Google Form pre-filled link (fallback)."""
     view = _form_action_url().replace("/formResponse", "/viewform")
     entries = _entry_map()
     params: dict[str, str] = {"usp": "pp_url"}
@@ -169,6 +170,48 @@ def build_prefill_url(row: dict[str, str]) -> str:
         if eid and row.get(header):
             params[eid] = row.get(header, "")
     return f"{view}?{urlencode(params)}"
+
+
+def build_browser_autosubmit_html(row: dict[str, str]) -> str:
+    """HTML+JS that POSTs to Google Form from the Soldier's browser (one-click).
+
+    Server-side POSTs are often blocked (HTTP 400). Submitting from the browser
+    with a hidden iframe avoids a second button and still records the response.
+    """
+    action = html_lib.escape(_form_action_url(), quote=True)
+    entries = _entry_map()
+    inputs: list[str] = []
+    for header in REFERRAL_COLUMNS:
+        eid = entries.get(header)
+        if not eid:
+            continue
+        name = html_lib.escape(eid, quote=True)
+        value = html_lib.escape(row.get(header, ""), quote=True)
+        inputs.append(f'<input type="hidden" name="{name}" value="{value}" />')
+    for header in EXTRA_COLUMNS:
+        eid = entries.get(header)
+        if not eid or not row.get(header):
+            continue
+        name = html_lib.escape(eid, quote=True)
+        value = html_lib.escape(row.get(header, ""), quote=True)
+        inputs.append(f'<input type="hidden" name="{name}" value="{value}" />')
+
+    fields = "\n".join(inputs)
+    return f"""
+<div style="font-family:system-ui,sans-serif;font-size:0.9rem;color:#2a4a3f;">
+  Sending your referral…
+</div>
+<iframe name="pcs_gform_iframe" style="display:none;width:0;height:0;border:0;"></iframe>
+<form id="pcs-gform-auto" action="{action}" method="POST" target="pcs_gform_iframe">
+  {fields}
+</form>
+<script>
+  (function () {{
+    var f = document.getElementById("pcs-gform-auto");
+    if (f) {{ f.submit(); }}
+  }})();
+</script>
+"""
 
 
 def submit_referral_to_google_form(row: dict[str, str]) -> tuple[bool, str]:
@@ -232,6 +275,7 @@ __all__ = [
     "EXTRA_COLUMNS",
     "INTEREST_OPTIONS",
     "REFERRAL_COLUMNS",
+    "build_browser_autosubmit_html",
     "build_prefill_url",
     "build_referral_row",
     "format_dependents_label",
