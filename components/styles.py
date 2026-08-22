@@ -126,15 +126,93 @@ CUSTOM_CSS = """
     .pcs-sticky-results-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.4rem;
-        font-size: 0.78rem;
-        color: rgba(255, 255, 255, 0.88);
+        gap: 0.45rem;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.65rem;
+        line-height: 1.35;
     }
 
     .pcs-sticky-results-grid b {
         color: #c5ebd4;
         font-weight: 700;
-        margin-right: 0.2rem;
+        font-size: 0.68rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .pcs-out-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.25rem;
+    }
+
+    .pcs-out-profile {
+        display: block !important;
+        margin-top: 0.35rem !important;
+        margin-bottom: 0.45rem;
+    }
+
+    .pcs-out-plain {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.82);
+        line-height: 1.45;
+        margin-bottom: 0.15rem;
+    }
+
+    .pcs-out-compare {
+        padding: 0.75rem 0.95rem !important;
+        margin: 0.45rem 0 0.55rem 0 !important;
+    }
+
+    .pcs-out-compare-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .pcs-out-compare-action {
+        font-size: 0.88rem;
+        color: var(--pcs-slate);
+        line-height: 1.45;
+        margin-bottom: 0.55rem;
+    }
+
+    .pcs-out-compare-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem 1rem;
+        font-size: 0.8rem;
+        color: var(--pcs-slate);
+    }
+
+    .pcs-out-compare-row b {
+        color: var(--pcs-navy);
+    }
+
+    .pcs-out-arrive {
+        background: #eef4f0;
+        border: 1px solid #c8ddd0;
+        border-left: 4px solid var(--pcs-accent);
+        border-radius: 10px;
+        padding: 0.7rem 0.9rem;
+        margin: 0 0 0.55rem 0;
+        font-size: 0.86rem;
+        color: var(--pcs-navy);
+        line-height: 1.45;
+    }
+
+    .pcs-out-arrive-note {
+        display: block;
+        margin-top: 0.3rem;
+        font-size: 0.76rem;
+        color: var(--pcs-muted);
+        font-weight: 400;
     }
 
     .pcs-delta-tight {
