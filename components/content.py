@@ -5,12 +5,12 @@ from services.installation_data import SUPPORTED_INSTALLATIONS
 INSTALLATION_COUNT = len(SUPPORTED_INSTALLATIONS)
 
 HERO = {
-    "kicker": "Your PCS. Your family. One clear plan.",
-    "headline": "Stop guessing your PCS — get a plan your whole family can follow",
+    "kicker": "Know the money before you sign anything.",
+    "headline": "See what your new post actually pays — then find a place that fits",
     "subheadline": (
-        "Where to live, spouse work, schools, cash, and your first 30 days — "
-        "in plain language, like advice from a senior NCO who's done this move. "
-        "Start with the free housing calculator, then turn it into a full plan."
+        "Compare BAH, OHA, and COLA at your gaining station versus where you are now. "
+        "Add local utility ranges and Dislocation Allowance (DLA) planning figures — "
+        "then get connected when you’re ready to buy or rent."
     ),
 }
 
@@ -18,10 +18,10 @@ TRUST_SIGNALS = {
     "banner": "Built For Soldiers; By Soldiers",
     "badges": [
         "By Soldiers, for families",
-        "Secure Stripe checkout",
-        "PDF emailed to you",
+        "BAH · OHA · COLA calculator",
         "68+ Army installations",
-        "Minutes, not weeks of research",
+        "Utility planning ranges",
+        "Buy / rent referrals",
     ],
 }
 

@@ -9,8 +9,10 @@ import streamlit as st
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
 from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
+from services.dla_rates import format_dla_usd, get_dla_rate
 from services.housing_allowances import compare_housing_packages, get_housing_package
 from services.installation_data import SUPPORTED_INSTALLATIONS
+from services.utility_costs import get_utility_costs_for_installation
 
 YOS_OPTIONS = list(range(0, 41))
 
@@ -90,11 +92,11 @@ def render_bah_calculator() -> None:
         <div class="pcs-bah-wrap">
             <div class="pcs-bah-header">
                 <div class="pcs-bah-badge">2026 · {len(installations)} posts</div>
-                <h3>Housing Allowance Calculator</h3>
+                <h3>PCS Finance Calculator</h3>
                 <p class="pcs-bah-sub">
-                    CONUS: BAH. Foreign OCONUS: OHA (rent max + utilities) + COLA.
-                    Hawaii / Puerto Rico: BAH + COLA. COLA uses grade, years of service,
-                    and number of dependents (DoD spendable-income formula).
+                    Compare current vs gaining post. CONUS: BAH.
+                    Foreign OCONUS: OHA (rent max + utilities) + COLA.
+                    Hawaii / Puerto Rico: BAH + COLA. Then see utilities and DLA planning figures.
                 </p>
             </div>
         </div>
@@ -381,11 +383,50 @@ def render_bah_calculator() -> None:
                 unsafe_allow_html=True,
             )
 
+        # DLA planning figure
+        dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
+        if dla.get("found"):
+            st.markdown("##### Dislocation Allowance (DLA) — planning")
+            st.markdown(
+                f"**{format_dla_usd(dla['dla_usd'])}** one-time "
+                f"({'with' if with_dependents else 'without'} dependents relocating) · "
+                f"grade {dla['pay_grade']} · effective {dla.get('effective_date', '2026')}"
+            )
+            st.caption(
+                "DLA is usually yours to keep when authorized — not a Travel Advance "
+                "(advances get paid back from your LES). Confirm with finance."
+            )
+
+        # Off-post utility ranges for gaining post
+        is_oconus = system in ("OHA", "BAH_PLUS_COLA")
+        util_ctx = get_utility_costs_for_installation(gaining, is_oconus=is_oconus)
+        areas = util_ctx.get("areas") or []
+        if areas:
+            st.markdown("##### Off-post utilities (on top of rent)")
+            st.caption(
+                (util_ctx.get("as_of") or "2026 planning")
+                + " · typical 3-bedroom · verify with landlord / providers"
+            )
+            rows = []
+            for a in areas[:4]:
+                tot = a.get("total_utilities_usd_mo") or {}
+                e = a.get("electric_usd_mo") or {}
+                g = a.get("gas_or_heat_usd_mo") or {}
+                rows.append(
+                    {
+                        "Area": a.get("name", "—"),
+                        "Electric": f"${e.get('low', 0)}–${e.get('high', 0)}",
+                        "Heat / gas": f"${g.get('low', 0)}–${g.get('high', 0)}",
+                        "Total / mo": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
+                    }
+                )
+            st.dataframe(rows, use_container_width=True, hide_index=True)
+            if areas[0].get("season_note"):
+                st.caption(areas[0]["season_note"])
+
         st.caption(
             "CONUS = BAH. Foreign OCONUS = OHA (actual rent up to max + utilities) + COLA. "
-            "HI/PR = BAH + COLA. COLA uses CY2026 spendable-income tables × location index "
-            "(DoD FMR Vol 7A Ch 68). OHA USD amounts move with DTMO exchange rates (1st/16th). "
-            "Always verify on your LES and DTMO calculators."
+            "HI/PR = BAH + COLA. Always verify on your LES and DTMO calculators before you spend."
         )
 
 

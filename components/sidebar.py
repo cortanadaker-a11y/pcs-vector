@@ -1,74 +1,63 @@
-"""Sidebar navigation for PCS Vector."""
+"""Sidebar for PCS Vector (single-page calculator experience)."""
+
+from __future__ import annotations
 
 import streamlit as st
 
-from components.scroll import request_scroll_to_top
-
-PAGE_LABELS = {
-    "home": "Home",
-    "input": "Build your plan",
-    "report": "Your report",
-    "retrieve": "Retrieve report",
-}
+from services.installation_data import SUPPORTED_INSTALLATIONS
 
 
 def sync_nav_before_sidebar() -> None:
-    """Align sidebar widget state before it renders (must run before render_sidebar)."""
-    if "nav_page" not in st.session_state:
-        st.session_state.nav_page = st.session_state.page
-    if st.session_state.pop("_sync_nav_from_page", False):
-        st.session_state.nav_page = st.session_state.page
+    """No-op kept for compatibility with older call sites."""
+    st.session_state.page = "home"
+    st.session_state.nav_page = "home"
 
 
 def set_page(page: str) -> None:
-    """Set active page before sidebar renders (e.g. payment redirect)."""
-    st.session_state.page = page
-    st.session_state.nav_page = page
+    """Force home — multi-page nav is retired."""
+    st.session_state.page = "home"
+    st.session_state.nav_page = "home"
 
 
 def navigate_to(page: str) -> None:
-    """Navigate from a button after sidebar has already rendered."""
-    st.session_state.page = page
-    st.session_state._sync_nav_from_page = True
-    if page == "input":
-        st.session_state.form_step = 0
-    request_scroll_to_top()
+    """Stay on home (legacy callers safe)."""
+    st.session_state.page = "home"
+    st.session_state.nav_page = "home"
     st.rerun()
 
 
 def render_sidebar() -> str:
-    """Render sidebar navigation and return the selected page."""
+    """Brand + about only — no page navigation."""
     with st.sidebar:
         st.markdown("## PCS Vector")
-        st.caption("Personalized PCS plans for Army families.")
+        st.caption("PCS finance clarity for Army families.")
         st.caption("Built For Soldiers; By Soldiers")
 
         st.divider()
 
-        st.radio(
-            "Navigate",
-            options=["home", "input", "report", "retrieve"],
-            format_func=lambda p: PAGE_LABELS[p],
-            key="nav_page",
-            label_visibility="collapsed",
+        st.markdown(
+            f"""
+            Compare **BAH / OHA / COLA** across **{len(SUPPORTED_INSTALLATIONS)}** posts,
+            see local **utility** ranges, and get help finding a place to **buy or rent**
+            at your gaining station.
+            """
         )
-
-        st.divider()
 
         with st.expander("About", expanded=False):
             st.markdown(
                 """
-                **PCS Vector** — decision-grade PCS plans for Army families.
+                **PCS Vector** is a one-stop shop for Soldiers getting ready to PCS:
 
-                - Housing, spouse career, schools, cash flow, first 30 days
-                - 68+ CONUS & OCONUS posts (BAH + OHA/COLA)
-                - One-time payment · PDF emailed
-                - Retrieve anytime with your order reference
+                - Compare current vs new post housing packages
+                - CONUS **BAH** · Foreign **OHA + COLA** · HI/PR **BAH + COLA**
+                - Off-post utility planning ranges by area
+                - **Dislocation Allowance (DLA)** planning figures
+                - Referral help when you're ready to buy or rent
 
-                Built For Soldiers; By Soldiers. Always verify entitlements with finance.
+                Always verify entitlements with finance / DTMO before you spend.
                 """
             )
 
         st.caption("Army PCS · CONUS & OCONUS")
 
-    return st.session_state.nav_page
+    return "home"
