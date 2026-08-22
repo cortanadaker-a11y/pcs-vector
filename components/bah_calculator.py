@@ -1,4 +1,4 @@
-"""Homepage housing allowance calculator (BAH CONUS + OHA/COLA OCONUS)."""
+"""Compact sticky PCS finance calculator."""
 
 from __future__ import annotations
 
@@ -11,15 +11,20 @@ from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
 from services.dla_rates import format_dla_usd, get_dla_rate
 from services.housing_allowances import compare_housing_packages, get_housing_package
-from services.installation_data import SUPPORTED_INSTALLATIONS
+from services.installation_data import SUPPORTED_INSTALLATIONS, get_installation_data
 from services.utility_costs import get_utility_costs_for_installation
 
 YOS_OPTIONS = list(range(0, 41))
-
-_NONE_CURRENT = "— Skip comparison (gaining post only) —"
+_NONE_CURRENT = "— Skip —"
 _DEP_OPTIONS = [0, 1, 2, 3, 4, 5]
-
-# Session key written each calculator render so CTAs can pre-fill the plan form.
+_QUICK_POSTS = [
+    "Fort Bragg, NC",
+    "Fort Hood, TX",
+    "Fort Campbell, KY",
+    "Joint Base Lewis-McChord, WA",
+    "Camp Humphreys, South Korea",
+    "USAG Rheinland-Pfalz, Germany",
+]
 CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
 
 
@@ -32,53 +37,88 @@ def _money(n: int | None) -> str:
 
 def _deps_label(n: int) -> str:
     if n == 0:
-        return "0 dependents"
+        return "0 deps"
     if n == 5:
-        return "5+ dependents"
-    return f"{n} dependent{'s' if n != 1 else ''}"
+        return "5+ deps"
+    return f"{n} dep{'s' if n != 1 else ''}"
 
 
 def get_calculator_snapshot() -> dict[str, Any] | None:
-    """Return the latest homepage calculator values, if any."""
     snap = st.session_state.get(CALC_SNAPSHOT_KEY)
     return dict(snap) if isinstance(snap, dict) and snap.get("pay_grade") else None
 
 
-def _store_snapshot(
+def _store_snapshot(data: dict[str, Any]) -> None:
+    st.session_state[CALC_SNAPSHOT_KEY] = data
+
+
+def _util_mid(areas: list[dict[str, Any]]) -> int | None:
+    if not areas:
+        return None
+    lows, highs = [], []
+    for a in areas:
+        tot = a.get("total_utilities_usd_mo") or {}
+        if tot.get("low") is not None and tot.get("high") is not None:
+            lows.append(int(tot["low"]))
+            highs.append(int(tot["high"]))
+    if not lows:
+        return None
+    return int(round((sum(lows) / len(lows) + sum(highs) / len(highs)) / 2))
+
+
+def _rent_target(
     *,
-    pay_grade: str,
-    years_of_service: int,
-    num_dependents: int,
-    gaining: str,
-    current: str | None,
-    barracks_meal_card: bool,
-    package: dict[str, Any] | None,
-) -> None:
-    total = None
-    housing = None
-    cola = None
-    system = None
-    if package and package.get("found"):
-        total = package.get("total_monthly_usd")
-        housing = package.get("housing_monthly_usd")
-        cola = package.get("cola_monthly_usd")
-        system = package.get("housing_system")
-    st.session_state[CALC_SNAPSHOT_KEY] = {
-        "pay_grade": pay_grade,
-        "years_of_service": int(years_of_service),
-        "num_dependents": int(num_dependents),
-        "gaining_installation": gaining,
-        "current_installation": current,
-        "barracks_meal_card": bool(barracks_meal_card),
-        "housing_monthly_usd": housing,
-        "cola_monthly_usd": cola,
-        "total_monthly_usd": total,
-        "housing_system": system,
+    system: str,
+    housing: int,
+    util_mid: int | None,
+    oha_rent_max: int | None,
+) -> int | None:
+    if system == "OHA":
+        return int(oha_rent_max) if oha_rent_max is not None else (int(housing) if housing else None)
+    if util_mid and util_mid > 0:
+        return max(int(housing) - int(util_mid), 0)
+    return int(housing) if housing else None
+
+
+def _arrive_cash(rent_tgt: int | None, dla_usd: float | None, util_mid: int | None) -> dict[str, int]:
+    rent = int(rent_tgt or 0)
+    util = int(util_mid or 0)
+    dla = int(round(float(dla_usd or 0)))
+    deposit = rent
+    first_month = rent + util
+    gross = deposit + first_month
+    return {
+        "deposit": deposit,
+        "first_month": first_month,
+        "dla": dla,
+        "net": max(gross - dla, 0),
     }
 
 
+def _spouse_blurb(
+    *,
+    gaining: str,
+    total: int,
+    system_chip: str,
+    rent_tgt: int | None,
+    delta: int | None,
+    current: str | None,
+    dla_usd: float | None,
+) -> str:
+    parts = [
+        f"Hey — PCS money for {gaining}: ~{_money(total)}/mo ({system_chip}).",
+    ]
+    if rent_tgt is not None:
+        parts.append(f"Rent target ~{_money(rent_tgt)}/mo.")
+    if current and delta is not None:
+        parts.append(f"Δ {_money(int(delta))}/mo vs {current}.")
+    if dla_usd:
+        parts.append(f"DLA ~{format_dla_usd(dla_usd)} one-time.")
+    parts.append("PCS Vector — Built For Soldiers; By Soldiers.")
+    return " ".join(parts)
+
+
 def render_bah_calculator() -> None:
-    """Interactive BAH / OHA + COLA calculator for the homepage."""
     installations = list_bah_installations()
     if list(installations) != list(SUPPORTED_INSTALLATIONS):
         installations = list(SUPPORTED_INSTALLATIONS)
@@ -86,84 +126,75 @@ def render_bah_calculator() -> None:
         return
 
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
-
-    st.markdown(
-        f"""
-        <div class="pcs-bah-wrap">
-            <div class="pcs-bah-header">
-                <div class="pcs-bah-badge">2026 · {len(installations)} posts</div>
-                <h3>PCS Finance Calculator</h3>
-                <p class="pcs-bah-sub">
-                    Compare current vs gaining post. CONUS: BAH.
-                    Foreign OCONUS: OHA (rent max + utilities) + COLA.
-                    Hawaii / Puerto Rico: BAH + COLA. Then see utilities and DLA planning figures.
-                </p>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    quick = [p for p in _QUICK_POSTS if p in installations]
 
     with st.container(border=True):
-        st.markdown('<p class="pcs-bah-section-label">Your profile</p>', unsafe_allow_html=True)
-        c1, c2, c3, c4 = st.columns([1.15, 0.9, 1.0, 1.1])
+        if quick:
+            row1, row2 = quick[:3], quick[3:6]
+            for row_i, row in enumerate((row1, row2)):
+                if not row:
+                    continue
+                cols = st.columns(3)
+                for i, post in enumerate(row):
+                    with cols[i]:
+                        label = post.split(",")[0].replace("Joint Base ", "JB ")
+                        if st.button(label, key=f"quick_{row_i}_{i}", use_container_width=True):
+                            st.session_state.bah_calc_gaining = post
+                            st.rerun()
+
+        c1, c2, c3 = st.columns([1.3, 0.7, 0.9])
         with c1:
             pay_grade = st.selectbox(
-                "Pay grade",
+                "Grade",
                 options=grades,
                 index=grades.index("E-5") if "E-5" in grades else 0,
                 format_func=lambda g: f"{g} — {PAY_GRADE_TO_RANK.get(g, g)}",
                 key="bah_calc_grade",
             )
         with c2:
-            yos = st.selectbox(
-                "Years of service",
-                options=YOS_OPTIONS,
-                index=4,
-                key="bah_calc_yos",
-                help="Used for OCONUS COLA spendable income (base pay at this YOS).",
-            )
+            yos = st.selectbox("YOS", options=YOS_OPTIONS, index=4, key="bah_calc_yos")
         with c3:
             num_deps = st.selectbox(
-                "Number of dependents",
+                "Deps",
                 options=_DEP_OPTIONS,
                 index=1,
                 format_func=_deps_label,
                 key="bah_calc_num_deps",
-                help=(
-                    "Command-sponsored dependents for COLA (spouse + children, 0–5+). "
-                    "Also sets with/without-dependents BAH and OHA ceilings."
-                ),
-            )
-        with c4:
-            barracks = st.checkbox(
-                "Barracks + meal card",
-                value=False,
-                key="bah_calc_barracks",
-                help="Single members in government quarters with meal card get ~63% COLA.",
             )
 
-        st.markdown('<p class="pcs-bah-section-label">Duty stations</p>', unsafe_allow_html=True)
-        d1, d2 = st.columns(2)
-        with d1:
-            gaining = st.selectbox(
-                "New post (gaining)",
-                options=installations,
-                index=installations.index("Fort Bragg, NC")
-                if "Fort Bragg, NC" in installations
-                else 0,
-                key="bah_calc_gaining",
+        if "bah_calc_gaining" not in st.session_state:
+            st.session_state.bah_calc_gaining = (
+                "Fort Bragg, NC" if "Fort Bragg, NC" in installations else installations[0]
             )
+
+        d1, d2, d3 = st.columns([1.2, 1.2, 0.45])
+        with d1:
+            gaining = st.selectbox("Going to", options=installations, key="bah_calc_gaining")
         with d2:
             current_raw = st.selectbox(
-                "Current post (optional compare)",
+                "Coming from",
                 options=[_NONE_CURRENT] + installations,
                 key="bah_calc_current",
             )
             current = None if current_raw == _NONE_CURRENT else current_raw
+        with d3:
+            st.write("")
+            st.write("")
+            if st.button("⇄", use_container_width=True, key="bah_swap", help="Swap posts"):
+                g = st.session_state.get("bah_calc_gaining")
+                c = st.session_state.get("bah_calc_current")
+                if c and c != _NONE_CURRENT:
+                    st.session_state.bah_calc_gaining = c
+                    st.session_state.bah_calc_current = g
+                else:
+                    st.session_state.bah_calc_current = g
+                st.rerun()
 
         with_dependents = int(num_deps) > 0
-        barracks_on = bool(barracks) and int(num_deps) == 0
+        barracks_on = False
+        if not with_dependents:
+            barracks_on = st.checkbox("Barracks + meal card", value=False, key="bah_calc_barracks")
+
         result = compare_housing_packages(
             pay_grade=pay_grade,
             with_dependents=with_dependents,
@@ -174,121 +205,111 @@ def render_bah_calculator() -> None:
             barracks_meal_card=barracks_on,
         )
         pkg = result["gaining"]
-        _store_snapshot(
-            pay_grade=pay_grade,
-            years_of_service=int(yos),
-            num_dependents=int(num_deps),
-            gaining=gaining,
-            current=current,
-            barracks_meal_card=barracks_on,
-            package=pkg if pkg.get("found") else None,
-        )
 
         if not pkg.get("found") or pkg.get("total_monthly_usd") is None:
-            st.warning(
-                f"No 2026 housing package on file for {pay_grade} at {gaining}. "
-                "Try another post or verify with finance / DTMO."
-            )
+            _store_snapshot({"pay_grade": pay_grade})
+            st.warning(f"No 2026 package for {pay_grade} at {gaining}.")
             return
 
-        rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
-        dep_label = _deps_label(int(num_deps))
-        dep_chip = f"{int(num_deps)} DEPS" if int(num_deps) else "NO DEPS"
         system = pkg.get("housing_system") or "BAH"
         housing = int(pkg["housing_monthly_usd"] or 0)
         cola = int(pkg.get("cola_monthly_usd") or 0)
         total = int(pkg["total_monthly_usd"])
-        cola_detail = pkg.get("cola_detail") or {}
+        is_oconus = system in ("OHA", "BAH_PLUS_COLA")
+        util_ctx = get_utility_costs_for_installation(gaining, is_oconus=is_oconus)
+        areas = util_ctx.get("areas") or []
+        util_mid = _util_mid(areas)
+        oha_rent = int(pkg["oha_rent_max_usd"]) if pkg.get("oha_rent_max_usd") is not None else None
+        rent_tgt = _rent_target(
+            system=system, housing=housing, util_mid=util_mid, oha_rent_max=oha_rent
+        )
+
+        cur = result.get("current")
+        delta = result.get("monthly_delta_usd")
+        annual = result.get("annual_delta_usd")
+        if not (current and cur and cur.get("found") and delta is not None):
+            delta = None
+            annual = None
 
         if system == "OHA":
-            label = f"OHA planning max · {gaining}"
-            system_chip = "OHA + COLA"
-            annual_note = f"{_money(total * 12)} / year combined (housing package + COLA)"
+            system_chip = "OHA+COLA"
         elif system == "BAH_PLUS_COLA":
-            label = f"BAH + COLA · {gaining}"
-            system_chip = "BAH + COLA"
-            annual_note = f"{_money(total * 12)} / year combined (BAH + COLA)"
+            system_chip = "BAH+COLA"
         else:
-            label = f"Monthly BAH · {gaining}"
             system_chip = "BAH"
-            annual_note = f"{_money(total * 12)} / year housing allowance"
 
+        dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
+        dla_amt = float(dla["dla_usd"]) if dla.get("found") else None
+        arrive = _arrive_cash(rent_tgt, dla_amt, util_mid)
+
+        share = f"{pay_grade} @ {gaining}: {_money(total)}/mo ({system_chip})"
+        if current and delta is not None:
+            share += f" · Δ {_money(int(delta))}/mo vs {current}"
+        if rent_tgt is not None:
+            share += f" · rent ~{_money(rent_tgt)}"
+
+        spouse = _spouse_blurb(
+            gaining=gaining,
+            total=total,
+            system_chip=system_chip,
+            rent_tgt=rent_tgt,
+            delta=int(delta) if delta is not None else None,
+            current=current,
+            dla_usd=dla_amt,
+        )
+
+        _store_snapshot(
+            {
+                "pay_grade": pay_grade,
+                "years_of_service": int(yos),
+                "num_dependents": int(num_deps),
+                "gaining_installation": gaining,
+                "current_installation": current,
+                "barracks_meal_card": barracks_on,
+                "housing_monthly_usd": housing,
+                "cola_monthly_usd": cola,
+                "total_monthly_usd": total,
+                "housing_system": system,
+                "rent_target_usd": rent_tgt,
+                "dla_usd": dla_amt,
+                "arrive_cash_net_usd": arrive["net"],
+                "share_line": share,
+                "spouse_blurb": spouse,
+            }
+        )
+
+        # Sticky results strip
+        delta_bit = f" · Δ {_money(int(delta))}/mo" if delta is not None else ""
         st.markdown(
             f"""
-            <div class="pcs-bah-result">
-                <div class="pcs-bah-result-top">
-                    <div class="pcs-bah-result-label">{safe_html(label)}</div>
-                    <span class="pcs-bah-chip pcs-bah-chip-{'with' if with_dependents else 'without'}">{safe_html(dep_chip)} · {safe_html(system_chip)}</span>
+            <div class="pcs-sticky-results">
+                <div class="pcs-sticky-results-main">
+                    <span class="pcs-sticky-results-amt">{_money(total)}</span>
+                    <span class="pcs-sticky-results-unit">/mo</span>
+                    <span class="pcs-sticky-results-meta">{safe_html(system_chip)} · {safe_html(gaining)}{safe_html(delta_bit)}</span>
                 </div>
-                <div class="pcs-bah-result-amount">{_money(total)}<span>/mo total</span></div>
-                <div class="pcs-bah-result-meta">
-                    {safe_html(pay_grade)} ({safe_html(rank_label)}) · {safe_html(dep_label)} · {int(yos)} YOS
+                <div class="pcs-sticky-results-grid">
+                    <div><b>Rent</b> {_money(rent_tgt)}</div>
+                    <div><b>DLA</b> {safe_html(format_dla_usd(dla_amt) if dla_amt is not None else '—')}</div>
+                    <div><b>Arrive</b> {_money(arrive['net'])}</div>
                 </div>
-                <div class="pcs-bah-result-annual">{safe_html(annual_note)}</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        # Breakdown cards
+        # Compact breakdown
         if system == "OHA":
-            rent = pkg.get("oha_rent_max_usd")
             util = pkg.get("oha_utility_usd")
-            st.markdown(
-                f"""
-                <div class="pcs-bah-pair">
-                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
-                        <div class="pcs-bah-pair-k">OHA rent ceiling</div>
-                        <div class="pcs-bah-pair-v">{_money(int(rent) if rent else None)}/mo</div>
-                    </div>
-                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
-                        <div class="pcs-bah-pair-k">OHA utilities</div>
-                        <div class="pcs-bah-pair-v">{_money(int(util) if util else None)}/mo</div>
-                    </div>
-                    <div class="pcs-bah-pair-card pcs-bah-pair-diff">
-                        <div class="pcs-bah-pair-k">COLA (index {safe_html(str(pkg.get('cola_index') if pkg.get('cola_index') is not None else '—'))})</div>
-                        <div class="pcs-bah-pair-v">{_money(cola)}/mo</div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            if cola_detail.get("note") and (cola or pkg.get("cola_index") is not None):
-                spend = cola_detail.get("annual_spendable_usd")
-                if spend:
-                    st.caption(
-                        f"COLA math: annual spendable ${_format_int(spend)} "
-                        f"({int(num_deps)} deps, {int(yos)} YOS) · {cola_detail.get('note')}"
-                    )
-            st.caption(pkg.get("disclaimer") or "")
-            if pkg.get("currency_note"):
-                st.caption(pkg["currency_note"])
+            b1, b2, b3 = st.columns(3)
+            b1.metric("Rent ceiling", _money(oha_rent))
+            b2.metric("OHA utils", _money(int(util) if util else None))
+            b3.metric("COLA", _money(cola))
         elif system == "BAH_PLUS_COLA":
-            st.markdown(
-                f"""
-                <div class="pcs-bah-pair">
-                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
-                        <div class="pcs-bah-pair-k">BAH</div>
-                        <div class="pcs-bah-pair-v">{_money(housing)}/mo</div>
-                    </div>
-                    <div class="pcs-bah-pair-card pcs-bah-pair-active">
-                        <div class="pcs-bah-pair-k">COLA (index {safe_html(str(pkg.get('cola_index') if pkg.get('cola_index') is not None else '—'))})</div>
-                        <div class="pcs-bah-pair-v">{_money(cola)}/mo</div>
-                    </div>
-                    <div class="pcs-bah-pair-card pcs-bah-pair-diff">
-                        <div class="pcs-bah-pair-k">Combined</div>
-                        <div class="pcs-bah-pair-v">{_money(total)}/mo</div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            if cola_detail.get("annual_spendable_usd"):
-                st.caption(
-                    f"COLA math: annual spendable ${_format_int(cola_detail['annual_spendable_usd'])} "
-                    f"({int(num_deps)} deps, {int(yos)} YOS) · {cola_detail.get('note', '')}"
-                )
-            st.caption(pkg.get("disclaimer") or "")
+            b1, b2, b3 = st.columns(3)
+            b1.metric("BAH", _money(housing))
+            b2.metric("COLA", _money(cola))
+            b3.metric("Total", _money(total))
         else:
             alt_with = get_housing_package(
                 gaining, pay_grade, with_dependents=True, years_of_service=int(yos), num_dependents=1
@@ -299,136 +320,48 @@ def render_bah_calculator() -> None:
             aw = alt_with.get("housing_monthly_usd")
             awo = alt_without.get("housing_monthly_usd")
             if aw is not None and awo is not None:
-                active_with = "pcs-bah-pair-active" if with_dependents else ""
-                active_without = "pcs-bah-pair-active" if not with_dependents else ""
-                st.markdown(
-                    f"""
-                    <div class="pcs-bah-pair">
-                        <div class="pcs-bah-pair-card {active_with}">
-                            <div class="pcs-bah-pair-k">With dependents</div>
-                            <div class="pcs-bah-pair-v">{_money(int(aw))}/mo</div>
-                        </div>
-                        <div class="pcs-bah-pair-card {active_without}">
-                            <div class="pcs-bah-pair-k">Without dependents</div>
-                            <div class="pcs-bah-pair-v">{_money(int(awo))}/mo</div>
-                        </div>
-                        <div class="pcs-bah-pair-card pcs-bah-pair-diff">
-                            <div class="pcs-bah-pair-k">Dependent difference</div>
-                            <div class="pcs-bah-pair-v">{_money(int(aw) - int(awo))}/mo</div>
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                b1, b2, b3 = st.columns(3)
+                b1.metric("With deps", _money(int(aw)))
+                b2.metric("Without", _money(int(awo)))
+                b3.metric("Diff", _money(int(aw) - int(awo)))
 
-        # Comparison to current post
-        cur = result.get("current")
-        delta = result.get("monthly_delta_usd")
-        if current and cur and cur.get("found") and cur.get("total_monthly_usd") is not None and delta is not None:
-            curr_tot = int(cur["total_monthly_usd"])
-            annual = int(result.get("annual_delta_usd") or 0)
-            cur_sys = cur.get("housing_system") or "BAH"
-            if delta > 0:
-                tone, headline = "up", f"+{_money(delta)}/mo more at your new post"
-            elif delta < 0:
-                tone, headline = "down", f"{_money(delta)}/mo less at your new post"
-            else:
-                tone, headline = "flat", "Same total package at both posts"
-
-            cur_bits = []
-            if cur_sys == "OHA":
-                cur_bits.append(f"OHA ≈ {_money(cur.get('housing_monthly_usd'))}")
-            else:
-                cur_bits.append(f"BAH {_money(cur.get('housing_monthly_usd'))}")
-            if int(cur.get("cola_monthly_usd") or 0):
-                cur_bits.append(f"COLA {_money(int(cur['cola_monthly_usd']))}")
-            new_bits = []
-            if system == "OHA":
-                new_bits.append(f"OHA ≈ {_money(housing)}")
-            else:
-                new_bits.append(f"BAH {_money(housing)}")
-            if cola:
-                new_bits.append(f"COLA {_money(cola)}")
-
-            detail = (
-                f"{current} ({', '.join(cur_bits)} → {_money(curr_tot)} total) → "
-                f"{gaining} ({', '.join(new_bits)} → {_money(total)} total). "
-                f"About {_money(annual)} per year."
-            )
+        if current and cur and cur.get("found") and delta is not None:
+            tone = "up" if delta > 0 else ("down" if delta < 0 else "flat")
             st.markdown(
                 f"""
-                <div class="pcs-bah-delta pcs-bah-delta-{tone}">
-                    <div class="pcs-bah-delta-title">{safe_html(headline)}</div>
-                    <div class="pcs-bah-delta-detail">{safe_html(detail)}</div>
-                    <div class="pcs-bah-delta-grid">
-                        <div class="pcs-bah-delta-cell">
-                            <div class="pcs-bah-delta-k">Current total</div>
-                            <div class="pcs-bah-delta-v">{_money(curr_tot)}/mo</div>
-                            <div class="pcs-bah-delta-s">{safe_html(current)}</div>
-                        </div>
-                        <div class="pcs-bah-delta-arrow">→</div>
-                        <div class="pcs-bah-delta-cell">
-                            <div class="pcs-bah-delta-k">New total</div>
-                            <div class="pcs-bah-delta-v">{_money(total)}/mo</div>
-                            <div class="pcs-bah-delta-s">{safe_html(gaining)}</div>
-                        </div>
-                        <div class="pcs-bah-delta-cell">
-                            <div class="pcs-bah-delta-k">Change</div>
-                            <div class="pcs-bah-delta-v">{_money(int(delta))}</div>
-                            <div class="pcs-bah-delta-s">{_money(annual)} / year</div>
-                        </div>
-                    </div>
+                <div class="pcs-bah-delta pcs-bah-delta-{tone} pcs-delta-tight">
+                    <strong>{_money(int(delta))}/mo</strong> · {_money(int(annual or 0))}/yr
+                    · {safe_html(current)} → {safe_html(gaining)}
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
-        # DLA planning figure
-        dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
-        if dla.get("found"):
-            st.markdown("##### Dislocation Allowance (DLA) — planning")
-            st.markdown(
-                f"**{format_dla_usd(dla['dla_usd'])}** one-time "
-                f"({'with' if with_dependents else 'without'} dependents relocating) · "
-                f"grade {dla['pay_grade']} · effective {dla.get('effective_date', '2026')}"
-            )
-            st.caption(
-                "DLA is usually yours to keep when authorized — not a Travel Advance "
-                "(advances get paid back from your LES). Confirm with finance."
-            )
-
-        # Off-post utility ranges for gaining post
-        is_oconus = system in ("OHA", "BAH_PLUS_COLA")
-        util_ctx = get_utility_costs_for_installation(gaining, is_oconus=is_oconus)
-        areas = util_ctx.get("areas") or []
-        if areas:
-            st.markdown("##### Off-post utilities (on top of rent)")
-            st.caption(
-                (util_ctx.get("as_of") or "2026 planning")
-                + " · typical 3-bedroom · verify with landlord / providers"
-            )
-            rows = []
-            for a in areas[:4]:
-                tot = a.get("total_utilities_usd_mo") or {}
-                e = a.get("electric_usd_mo") or {}
-                g = a.get("gas_or_heat_usd_mo") or {}
-                rows.append(
-                    {
-                        "Area": a.get("name", "—"),
-                        "Electric": f"${e.get('low', 0)}–${e.get('high', 0)}",
-                        "Heat / gas": f"${g.get('low', 0)}–${g.get('high', 0)}",
-                        "Total / mo": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
-                    }
+        info = get_installation_data(gaining) or {}
+        with st.expander("More: intel · utilities · share", expanded=False):
+            notes = (info.get("notes") or "").strip()
+            if notes:
+                st.markdown(f"**{gaining}** — {notes}")
+            areas_list = info.get("major_areas") or []
+            if areas_list:
+                st.caption("Areas: " + ", ".join(areas_list[:4]))
+            if areas:
+                st.caption(
+                    (util_ctx.get("as_of") or "2026")
+                    + (f" · mid utils ~{_money(util_mid)}" if util_mid else "")
                 )
-            st.dataframe(rows, use_container_width=True, hide_index=True)
-            if areas[0].get("season_note"):
-                st.caption(areas[0]["season_note"])
+                rows = []
+                for a in areas[:3]:
+                    tot = a.get("total_utilities_usd_mo") or {}
+                    rows.append(
+                        {
+                            "Area": a.get("name", "—"),
+                            "Total/mo": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
+                        }
+                    )
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            st.caption("Copy to text")
+            st.code(spouse, language=None)
+            st.code(share, language=None)
 
-        st.caption(
-            "CONUS = BAH. Foreign OCONUS = OHA (actual rent up to max + utilities) + COLA. "
-            "HI/PR = BAH + COLA. Always verify on your LES and DTMO calculators before you spend."
-        )
-
-
-def _format_int(n: int | float) -> str:
-    return f"{int(n):,}"
+        st.caption("Planning figures · verify LES / finance / DTMO")

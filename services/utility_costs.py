@@ -331,6 +331,117 @@ _UTILITY_BY_INSTALL: dict[str, dict[str, Any]] = {
         ],
         "as_of": "2026 planning (KMC)",
     },
+    "Fort Carson, CO": {
+        "areas": [
+            {
+                "name": "Fountain / Widefield (80817)",
+                "zips": ["80817", "80911"],
+                "electric": (90, 170),
+                "gas_or_heat": (50, 160),
+                "water_trash": (55, 100),
+                "internet": (60, 95),
+                "season_note": "Winter heating is the swing; altitude + dry air — humidifiers help.",
+            },
+            {
+                "name": "Colorado Springs south (80906)",
+                "zips": ["80906", "80910"],
+                "electric": (95, 180),
+                "gas_or_heat": (55, 170),
+                "water_trash": (60, 110),
+                "internet": (65, 100),
+                "season_note": "Newer builds often more efficient; ask for prior winter gas bills.",
+            },
+        ],
+        "as_of": "2026 planning (Front Range dual-season)",
+    },
+    "Fort Riley, KS": {
+        "areas": [
+            {
+                "name": "Junction City (66441)",
+                "zips": ["66441"],
+                "electric": (110, 210),
+                "gas_or_heat": (40, 130),
+                "water_trash": (50, 90),
+                "internet": (55, 90),
+                "season_note": "Hot summers + cold winters — budget both AC and heat.",
+            },
+            {
+                "name": "Manhattan / 66502",
+                "zips": ["66502", "66503"],
+                "electric": (105, 200),
+                "gas_or_heat": (40, 125),
+                "water_trash": (50, 95),
+                "internet": (55, 95),
+                "season_note": "Longer commute; confirm fuel cost on top of utilities.",
+            },
+        ],
+        "as_of": "2026 planning (Flint Hills)",
+    },
+    "Joint Base San Antonio, TX": {
+        "areas": [
+            {
+                "name": "San Antonio NE / Schertz / Universal City",
+                "zips": ["78154", "78148", "78233"],
+                "electric": (120, 250),
+                "gas_or_heat": (20, 55),
+                "water_trash": (55, 100),
+                "internet": (60, 95),
+                "season_note": "Summer AC is the spike; many leases exclude electric — read the lease.",
+            },
+            {
+                "name": "Converse / Live Oak corridor",
+                "zips": ["78109", "78233"],
+                "electric": (115, 240),
+                "gas_or_heat": (20, 55),
+                "water_trash": (50, 95),
+                "internet": (55, 90),
+                "season_note": "Confirm JBSA gate against commute fuel cost.",
+            },
+        ],
+        "as_of": "2026 planning (San Antonio / JBSA)",
+    },
+    "Fort Polk, LA": {
+        "areas": [
+            {
+                "name": "Leesville (71446)",
+                "zips": ["71446"],
+                "electric": (140, 280),
+                "gas_or_heat": (20, 55),
+                "water_trash": (50, 90),
+                "internet": (55, 90),
+                "season_note": "Humid summers = high AC; check if electric is included in rent.",
+            },
+        ],
+        "as_of": "2026 planning (central LA humidity)",
+    },
+    "Fort Gordon, GA": {
+        "areas": [
+            {
+                "name": "Grovetown / Augusta west (30813)",
+                "zips": ["30813", "30909"],
+                "electric": (125, 240),
+                "gas_or_heat": (25, 75),
+                "water_trash": (50, 90),
+                "internet": (55, 90),
+                "season_note": "Summer humidity drives AC; winter mild but still plan heat.",
+            },
+        ],
+        "as_of": "2026 planning (CSRA / Augusta)",
+    },
+    "Fort Jackson, SC": {
+        "areas": [
+            {
+                "name": "Columbia / Elgin corridor",
+                "zips": ["29223", "29045"],
+                "electric": (120, 230),
+                "gas_or_heat": (30, 90),
+                "water_trash": (50, 95),
+                "internet": (55, 90),
+                "season_note": "Hot humid summers; confirm water/trash vs HOA fees.",
+            },
+        ],
+        "as_of": "2026 planning (Midlands SC)",
+    },
 }
 
 # Climate-region fallbacks when installation is not in the table

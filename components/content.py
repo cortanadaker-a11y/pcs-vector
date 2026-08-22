@@ -5,13 +5,9 @@ from services.installation_data import SUPPORTED_INSTALLATIONS
 INSTALLATION_COUNT = len(SUPPORTED_INSTALLATIONS)
 
 HERO = {
-    "kicker": "Know the money before you sign anything.",
-    "headline": "See what your new post actually pays — then find a place that fits",
-    "subheadline": (
-        "Compare BAH, OHA, and COLA at your gaining station versus where you are now. "
-        "Add local utility ranges and Dislocation Allowance (DLA) planning figures — "
-        "then get connected when you’re ready to buy or rent."
-    ),
+    "kicker": "",
+    "headline": "",
+    "subheadline": "",
 }
 
 TRUST_SIGNALS = {
