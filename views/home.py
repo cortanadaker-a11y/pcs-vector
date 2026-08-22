@@ -35,24 +35,19 @@ def _render_referral_hook() -> None:
     if grade:
         bits.append(str(grade))
     if total is not None:
-        bits.append(f"about ${int(total):,}/month {system}")
+        bits.append(f"${int(total):,}/mo {system}")
     if market_mid is not None and bedrooms is not None:
-        bits.append(f"typical {int(bedrooms)}-bedroom rent about ${int(market_mid):,}")
+        bits.append(f"{int(bedrooms)}BR ~${int(market_mid):,}")
     if arrive is not None and arrive > 0:
-        bits.append(f"still need about ${int(arrive):,} after DLA for move-in")
-    elif arrive == 0:
-        bits.append("DLA may cover a typical move-in")
-    meta = " · ".join(bits) if bits else "Based on the numbers from the calculator above"
+        bits.append(f"~${int(arrive):,} needed after DLA")
+    meta = " · ".join(bits) if bits else "From your calculator results"
 
     st.markdown(
         f"""
         <div class="pcs-ref-card">
-            <div class="pcs-ref-kicker">Free · no obligation</div>
-            <h3 class="pcs-ref-title">Need help finding a place near {safe_html(dest)}?</h3>
-            <p class="pcs-ref-body">
-                We can connect you with someone who helps military families buy or rent.
-                There is no charge to request a referral.
-            </p>
+            <div class="pcs-ref-kicker">Free referral</div>
+            <h3 class="pcs-ref-title">Buy or rent near {safe_html(dest)}</h3>
+            <p class="pcs-ref-body">We’ll connect you with a partner who works military PCS moves.</p>
             <div class="pcs-ref-meta">{safe_html(meta)}</div>
         </div>
         """,
@@ -61,24 +56,23 @@ def _render_referral_hook() -> None:
     with st.container(border=True):
         c1, c2 = st.columns(2)
         with c1:
-            name = st.text_input("Name", key="referral_name", placeholder="First and last name")
+            name = st.text_input("Name", key="referral_name", placeholder="First and last")
         with c2:
             email = st.text_input("Email", key="referral_email", placeholder="you@email.com")
         interest = st.radio(
             "I want to",
-            options=["Rent", "Buy", "Not sure yet"],
+            options=["Rent", "Buy", "Not sure"],
             horizontal=True,
             key="referral_interest",
         )
         notes = st.text_input(
-            "Anything else we should know? (optional)",
+            "Notes (optional)",
             key="referral_notes",
             placeholder="Report date, pets, schools…",
         )
-        st.caption("We will not spam you. Built For Soldiers; By Soldiers.")
-        if st.button("Request a free referral →", type="primary", use_container_width=True, key="referral_submit"):
+        if st.button("Request free referral →", type="primary", use_container_width=True, key="referral_submit"):
             if not (email or "").strip() or "@" not in (email or ""):
-                st.error("Please enter a valid email so we can reach you.")
+                st.error("Enter a valid email.")
             else:
                 st.session_state.referral_lead = {
                     "name": (name or "").strip(),
@@ -93,26 +87,19 @@ def _render_referral_hook() -> None:
                     "arrive_cash_net_usd": arrive,
                     "calculator": snap,
                 }
-                st.success(f"Thanks — we will follow up about housing near **{dest}**.")
-                st.caption("Built For Soldiers; By Soldiers")
+                st.success(f"Got it — we’ll follow up about housing near **{dest}**.")
 
 
 def _render_faq() -> None:
-    with st.expander("Common questions", expanded=False):
+    with st.expander("FAQ", expanded=False):
         st.markdown(
-            "**Is this free?** Yes. The calculator and housing referrals are free.\n\n"
-            "**What is BAH?** Basic Allowance for Housing — a flat monthly housing payment "
-            "for most U.S. posts. If rent is less than BAH, you usually keep the difference.\n\n"
-            "**What is OHA?** Overseas Housing Allowance — for foreign posts. It pays your actual rent "
-            "up to a maximum, plus a utilities allowance.\n\n"
-            "**What is COLA?** Cost of Living Allowance — extra money for higher day-to-day costs "
-            "overseas (and in Hawaii / Puerto Rico). It is not meant for rent.\n\n"
-            "**What is DLA?** Dislocation Allowance — one-time money for a move when you are authorized. "
-            "Confirm with finance. It is not a travel advance you have to pay back.\n\n"
-            "**Where do the rent numbers come from?** They are planning estimates for a home size based "
-            "on how many dependents you have (1 to 4 bedrooms). They are not official rates.\n\n"
-            "**Are the allowance numbers official?** BAH, OHA, COLA, and DLA come from DoD planning tables. "
-            "Always check your LES and confirm with finance before you sign a lease or buy."
+            "**Free?** Yes.\n\n"
+            "**BAH** — Flat U.S. housing pay. Keep the leftover if rent is lower.\n\n"
+            "**OHA** — Overseas: actual rent up to a max, plus utilities.\n\n"
+            "**COLA** — Extra for higher daily costs overseas / HI / PR. Not for rent.\n\n"
+            "**DLA** — One-time move money when authorized. Confirm with finance.\n\n"
+            "**Rent estimates** — Planning ranges by family size (1–4 bedrooms), not official rates.\n\n"
+            "**Official?** Allowances from DoD tables — verify on your LES before you sign."
         )
 
 
@@ -121,7 +108,4 @@ def render_home() -> None:
     render_bah_calculator()
     _render_referral_hook()
     _render_faq()
-    st.caption(
-        "PCS Vector — Built For Soldiers; By Soldiers. "
-        "Always confirm BAH, OHA, COLA, and DLA with your finance office before you spend."
-    )
+    st.caption("PCS Vector — Built For Soldiers; By Soldiers · Verify with finance before you spend.")

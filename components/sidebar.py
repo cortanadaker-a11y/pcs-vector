@@ -29,8 +29,8 @@ def render_sidebar() -> str:
         st.caption("Built For Soldiers; By Soldiers")
         st.divider()
         st.markdown(
-            f"Free calculator for housing money at **{len(SUPPORTED_INSTALLATIONS)}** Army posts — "
-            "BAH, OHA, COLA, utilities, DLA, and help finding a place to buy or rent."
+            f"Free housing calculator for **{len(SUPPORTED_INSTALLATIONS)}** posts — "
+            "BAH, OHA, COLA, utilities, DLA, and buy/rent help."
         )
-        st.caption("Always double-check numbers with finance before you sign anything.")
+        st.caption("Confirm numbers with finance before you sign.")
     return "home"
