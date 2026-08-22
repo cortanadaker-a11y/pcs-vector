@@ -189,32 +189,6 @@ def _package_side_html(pkg: dict[str, Any], *, side_label: str) -> str:
     )
 
 
-def _scenario_rows(
-    *,
-    rent_budget: int,
-    market_low: int,
-    market_mid: int,
-    market_high: int,
-    util_mid: int | None,
-) -> list[dict[str, Any]]:
-    """BAH/OHA vs low/mid/high rent (+ utils) leftover scenarios."""
-    util = int(util_mid or 0)
-    rows = []
-    for label, rent in (("Cheaper", market_low), ("Typical", market_mid), ("Higher", market_high)):
-        all_in = rent + util
-        left = rent_budget - all_in
-        rows.append(
-            {
-                "label": label,
-                "rent": rent,
-                "utils": util,
-                "all_in": all_in,
-                "left": left,
-            }
-        )
-    return rows
-
-
 def render_bah_calculator() -> None:
     installations = list_bah_installations()
     if list(installations) != list(SUPPORTED_INSTALLATIONS):
@@ -429,35 +403,6 @@ def render_bah_calculator() -> None:
                     <div><b>Move-in</b><br>{_money_html(move_in) if move_in else '—'}</div>
                     <div><b>After DLA</b><br>{gap_html}</div>
                 </div>
-            </div>
-            """
-        )
-
-        scenarios = _scenario_rows(
-            rent_budget=rent_budget,
-            market_low=market_low,
-            market_mid=market_mid,
-            market_high=market_high,
-            util_mid=util_mid,
-        )
-        scen_html = ""
-        for s in scenarios:
-            tone = "ok" if s["left"] >= 0 else "short"
-            left_lbl = f"+{_money_html(s['left'])}" if s["left"] >= 0 else _money_html(s["left"])
-            left_word = " left" if s["left"] >= 0 else " short"
-            scen_html += (
-                f'<div class="pcs-scen pcs-scen-{tone}">'
-                f'<div class="pcs-scen-k">{s["label"]}</div>'
-                f'<div class="pcs-scen-rent">{_money_html(s["rent"])}</div>'
-                f'<div class="pcs-scen-sub">+ util {_money_html(s["utils"])} = {_money_html(s["all_in"])}</div>'
-                f'<div class="pcs-scen-left">{left_lbl}<span>{left_word}</span></div>'
-                f"</div>"
-            )
-        _render_html(
-            f"""
-            <div class="pcs-scen-wrap">
-                <div class="pcs-scen-title">{safe_html(primary_k)} left after rent + utilities</div>
-                <div class="pcs-scen-grid">{scen_html}</div>
             </div>
             """
         )
