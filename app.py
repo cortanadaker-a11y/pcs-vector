@@ -11,6 +11,7 @@ import logging
 import streamlit as st
 
 from components.scroll import (
+    render_boot_at_top,
     render_dropdown_scroll_fix,
     render_page_top_anchor,
     render_scroll_to_top,
@@ -43,3 +44,4 @@ render_sidebar()
 render_page_top_anchor()
 render_home()
 render_scroll_to_top()
+render_boot_at_top()

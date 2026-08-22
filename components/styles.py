@@ -1744,40 +1744,66 @@ CUSTOM_CSS = """
         margin: 0.5rem 0 0.35rem 0;
     }
 
-    .pcs-ref-card {
-        margin: 1.25rem 0 0.55rem 0;
-        background: var(--pcs-surface);
-        border: 1px solid var(--pcs-border);
-        border-left: 4px solid var(--pcs-accent);
-        border-radius: 12px;
-        padding: 1rem 1.15rem;
-        box-shadow: 0 4px 16px rgba(28, 28, 26, 0.04);
+    .pcs-ref-head {
+        margin: 0.1rem 0 0.55rem 0;
+        padding-bottom: 0.65rem;
+        border-bottom: 1px solid var(--pcs-border);
+        scroll-margin-top: 0.75rem;
     }
 
     .pcs-ref-kicker {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         font-weight: 800;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--pcs-accent);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.28rem;
     }
 
     .pcs-ref-title {
-        font-size: 1.2rem !important;
-        font-weight: 800 !important;
-        color: var(--pcs-navy) !important;
-        margin: 0 0 0.35rem 0 !important;
-        letter-spacing: -0.02em;
-        line-height: 1.25 !important;
+        display: block;
+        font-size: 1.28rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        margin: 0 0 0.4rem 0;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
     }
 
     .pcs-ref-body {
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         color: var(--pcs-slate);
         line-height: 1.45;
-        margin: 0 0 0.35rem 0;
-        max-width: 36rem;
+        margin: 0 0 0.55rem 0;
+        max-width: 40rem;
+    }
+
+    .pcs-ref-body strong {
+        color: var(--pcs-navy);
+        font-weight: 700;
+    }
+
+    .pcs-ref-summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.2rem 0.35rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--pcs-muted);
+        line-height: 1.35;
+        margin: 0;
+        padding: 0.35rem 0.55rem;
+        background: #f7f5f1;
+        border: 1px solid var(--pcs-border);
+        border-radius: 8px;
+        width: fit-content;
+        max-width: 100%;
+    }
+
+    .pcs-ref-summary-sep {
+        color: var(--pcs-border);
+        font-weight: 700;
     }
 
     .pcs-ref-meta {

@@ -13,6 +13,63 @@ def request_scroll_to_top() -> None:
     st.session_state[SCROLL_TO_TOP_FLAG] = True
 
 
+def _scroll_top_script(*, clear_hash: bool) -> str:
+    clear = "true" if clear_hash else "false"
+    return f"""
+<script>
+(function () {{
+  const doc = window.parent.document;
+  const clearHash = {clear};
+
+  function scrollAllToTop() {{
+    if (clearHash) {{
+      try {{
+        const url = window.parent.location;
+        if (url.hash) {{
+          window.parent.history.replaceState(
+            null,
+            "",
+            url.pathname + url.search
+          );
+        }}
+      }} catch (err) {{}}
+    }}
+
+    try {{
+      window.parent.scrollTo({{ top: 0, left: 0, behavior: "auto" }});
+    }} catch (err) {{
+      try {{ window.parent.scrollTo(0, 0); }} catch (e2) {{}}
+    }}
+
+    const selectors = [
+      '[data-testid="stAppViewContainer"]',
+      '[data-testid="stMain"]',
+      "section.main",
+      ".main",
+      ".block-container",
+    ];
+
+    selectors.forEach(function (selector) {{
+      doc.querySelectorAll(selector).forEach(function (el) {{
+        el.scrollTop = 0;
+      }});
+    }});
+
+    const anchor = doc.getElementById("pcs-page-top");
+    if (anchor && anchor.scrollIntoView) {{
+      anchor.scrollIntoView({{ block: "start", behavior: "auto" }});
+    }}
+  }}
+
+  scrollAllToTop();
+  [50, 150, 350, 600, 1200].forEach(function (delay) {{
+    setTimeout(scrollAllToTop, delay);
+  }});
+}})();
+</script>
+"""
+
+
 def render_scroll_to_top() -> None:
     """Scroll the main view to the top when requested.
 
@@ -22,46 +79,16 @@ def render_scroll_to_top() -> None:
     if not st.session_state.pop(SCROLL_TO_TOP_FLAG, False):
         return
 
-    components.html(
-        """<script>
-            (function () {
-                const doc = window.parent.document;
+    components.html(_scroll_top_script(clear_hash=False), height=0)
 
-                function scrollAllToTop() {
-                    try {
-                        window.parent.scrollTo({ top: 0, left: 0, behavior: "auto" });
-                    } catch (err) {
-                        window.parent.scrollTo(0, 0);
-                    }
 
-                    const selectors = [
-                        '[data-testid="stAppViewContainer"]',
-                        '[data-testid="stMain"]',
-                        "section.main",
-                        ".main",
-                        ".block-container",
-                    ];
+def render_boot_at_top() -> None:
+    """On home load: strip deep-link hashes (#ready-to-find-a-place) and stay at top.
 
-                    selectors.forEach(function (selector) {
-                        doc.querySelectorAll(selector).forEach(function (el) {
-                            el.scrollTop = 0;
-                        });
-                    });
-
-                    const anchor = doc.getElementById("pcs-page-top");
-                    if (anchor && anchor.scrollIntoView) {
-                        anchor.scrollIntoView({ block: "start", behavior: "auto" });
-                    }
-                }
-
-                scrollAllToTop();
-                [50, 150, 350, 600].forEach(function (delay) {
-                    setTimeout(scrollAllToTop, delay);
-                });
-            })();
-        </script>""",
-        height=0,
-    )
+    Streamlit heading anchors and height-0 component iframes otherwise drop users
+    at the referral section.
+    """
+    components.html(_scroll_top_script(clear_hash=True), height=0)
 
 
 def render_page_top_anchor() -> None:
