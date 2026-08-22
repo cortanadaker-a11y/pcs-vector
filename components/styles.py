@@ -203,6 +203,26 @@ CUSTOM_CSS = """
         margin-top: 0.2rem;
     }
 
+    .pcs-out-fit {
+        font-size: 0.84rem;
+        line-height: 1.45;
+        margin: 0.35rem 0 0.45rem 0;
+        padding: 0.55rem 0.7rem;
+        border-radius: 8px;
+    }
+
+    .pcs-out-fit-fit {
+        background: rgba(168, 212, 188, 0.18);
+        color: #c5ebd4;
+        border: 1px solid rgba(168, 212, 188, 0.35);
+    }
+
+    .pcs-out-fit-tight {
+        background: rgba(240, 196, 180, 0.15);
+        color: #f0d0c0;
+        border: 1px solid rgba(240, 196, 180, 0.35);
+    }
+
     .pcs-out-bar-wrap {
         margin: 0.35rem 0 0.75rem 0;
     }

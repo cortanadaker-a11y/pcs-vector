@@ -2015,6 +2015,50 @@ def resolve_installation(gaining_label: str) -> InstallationProfile:
     return DEFAULT_INSTALLATION
 
 
+def bedrooms_for_dependents(num_dependents: int) -> int:
+    """Planning bedroom count from command-sponsored dependent count."""
+    n = max(0, int(num_dependents))
+    if n <= 0:
+        return 1
+    if n == 1:
+        return 2
+    if n <= 3:
+        return 3
+    return 4
+
+
+def get_family_market_rent(
+    installation: str,
+    *,
+    num_dependents: int = 1,
+) -> dict[str, Any]:
+    """Typical off-post rent range sized to family (scaled from 3BR planning data).
+
+    Returns low/mid/high USD/mo plus bedroom count. Planning figures only —
+    not an official BAH or OHA number.
+    """
+    profile = resolve_installation(installation)
+    br = bedrooms_for_dependents(num_dependents)
+    # Scale factors vs the installation's avg 3BR planning band
+    scale = {1: 0.72, 2: 0.88, 3: 1.0, 4: 1.18}.get(br, 1.0)
+    base_low, base_high = profile.housing.avg_3br_rent_range
+    low = int(round(base_low * scale))
+    high = int(round(base_high * scale))
+    mid = int(round((low + high) / 2))
+    rich = bool(_RICH_PROFILE_EXTENSIONS.get(profile.display_name))
+    return {
+        "installation": profile.display_name,
+        "bedrooms": br,
+        "num_dependents": int(num_dependents),
+        "low_usd": low,
+        "mid_usd": mid,
+        "high_usd": high,
+        "source_3br_range": (int(base_low), int(base_high)),
+        "rich_market_data": rich,
+        "label": f"Typical {br}BR off-post",
+    }
+
+
 def get_bah_estimate(pay_grade: str, profile: InstallationProfile) -> int:
     """Return monthly BAH with dependents (2026 DTMO rates when available)."""
     from services.bah_rates import get_bah_monthly

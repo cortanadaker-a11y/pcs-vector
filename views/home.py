@@ -27,7 +27,8 @@ def _render_referral_hook() -> None:
     total = (snap or {}).get("total_monthly_usd")
     grade = (snap or {}).get("pay_grade")
     system = (snap or {}).get("housing_system") or "BAH"
-    rent_hint = (snap or {}).get("rent_target_usd")
+    market_mid = (snap or {}).get("market_rent_mid_usd")
+    bedrooms = (snap or {}).get("market_bedrooms")
     arrive = (snap or {}).get("arrive_cash_net_usd")
 
     bits = []
@@ -35,10 +36,10 @@ def _render_referral_hook() -> None:
         bits.append(str(grade))
     if total is not None:
         bits.append(f"~${int(total):,}/mo {system}")
-    if rent_hint is not None:
-        bits.append(f"rent ~${int(rent_hint):,}")
+    if market_mid is not None and bedrooms is not None:
+        bits.append(f"typical {int(bedrooms)}BR ~${int(market_mid):,}")
     if arrive is not None:
-        bits.append(f"arrive ~${int(arrive):,}")
+        bits.append(f"move-in gap ~${int(arrive):,}")
     meta = " · ".join(bits) if bits else "Uses your calculator results"
 
     st.markdown(
@@ -82,7 +83,8 @@ def _render_referral_hook() -> None:
                     "gaining_installation": dest,
                     "pay_grade": grade,
                     "housing_package_usd": total,
-                    "rent_target_usd": rent_hint,
+                    "market_rent_mid_usd": market_mid,
+                    "market_bedrooms": bedrooms,
                     "arrive_cash_net_usd": arrive,
                     "calculator": snap,
                 }

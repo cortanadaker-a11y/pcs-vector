@@ -11,7 +11,11 @@ from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
 from services.dla_rates import get_dla_rate
 from services.housing_allowances import compare_housing_packages
-from services.installation_data import SUPPORTED_INSTALLATIONS, get_installation_data
+from services.installation_data import (
+    SUPPORTED_INSTALLATIONS,
+    get_family_market_rent,
+    get_installation_data,
+)
 from services.utility_costs import get_utility_costs_for_installation
 
 YOS_OPTIONS = list(range(0, 41))
@@ -57,22 +61,9 @@ def _util_mid(areas: list[dict[str, Any]]) -> int | None:
     return int(round((sum(lows) / len(lows) + sum(highs) / len(highs)) / 2))
 
 
-def _rent_target(
-    *,
-    system: str,
-    housing: int,
-    util_mid: int | None,
-    oha_rent_max: int | None,
-) -> int | None:
-    if system == "OHA":
-        return int(oha_rent_max) if oha_rent_max is not None else (int(housing) if housing else None)
-    if util_mid and util_mid > 0:
-        return max(int(housing) - int(util_mid), 0)
-    return int(housing) if housing else None
-
-
-def _arrive_cash(rent_tgt: int | None, dla_usd: float | None, util_mid: int | None) -> dict[str, int]:
-    rent = int(rent_tgt or 0)
+def _arrive_cash(rent_mid: int | None, dla_usd: float | None, util_mid: int | None) -> dict[str, int]:
+    """Move-in estimate from typical market rent (not BAH − utilities)."""
+    rent = int(rent_mid or 0)
     util = int(util_mid or 0)
     dla = int(round(float(dla_usd or 0)))
     deposit = rent
@@ -84,6 +75,7 @@ def _arrive_cash(rent_tgt: int | None, dla_usd: float | None, util_mid: int | No
         "util": util,
         "dla": dla,
         "net": max(gross - dla, 0),
+        "gross": gross,
     }
 
 
@@ -218,9 +210,14 @@ def render_bah_calculator() -> None:
         areas = util_ctx.get("areas") or []
         util_mid = _util_mid(areas)
         oha_rent = int(pkg["oha_rent_max_usd"]) if pkg.get("oha_rent_max_usd") is not None else None
-        rent_tgt = _rent_target(
-            system=system, housing=housing, util_mid=util_mid, oha_rent_max=oha_rent
-        )
+        market = get_family_market_rent(gaining, num_dependents=int(num_deps))
+        market_mid = int(market["mid_usd"])
+        market_low = int(market["low_usd"])
+        market_high = int(market["high_usd"])
+        bedrooms = int(market["bedrooms"])
+        # Compare allowance that pays rent (BAH / OHA ceiling) to market mid
+        rent_budget = int(oha_rent) if system == "OHA" and oha_rent is not None else housing
+        vs_market = rent_budget - market_mid
 
         cur = result.get("current")
         delta = result.get("monthly_delta_usd")
@@ -235,8 +232,8 @@ def render_bah_calculator() -> None:
 
         dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
         dla_amt = float(dla["dla_usd"]) if dla.get("found") else None
-        arrive = _arrive_cash(rent_tgt, dla_amt, util_mid)
-        move_in = arrive["deposit"] + arrive["first_month"] if rent_tgt else 0
+        arrive = _arrive_cash(market_mid, dla_amt, util_mid)
+        move_in = arrive["gross"] if market_mid else 0
         dla_covers = bool(arrive["dla"] and move_in and arrive["dla"] >= move_in)
         move_gap_label = "Covered by DLA" if dla_covers else _money(arrive["net"])
 
@@ -252,30 +249,58 @@ def render_bah_calculator() -> None:
                 "cola_monthly_usd": cola,
                 "total_monthly_usd": total,
                 "housing_system": system,
-                "rent_target_usd": rent_tgt,
+                "market_rent_mid_usd": market_mid,
+                "market_rent_low_usd": market_low,
+                "market_rent_high_usd": market_high,
+                "market_bedrooms": bedrooms,
                 "dla_usd": dla_amt,
                 "arrive_cash_net_usd": arrive["net"],
             }
         )
 
-        # 1) Hierarchy: rent target is the shopping number; BAH is context
+        # Primary: official-ish allowance vs local market for this family size
+        if system == "OHA":
+            primary_k = "OHA rent ceiling"
+            primary_v = _money(oha_rent)
+        else:
+            primary_k = "BAH"
+            primary_v = _money(housing)
+
+        if vs_market >= 0:
+            fit_line = (
+                f"Typical {bedrooms}BR mid (~{_money(market_mid)}) fits under your "
+                f"{'ceiling' if system == 'OHA' else 'BAH'} with ~{_money(vs_market)}/mo left "
+                f"(before utilities)."
+            )
+            fit_tone = "fit"
+        else:
+            fit_line = (
+                f"Typical {bedrooms}BR mid (~{_money(market_mid)}) runs "
+                f"~{_money(abs(vs_market))}/mo over your "
+                f"{'OHA ceiling' if system == 'OHA' else 'BAH'} — shop the low end "
+                f"({_money(market_low)}–{_money(market_high)}) or stretch the budget."
+            )
+            fit_tone = "tight"
+
         st.markdown(
             f"""
             <div class="pcs-sticky-results">
                 <div class="pcs-out-label">{safe_html(gaining)} · {safe_html(system_chip)}</div>
                 <div class="pcs-out-dual">
                     <div class="pcs-out-dual-primary">
-                        <div class="pcs-out-dual-k">Shop rent at or under</div>
-                        <div class="pcs-out-dual-v">{_money(rent_tgt)}<span>/mo</span></div>
+                        <div class="pcs-out-dual-k">{safe_html(primary_k)}</div>
+                        <div class="pcs-out-dual-v">{primary_v}<span>/mo</span></div>
                     </div>
                     <div class="pcs-out-dual-secondary">
-                        <div class="pcs-out-dual-k">{safe_html(system_chip)} package</div>
-                        <div class="pcs-out-dual-v-sm">{_money(total)}<span>/mo</span></div>
-                        <div class="pcs-out-dual-sub">{_money(total * 12)}/yr</div>
+                        <div class="pcs-out-dual-k">Typical {bedrooms}BR market</div>
+                        <div class="pcs-out-dual-v-sm">{_money(market_low)}–{_money(market_high)}</div>
+                        <div class="pcs-out-dual-sub">mid ~{_money(market_mid)}/mo · {safe_html(dep_label)}</div>
                     </div>
                 </div>
+                <div class="pcs-out-fit pcs-out-fit-{fit_tone}">{fit_line}</div>
                 <div class="pcs-sticky-results-meta pcs-out-profile">
                     {safe_html(pay_grade)} · {safe_html(rank_label)} · {safe_html(dep_label)} · {int(yos)} YOS
+                    · package {_money(total)}/mo ({_money(total * 12)}/yr)
                 </div>
                 <div class="pcs-sticky-results-grid">
                     <div><b>DLA</b><br>{safe_html(_dla_display(dla_amt))}</div>
@@ -321,26 +346,29 @@ def render_bah_calculator() -> None:
             bar_pct = min(max(int(round((total / curr_tot) * 100)), 4), 100) if curr_tot else 50
 
             checks = []
-            if rent_tgt:
-                checks.append(f"Rent search: stay ≤ <strong>{_money(rent_tgt)}/mo</strong> at {safe_html(gaining)}")
+            checks.append(
+                f"Rent search: typical {bedrooms}BR near {safe_html(gaining)} is "
+                f"<strong>{_money(market_low)}–{_money(market_high)}/mo</strong> "
+                f"(your {primary_k} is {primary_v}/mo)"
+            )
             if abs(int(delta)) >= 100:
                 direction = "less" if delta < 0 else "more"
                 checks.append(
-                    f"Budget: {_money(abs(int(delta)))}/mo {direction} than {safe_html(current)} "
+                    f"vs {safe_html(current)}: {_money(abs(int(delta)))}/mo {direction} "
                     f"(~{_money(abs(int(annual or 0)))}/yr)"
                 )
             if dla_covers:
                 checks.append(
                     f"Move-in: DLA (~{_dla_display(dla_amt)}) can cover typical deposit + first month "
-                    f"(~{_money(move_in)}) — keep a buffer for first+last leases / travel"
+                    f"at mid market (~{_money(move_in)}) — buffer for first+last / travel"
                 )
             elif arrive["dla"] and move_in:
                 checks.append(
-                    f"Move-in: plan ~{_money(arrive['net'])} beyond DLA for deposit + first month "
-                    f"(~{_money(move_in)} total)"
+                    f"Move-in: plan ~{_money(arrive['net'])} beyond DLA "
+                    f"(~{_money(move_in)} at mid-market rent + utils)"
                 )
             elif move_in:
-                checks.append(f"Move-in: plan ~{_money(move_in)} for deposit + first month")
+                checks.append(f"Move-in: plan ~{_money(move_in)} at mid-market rent + utils")
 
             checks_html = "".join(f"<li>{c}</li>" for c in checks)
             st.markdown(
@@ -380,29 +408,29 @@ def render_bah_calculator() -> None:
                 unsafe_allow_html=True,
             )
         else:
-            # No compare — still show action checklist
-            checks = []
-            if rent_tgt:
-                checks.append(f"Rent search: stay ≤ <strong>{_money(rent_tgt)}/mo</strong>")
+            checks = [
+                f"Rent search: typical {bedrooms}BR is "
+                f"<strong>{_money(market_low)}–{_money(market_high)}/mo</strong> "
+                f"vs your {primary_k} {primary_v}/mo"
+            ]
             if dla_covers:
                 checks.append(
-                    f"Move-in: DLA (~{_dla_display(dla_amt)}) can cover typical ~{_money(move_in)} move-in — keep a buffer"
+                    f"Move-in: DLA (~{_dla_display(dla_amt)}) can cover typical ~{_money(move_in)} — keep a buffer"
                 )
             elif move_in:
                 gap = arrive["net"] if arrive["dla"] else move_in
-                checks.append(f"Move-in: plan ~{_money(gap)} cash beyond any DLA")
-            if checks:
-                checks_html = "".join(f"<li>{c}</li>" for c in checks)
-                st.markdown(
-                    f"""
-                    <div class="pcs-out-arrive">
-                        <div class="pcs-out-checks-title">Your next moves</div>
-                        <ul class="pcs-out-checks">{checks_html}</ul>
-                        <span class="pcs-out-arrive-note">Set Coming from to compare against your current post.</span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                checks.append(f"Move-in: plan ~{_money(gap)} beyond any DLA at mid-market rent")
+            checks_html = "".join(f"<li>{c}</li>" for c in checks)
+            st.markdown(
+                f"""
+                <div class="pcs-out-arrive">
+                    <div class="pcs-out-checks-title">Your next moves</div>
+                    <ul class="pcs-out-checks">{checks_html}</ul>
+                    <span class="pcs-out-arrive-note">Set Coming from to compare against your current post. Market rents are planning ranges.</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
         # Local intel / utilities only (no copy-paste blurb)
         info = get_installation_data(gaining) or {}
