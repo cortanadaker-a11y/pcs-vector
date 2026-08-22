@@ -9,25 +9,19 @@ Form questions → entry IDs:
   Last Name            → entry.1445033394
   Rank                 → entry.1001940560
   Rent/Buy/Not Sure    → entry.1608004035
-
-(Rent Range removed from the app — do not send.)
-Not on Form yet (still collected in-app): Dependents, Email address.
 """
 
 from __future__ import annotations
 
 import html as html_lib
+import json
 import logging
 import os
-import re
 from typing import Any
 from urllib.parse import urlencode
 
-import requests
-
 logger = logging.getLogger("pcs_vector.referral")
 
-# Fields we POST / prefill to the Google Form
 REFERRAL_COLUMNS = (
     "Destination",
     "First Name",
@@ -66,7 +60,6 @@ def build_referral_row(
     dependents: str = "",
     email_address: str = "",
 ) -> dict[str, str]:
-    """Return a row dict keyed by Form question titles (+ extras)."""
     interest = (rent_buy_not_sure or "").strip()
     if interest not in INTEREST_OPTIONS:
         low = interest.lower()
@@ -156,130 +149,113 @@ def _entry_map() -> dict[str, str]:
     return mapping
 
 
-def build_prefill_url(row: dict[str, str]) -> str:
-    """Build a Google Form pre-filled link (fallback)."""
-    view = _form_action_url().replace("/formResponse", "/viewform")
+def _payload_pairs(row: dict[str, str]) -> list[tuple[str, str]]:
+    """(entry.ID, value) pairs for Form fields we know how to map."""
     entries = _entry_map()
-    params: dict[str, str] = {"usp": "pp_url"}
+    pairs: list[tuple[str, str]] = []
     for header in REFERRAL_COLUMNS:
         eid = entries.get(header)
         if eid:
-            params[eid] = row.get(header, "")
+            pairs.append((eid, row.get(header, "")))
     for header in EXTRA_COLUMNS:
         eid = entries.get(header)
         if eid and row.get(header):
-            params[eid] = row.get(header, "")
+            pairs.append((eid, row.get(header, "")))
+    return pairs
+
+
+def build_prefill_url(row: dict[str, str]) -> str:
+    """Pre-filled viewform URL (fields filled; Soldier may still hit Submit)."""
+    view = _form_action_url().replace("/formResponse", "/viewform")
+    params: dict[str, str] = {"usp": "pp_url"}
+    for eid, value in _payload_pairs(row):
+        params[eid] = value
     return f"{view}?{urlencode(params)}"
 
 
-def build_browser_autosubmit_html(row: dict[str, str]) -> str:
-    """HTML+JS that POSTs to Google Form from the Soldier's browser (one-click).
+def build_direct_submit_url(row: dict[str, str]) -> str:
+    """formResponse URL that attempts to record the response in one navigation."""
+    action = _form_action_url()
+    params: dict[str, str] = {"submit": "Submit"}
+    for eid, value in _payload_pairs(row):
+        params[eid] = value
+    return f"{action}?{urlencode(params)}"
 
-    Server-side POSTs are often blocked (HTTP 400). Submitting from the browser
-    with a hidden iframe avoids a second button and still records the response.
+
+def build_one_click_submit_html(row: dict[str, str]) -> str:
+    """JS that runs in-page (st.html + unsafe_allow_javascript) to POST the Form.
+
+    Strategy (best UX that still works around Google blocking server POSTs):
+      1. POST via a temporary form targeting a new tab (records response when allowed)
+      2. Also open the pre-filled Form so the Soldier sees confirmation / can Submit
+         if Google blocked the silent POST.
     """
-    action = html_lib.escape(_form_action_url(), quote=True)
-    entries = _entry_map()
-    inputs: list[str] = []
-    for header in REFERRAL_COLUMNS:
-        eid = entries.get(header)
-        if not eid:
-            continue
-        name = html_lib.escape(eid, quote=True)
-        value = html_lib.escape(row.get(header, ""), quote=True)
-        inputs.append(f'<input type="hidden" name="{name}" value="{value}" />')
-    for header in EXTRA_COLUMNS:
-        eid = entries.get(header)
-        if not eid or not row.get(header):
-            continue
-        name = html_lib.escape(eid, quote=True)
-        value = html_lib.escape(row.get(header, ""), quote=True)
-        inputs.append(f'<input type="hidden" name="{name}" value="{value}" />')
+    action = _form_action_url()
+    prefill = build_prefill_url(row)
+    pairs = _payload_pairs(row)
 
-    fields = "\n".join(inputs)
+    # Build inputs in JS to avoid quote-escaping headaches
+    fields_json = json.dumps([{ "name": eid, "value": val } for eid, val in pairs])
+    action_js = json.dumps(action)
+    prefill_js = json.dumps(prefill)
+
     return f"""
-<div style="font-family:system-ui,sans-serif;font-size:0.9rem;color:#2a4a3f;">
-  Sending your referral…
+<div id="pcs-ref-status" style="font-family:system-ui,sans-serif;font-size:0.92rem;color:#2a4a3f;">
+  Sending your referral to Google Form…
 </div>
-<iframe name="pcs_gform_iframe" style="display:none;width:0;height:0;border:0;"></iframe>
-<form id="pcs-gform-auto" action="{action}" method="POST" target="pcs_gform_iframe">
-  {fields}
-</form>
 <script>
-  (function () {{
-    var f = document.getElementById("pcs-gform-auto");
-    if (f) {{ f.submit(); }}
-  }})();
+(function () {{
+  var action = {action_js};
+  var prefill = {prefill_js};
+  var fields = {fields_json};
+
+  function postForm() {{
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = action;
+    form.target = "_blank";
+    form.style.display = "none";
+    fields.forEach(function (f) {{
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = f.name;
+      input.value = f.value;
+      form.appendChild(input);
+    }});
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function () {{
+      try {{ form.remove(); }} catch (e) {{}}
+    }}, 1000);
+  }}
+
+  try {{
+    postForm();
+    var el = document.getElementById("pcs-ref-status");
+    if (el) {{
+      el.textContent = "Referral sent. Check the new tab for Google’s confirmation.";
+    }}
+  }} catch (err) {{
+    window.open(prefill, "_blank");
+    var el2 = document.getElementById("pcs-ref-status");
+    if (el2) {{
+      el2.textContent = "Opened the Google Form with your answers — click Submit there.";
+    }}
+  }}
+}})();
 </script>
 """
-
-
-def submit_referral_to_google_form(row: dict[str, str]) -> tuple[bool, str]:
-    """POST mapped calculator + contact fields to Google Form."""
-    url = _form_action_url()
-    if not url or "formResponse" not in url:
-        return False, "Google Form is not configured yet."
-
-    entries = _entry_map()
-    payload: dict[str, str] = {}
-    for header in REFERRAL_COLUMNS:
-        eid = entries.get(header)
-        if eid:
-            payload[eid] = row.get(header, "")
-
-    for header in EXTRA_COLUMNS:
-        eid = entries.get(header)
-        if eid and row.get(header):
-            payload[eid] = row.get(header, "")
-
-    if not payload:
-        return False, "No Google Form entry IDs configured."
-
-    try:
-        view = url.replace("/formResponse", "/viewform")
-        session = requests.Session()
-        html = session.get(view, timeout=15).text
-        fbzx_m = re.search(r'name="fbzx"\s+value="([^"]+)"', html)
-        if fbzx_m:
-            payload["fbzx"] = fbzx_m.group(1)
-            payload["fvv"] = "1"
-            payload["pageHistory"] = "0"
-            payload["submissionTimestamp"] = "-1"
-
-        resp = session.post(
-            url,
-            data=payload,
-            headers={
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Referer": view,
-                "Origin": "https://docs.google.com",
-            },
-            timeout=15,
-            allow_redirects=True,
-        )
-        body = (resp.text or "").lower()
-        if resp.status_code < 400 and (
-            "response has been recorded" in body or "your response" in body
-        ):
-            return True, "Submitted to Google Form."
-        if resp.status_code >= 400:
-            logger.warning("Google Form submit failed: %s %s", resp.status_code, resp.text[:200])
-            return False, f"Form submit failed (HTTP {resp.status_code})."
-        return True, "Submitted to Google Form."
-    except requests.RequestException as exc:
-        logger.exception("Google Form submit error")
-        return False, f"Could not reach Google Form: {exc}"
 
 
 __all__ = [
     "EXTRA_COLUMNS",
     "INTEREST_OPTIONS",
     "REFERRAL_COLUMNS",
-    "build_browser_autosubmit_html",
+    "build_direct_submit_url",
+    "build_one_click_submit_html",
     "build_prefill_url",
     "build_referral_row",
     "format_dependents_label",
     "format_rank_label",
     "google_form_configured",
-    "submit_referral_to_google_form",
 ]

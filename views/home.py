@@ -10,8 +10,7 @@ from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
     INTEREST_OPTIONS,
-    REFERRAL_COLUMNS,
-    build_browser_autosubmit_html,
+    build_one_click_submit_html,
     build_prefill_url,
     build_referral_row,
     format_dependents_label,
@@ -63,7 +62,10 @@ def _render_referral_hook() -> None:
 
     with st.container(border=True):
         if not calc["destination"]:
-            st.info("Use the calculator above first — your New post, Rank, and Dependents carry over automatically.")
+            st.info(
+                "Use the calculator above first — your New post, Rank, and Dependents "
+                "carry over automatically."
+            )
 
         st.markdown("##### From your calculator")
         c1, c2, c3 = st.columns(3)
@@ -134,19 +136,18 @@ def _render_referral_hook() -> None:
             else:
                 st.session_state.referral_lead = {**row, "calculator": live}
 
-                # Auto-submit from the Soldier's browser (no second button)
-                import streamlit.components.v1 as components
-
-                components.html(
-                    build_browser_autosubmit_html(row),
-                    height=40,
+                # One click: browser POSTs to Google Form (and opens confirmation tab)
+                st.html(
+                    build_one_click_submit_html(row),
+                    unsafe_allow_javascript=True,
                 )
                 st.success(
                     f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
                 )
                 st.caption(
-                    "If nothing shows up in your Form responses, "
-                    f"[open the pre-filled form]({build_prefill_url(row)}) and hit Submit once."
+                    "A Google tab should open with your referral. "
+                    "Allow pop-ups for this site if you don’t see it. "
+                    f"[Backup: open pre-filled form]({build_prefill_url(row)})"
                 )
 
 
