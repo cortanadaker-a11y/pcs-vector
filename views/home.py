@@ -12,9 +12,11 @@ from services.installation_data import SUPPORTED_INSTALLATIONS
 from services.referral_lead import (
     INTEREST_OPTIONS,
     REFERRAL_COLUMNS,
+    build_prefill_url,
     build_referral_row,
     format_dependents_label,
     format_rank_label,
+    format_rent_range,
     google_form_configured,
     submit_referral_to_google_form,
 )
@@ -44,13 +46,18 @@ def _render_referral_hook() -> None:
     rank_default = format_rank_label(
         grade_default, PAY_GRADE_TO_RANK.get(str(grade_default))
     )
+    rent_range_default = format_rent_range(
+        snap.get("market_rent_low_usd"),
+        snap.get("market_rent_high_usd"),
+        snap.get("market_rent_mid_usd"),
+    )
 
     installs = list(SUPPORTED_INSTALLATIONS)
     if dest_default and dest_default not in installs:
         installs = [dest_default] + installs
 
     st.markdown(
-        f"""
+        """
         <div class="pcs-ref-card">
             <div class="pcs-ref-kicker">Free · takes under a minute</div>
             <h3 class="pcs-ref-title">Ready to find a place?</h3>
@@ -64,47 +71,41 @@ def _render_referral_hook() -> None:
     )
 
     with st.container(border=True):
-        # Prefill session defaults once so Streamlit widgets stay editable
-        if "referral_location" not in st.session_state and dest_default:
-            st.session_state.referral_location = dest_default
+        if "referral_destination" not in st.session_state and dest_default:
+            st.session_state.referral_destination = dest_default
         if "referral_rank" not in st.session_state and rank_default:
             st.session_state.referral_rank = rank_default
         if "referral_dependents" not in st.session_state:
             st.session_state.referral_dependents = deps_default
+        if "referral_rent_range" not in st.session_state and rent_range_default:
+            st.session_state.referral_rent_range = rent_range_default
 
-        location = st.selectbox(
-            "Location",
+        destination = st.selectbox(
+            "Destination",
             options=installs,
-            key="referral_location",
-            help="Usually your new (gaining) post from the calculator.",
+            key="referral_destination",
+            help="Your new post (from the calculator).",
         )
 
         c1, c2 = st.columns(2)
         with c1:
             first_name = st.text_input(
-                "First name",
+                "First Name",
                 key="referral_first_name",
                 placeholder="First name",
             )
         with c2:
             last_name = st.text_input(
-                "Last name",
+                "Last Name",
                 key="referral_last_name",
                 placeholder="Last name",
             )
 
         grades = [g for g in RANK_PAY_GRADES if g != "Other"]
-        rank_options = [
-            format_rank_label(g, PAY_GRADE_TO_RANK.get(g)) for g in grades
-        ]
-        # Keep current prefilled rank in options
+        rank_options = [format_rank_label(g, PAY_GRADE_TO_RANK.get(g)) for g in grades]
         if rank_default and rank_default not in rank_options:
             rank_options = [rank_default] + rank_options
-        rank = st.selectbox(
-            "Rank",
-            options=rank_options,
-            key="referral_rank",
-        )
+        rank = st.selectbox("Rank", options=rank_options, key="referral_rank")
 
         dep_options = [
             "Without dependents",
@@ -120,19 +121,28 @@ def _render_referral_hook() -> None:
             "Dependents",
             options=dep_options,
             key="referral_dependents",
+            help="Collected in-app — add this question to the Google Form to sync it.",
         )
 
         email_address = st.text_input(
             "Email address",
             key="referral_email_address",
             placeholder="you@email.com",
+            help="Collected in-app — add this question to the Google Form to sync it.",
         )
 
         rent_buy_not_sure = st.radio(
-            "Rent / Buy / Not sure",
+            "Rent/Buy/Not Sure",
             options=list(INTEREST_OPTIONS),
             horizontal=True,
             key="referral_rent_buy_not_sure",
+        )
+
+        rent_range = st.text_input(
+            "Rent Range",
+            key="referral_rent_range",
+            placeholder="$1,200–$1,650/mo",
+            help="Prefills from the calculator’s typical rent band for your family size.",
         )
 
         st.caption("Free referral · Built For Soldiers; By Soldiers · We won’t spam you.")
@@ -144,51 +154,57 @@ def _render_referral_hook() -> None:
             key="referral_submit",
         ):
             row = build_referral_row(
-                location=str(location or ""),
+                destination=str(destination or ""),
                 first_name=first_name or "",
                 last_name=last_name or "",
                 rank=str(rank or ""),
+                rent_buy_not_sure=str(rent_buy_not_sure or ""),
+                rent_range=rent_range or "",
                 dependents=str(dependents or ""),
                 email_address=email_address or "",
-                rent_buy_not_sure=str(rent_buy_not_sure or ""),
             )
 
-            if not row["First name"] or not row["Last name"]:
+            if not row["First Name"] or not row["Last Name"]:
                 st.error("Enter your first and last name.")
             elif not row["Email address"] or "@" not in row["Email address"]:
                 st.error("Enter a valid email address.")
-            elif not row["Location"]:
-                st.error("Pick a location.")
+            elif not row["Destination"]:
+                st.error("Pick a destination.")
             else:
-                st.session_state.referral_lead = {
-                    **row,
-                    "calculator": snap,
-                }
+                st.session_state.referral_lead = {**row, "calculator": snap}
+                prefill = build_prefill_url(row)
 
+                ok = False
+                msg = ""
                 if google_form_configured():
                     ok, msg = submit_referral_to_google_form(row)
-                    if ok:
-                        st.success(
-                            f"You’re in — we’ll follow up about housing near **{row['Location']}**."
-                        )
-                    else:
-                        st.warning(f"Could not reach Google Form: {msg}")
-                        st.success(
-                            f"You’re in — we’ll follow up about housing near **{row['Location']}**."
-                        )
-                else:
+
+                if ok:
                     st.success(
-                        f"You’re in — we’ll follow up about housing near **{row['Location']}**."
+                        f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
                     )
-                    with st.expander("Google Form mapping (for setup)", expanded=False):
-                        st.markdown("Use these **exact headers** on your Form / Sheet:")
-                        st.code("\n".join(REFERRAL_COLUMNS), language=None)
-                        st.markdown("This submission:")
-                        st.json(row)
-                        st.caption(
-                            "Add `[google_form]` entry IDs to secrets.toml to auto-submit. "
-                            "See `.streamlit/secrets.toml.example`."
-                        )
+                else:
+                    st.success("Almost done — confirm on the Google Form (1 click).")
+                    st.link_button(
+                        "Submit housing referral on Google Form →",
+                        prefill,
+                        type="primary",
+                        use_container_width=True,
+                    )
+                    if msg:
+                        st.caption(msg)
+                    st.caption(
+                        "Your answers are pre-filled. Click Submit on the Form page."
+                    )
+
+                with st.expander("What we captured", expanded=False):
+                    st.json(
+                        {
+                            k: row[k]
+                            for k in list(REFERRAL_COLUMNS)
+                            + ["Dependents", "Email address"]
+                        }
+                    )
 
 
 def _render_faq() -> None:
