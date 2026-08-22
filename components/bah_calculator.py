@@ -109,6 +109,86 @@ def _dla_html(amount: float | None) -> str:
     return _money_html(int(round(amount)))
 
 
+def _package_side_html(pkg: dict[str, Any], *, side_label: str) -> str:
+    """Spell out BAH / OHA / COLA lines + total for one post in the compare panel."""
+    install = safe_html(str(pkg.get("installation") or "—"))
+    system = pkg.get("housing_system") or "BAH"
+    housing = pkg.get("housing_monthly_usd")
+    cola = int(pkg.get("cola_monthly_usd") or 0)
+    total = pkg.get("total_monthly_usd")
+    cola_idx = pkg.get("cola_index")
+
+    rows: list[str] = []
+    if system == "OHA":
+        rent = pkg.get("oha_rent_max_usd")
+        util = pkg.get("oha_utility_usd")
+        rows.append('<div class="pcs-pkg-sys">Overseas Housing Allowance (OHA) + COLA</div>')
+        if rent is not None:
+            rows.append(
+                f'<div class="pcs-pkg-row"><span>OHA rent max</span>'
+                f"<strong>{_money_html(int(rent))}/mo</strong></div>"
+            )
+        if util is not None:
+            rows.append(
+                f'<div class="pcs-pkg-row"><span>OHA utilities</span>'
+                f"<strong>{_money_html(int(util))}/mo</strong></div>"
+            )
+        if housing is not None:
+            rows.append(
+                f'<div class="pcs-pkg-row"><span>OHA housing total</span>'
+                f"<strong>{_money_html(int(housing))}/mo</strong></div>"
+            )
+        if cola_idx is None and cola == 0:
+            rows.append(
+                '<div class="pcs-pkg-row"><span>COLA (Cost of Living)</span>'
+                "<strong>$0/mo</strong></div>"
+                '<div class="pcs-pkg-note">No COLA at this locality right now</div>'
+            )
+        else:
+            idx_bit = f" (index {cola_idx})" if cola_idx is not None else ""
+            rows.append(
+                f'<div class="pcs-pkg-row"><span>COLA (Cost of Living){safe_html(idx_bit)}</span>'
+                f"<strong>{_money_html(cola)}/mo</strong></div>"
+            )
+    elif system == "BAH_PLUS_COLA":
+        rows.append(
+            '<div class="pcs-pkg-sys">Basic Allowance for Housing (BAH) + COLA</div>'
+        )
+        rows.append(
+            f'<div class="pcs-pkg-row"><span>BAH</span>'
+            f"<strong>{_money_html(int(housing) if housing is not None else None)}/mo</strong></div>"
+        )
+        idx_bit = f" (index {cola_idx})" if cola_idx is not None else ""
+        rows.append(
+            f'<div class="pcs-pkg-row"><span>COLA (Cost of Living){safe_html(idx_bit)}</span>'
+            f"<strong>{_money_html(cola)}/mo</strong></div>"
+        )
+    else:
+        rows.append('<div class="pcs-pkg-sys">Basic Allowance for Housing (BAH)</div>')
+        rows.append(
+            f'<div class="pcs-pkg-row"><span>BAH</span>'
+            f"<strong>{_money_html(int(housing) if housing is not None else None)}/mo</strong></div>"
+        )
+        if cola:
+            rows.append(
+                f'<div class="pcs-pkg-row"><span>COLA (Cost of Living)</span>'
+                f"<strong>{_money_html(cola)}/mo</strong></div>"
+            )
+
+    rows.append(
+        f'<div class="pcs-pkg-total"><span>Total</span>'
+        f"<strong>{_money_html(int(total) if total is not None else None)}/mo</strong></div>"
+    )
+
+    return (
+        f'<div class="pcs-pkg-side">'
+        f'<div class="pcs-pkg-side-k">{safe_html(side_label)}</div>'
+        f'<div class="pcs-pkg-side-loc">{install}</div>'
+        f'{"".join(rows)}'
+        f"</div>"
+    )
+
+
 def _scenario_rows(
     *,
     rent_budget: int,
@@ -382,37 +462,61 @@ def render_bah_calculator() -> None:
             """
         )
 
-        # Always show OCONUS / HI / PR / AK package parts so COLA/OHA are visible
+        # Spell out package parts for OCONUS / HI / PR / AK
         if system == "OHA":
             util_oha = pkg.get("oha_utility_usd")
-            cola_note = (
-                f"COLA index {pkg.get('cola_index')}"
-                if pkg.get("cola_index") is not None
-                else "No COLA at this locality"
-            )
+            if pkg.get("cola_index") is not None:
+                cola_note = f"Cost of Living Allowance · index {pkg.get('cola_index')}"
+            else:
+                cola_note = "Cost of Living Allowance · none at this locality"
             _render_html(
                 f"""
                 <div class="pcs-out-split">
-                    <div class="pcs-out-split-item"><span>OHA rent max</span><strong>{_money_html(oha_rent)}</strong></div>
-                    <div class="pcs-out-split-item"><span>OHA utilities</span><strong>{_money_html(int(util_oha) if util_oha else None)}</strong></div>
-                    <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong>
-                    <div style="font-size:0.7rem;color:#6b6b66;margin-top:0.2rem;">{safe_html(cola_note)}</div></div>
+                    <div class="pcs-out-split-item">
+                        <span>OHA rent max</span>
+                        <strong>{_money_html(oha_rent)}</strong>
+                        <div class="pcs-pkg-note">Overseas Housing Allowance</div>
+                    </div>
+                    <div class="pcs-out-split-item">
+                        <span>OHA utilities</span>
+                        <strong>{_money_html(int(util_oha) if util_oha else None)}</strong>
+                    </div>
+                    <div class="pcs-out-split-item">
+                        <span>COLA</span>
+                        <strong>{_money_html(cola)}</strong>
+                        <div class="pcs-pkg-note">{safe_html(cola_note)}</div>
+                    </div>
+                </div>
+                <div class="pcs-pkg-grand">
+                    <span>Total (OHA housing + COLA)</span>
+                    <strong>{_money_html(total)}/mo</strong>
                 </div>
                 """
             )
         elif system == "BAH_PLUS_COLA":
             cola_note = (
-                f"Index {pkg.get('cola_index')} · daily costs, not rent"
+                f"Cost of Living Allowance · index {pkg.get('cola_index')} · not for rent"
                 if pkg.get("cola_index") is not None
-                else "Daily costs, not rent"
+                else "Cost of Living Allowance · not for rent"
             )
             _render_html(
                 f"""
                 <div class="pcs-out-split">
-                    <div class="pcs-out-split-item"><span>BAH</span><strong>{_money_html(housing)}</strong></div>
-                    <div class="pcs-out-split-item"><span>COLA</span><strong>{_money_html(cola)}</strong>
-                    <div style="font-size:0.7rem;color:#6b6b66;margin-top:0.2rem;">{safe_html(cola_note)}</div></div>
-                    <div class="pcs-out-split-item"><span>Total</span><strong>{_money_html(total)}</strong></div>
+                    <div class="pcs-out-split-item">
+                        <span>BAH</span>
+                        <strong>{_money_html(housing)}</strong>
+                        <div class="pcs-pkg-note">Basic Allowance for Housing</div>
+                    </div>
+                    <div class="pcs-out-split-item">
+                        <span>COLA</span>
+                        <strong>{_money_html(cola)}</strong>
+                        <div class="pcs-pkg-note">{safe_html(cola_note)}</div>
+                    </div>
+                    <div class="pcs-out-split-item">
+                        <span>Total</span>
+                        <strong>{_money_html(total)}</strong>
+                        <div class="pcs-pkg-note">BAH + COLA</div>
+                    </div>
                 </div>
                 """
             )
@@ -422,7 +526,6 @@ def render_bah_calculator() -> None:
             curr_tot = int(cur["total_monthly_usd"])
             pct = _pct_change(curr_tot, total)
             pct_txt = f"{pct:+d}%" if pct is not None else ""
-            bar_pct = min(max(int(round((total / curr_tot) * 100)), 4), 100) if curr_tot else 50
 
             cur_market = get_family_market_rent(current, num_dependents=int(num_deps))
             cur_mid = int(cur_market["mid_usd"])
@@ -431,16 +534,16 @@ def render_bah_calculator() -> None:
 
             if market_delta < -50:
                 market_note = (
-                    f"{bed_label} mid rent also drops "
+                    f"Typical {bed_label} rent also drops "
                     f"({_money_html(cur_mid)} → {_money_html(market_mid)})."
                 )
             elif market_delta > 50:
                 market_note = (
-                    f"{bed_label} mid rent rises "
+                    f"Typical {bed_label} rent rises "
                     f"({_money_html(cur_mid)} → {_money_html(market_mid)})."
                 )
             else:
-                market_note = f"{bed_label} mid rent is about the same ({_money_html(market_mid)})."
+                market_note = f"Typical {bed_label} rent is about the same ({_money_html(market_mid)})."
 
             if pressure < -100:
                 pressure_note = f"Net: about {_money_html(abs(pressure))}/mo tighter."
@@ -455,35 +558,20 @@ def render_bah_calculator() -> None:
             elif move_in and arrive["net"]:
                 tip = f"Budget ~{_money_html(arrive['net'])} after DLA for move-in."
 
+            left = _package_side_html(cur, side_label="Current post")
+            right = _package_side_html(pkg, side_label="New post")
             _render_html(
                 f"""
                 <div class="pcs-bah-delta pcs-bah-delta-{tone} pcs-out-compare">
-                    <div class="pcs-out-compare-title">Current vs new post</div>
-                    <div class="pcs-out-vs">
-                        <div class="pcs-out-vs-col">
-                            <div class="pcs-out-vs-k">Current</div>
-                            <div class="pcs-out-vs-v">{_money_html(curr_tot)}<span>/mo</span></div>
-                            <div class="pcs-out-vs-s">{safe_html(current)}</div>
+                    <div class="pcs-out-compare-title">Current vs new post — what each total includes</div>
+                    <div class="pcs-pkg-grid">
+                        {left}
+                        <div class="pcs-pkg-mid">
+                            <div class="pcs-pkg-mid-delta">{_money_html(int(delta))}/mo</div>
+                            <div class="pcs-pkg-mid-sub">{safe_html(pct_txt)} total</div>
+                            <div class="pcs-pkg-mid-sub">{_money_html(int(annual or 0))}/year</div>
                         </div>
-                        <div class="pcs-out-vs-mid">
-                            <div class="pcs-out-vs-delta">{_money_html(int(delta))}/mo</div>
-                            <div class="pcs-out-vs-yr">{safe_html(pct_txt)} · {_money_html(int(annual or 0))}/yr</div>
-                        </div>
-                        <div class="pcs-out-vs-col">
-                            <div class="pcs-out-vs-k">New</div>
-                            <div class="pcs-out-vs-v">{_money_html(total)}<span>/mo</span></div>
-                            <div class="pcs-out-vs-s">{safe_html(gaining)}</div>
-                        </div>
-                    </div>
-                    <div class="pcs-out-bar-wrap">
-                        <div class="pcs-out-bar-track">
-                            <div class="pcs-out-bar-fill pcs-out-bar-{tone}" style="width:{bar_pct}%;"></div>
-                        </div>
-                        <div class="pcs-out-bar-labels">
-                            <span></span>
-                            <span>New ≈ {bar_pct}% of current</span>
-                            <span></span>
-                        </div>
+                        {right}
                     </div>
                     <div class="pcs-out-compare-action">
                         {market_note} {pressure_note}
