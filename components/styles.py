@@ -183,15 +183,102 @@ CUSTOM_CSS = """
         margin-bottom: 0.55rem;
     }
 
-    .pcs-out-compare-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.45rem 1rem;
-        font-size: 0.8rem;
-        color: var(--pcs-slate);
+    .pcs-out-vs {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.65rem;
+        align-items: center;
+        margin: 0.55rem 0 0.65rem 0;
     }
 
-    .pcs-out-compare-row b {
+    @media (max-width: 640px) {
+        .pcs-out-vs {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+    }
+
+    .pcs-out-vs-k {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin-bottom: 0.15rem;
+    }
+
+    .pcs-out-vs-v {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+    }
+
+    .pcs-out-vs-v span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--pcs-muted);
+        margin-left: 0.15rem;
+    }
+
+    .pcs-out-vs-s {
+        font-size: 0.78rem;
+        color: var(--pcs-slate);
+        margin-top: 0.15rem;
+        line-height: 1.3;
+    }
+
+    .pcs-out-vs-mid {
+        text-align: center;
+        padding: 0 0.35rem;
+    }
+
+    .pcs-out-vs-delta {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+    }
+
+    .pcs-out-vs-yr {
+        font-size: 0.75rem;
+        color: var(--pcs-muted);
+        margin-top: 0.15rem;
+    }
+
+    .pcs-out-split {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.45rem;
+        margin: 0 0 0.55rem 0;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-out-split {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pcs-out-split-item {
+        background: #f7f5f1;
+        border: 1px solid var(--pcs-border);
+        border-radius: 10px;
+        padding: 0.55rem 0.7rem;
+    }
+
+    .pcs-out-split-item span {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin-bottom: 0.15rem;
+    }
+
+    .pcs-out-split-item strong {
+        font-size: 1.05rem;
+        font-weight: 800;
         color: var(--pcs-navy);
     }
 
