@@ -9,14 +9,13 @@ import streamlit as st
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
 from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
-from services.dla_rates import format_dla_usd, get_dla_rate
+from services.dla_rates import get_dla_rate
 from services.housing_allowances import compare_housing_packages
 from services.installation_data import SUPPORTED_INSTALLATIONS, get_installation_data
 from services.utility_costs import get_utility_costs_for_installation
 
 YOS_OPTIONS = list(range(0, 41))
 _NONE_CURRENT = "— Skip comparison —"
-_DEP_OPTIONS = [0, 1, 2, 3, 4, 5]
 CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
 
 
@@ -88,48 +87,24 @@ def _arrive_cash(rent_tgt: int | None, dla_usd: float | None, util_mid: int | No
     }
 
 
-def _system_plain(system: str) -> tuple[str, str]:
-    """Return (short chip, one-line plain English)."""
+def _system_chip(system: str) -> str:
     if system == "OHA":
-        return (
-            "OHA + COLA",
-            "Overseas: OHA covers rent up to a ceiling + utilities; COLA helps with everyday costs — not rent.",
-        )
+        return "OHA + COLA"
     if system == "BAH_PLUS_COLA":
-        return (
-            "BAH + COLA",
-            "Hawaii / Puerto Rico style: BAH is your housing check; COLA helps with higher day-to-day costs.",
-        )
-    return (
-        "BAH",
-        "Flat monthly U.S. housing allowance. Rent and most utilities come out of this number.",
-    )
+        return "BAH + COLA"
+    return "BAH"
 
 
-def _spouse_blurb(
-    *,
-    gaining: str,
-    total: int,
-    system_chip: str,
-    rent_tgt: int | None,
-    delta: int | None,
-    current: str | None,
-    dla_usd: float | None,
-    arrive_net: int | None,
-) -> str:
-    parts = [
-        f"Hey — PCS housing money for {gaining}: {_money(total)}/mo ({system_chip}).",
-    ]
-    if rent_tgt is not None:
-        parts.append(f"Aim for rent around {_money(rent_tgt)}/mo.")
-    if current and delta is not None:
-        parts.append(f"That’s {_money(int(delta))}/mo vs {current}.")
-    if dla_usd:
-        parts.append(f"DLA planning {format_dla_usd(dla_usd)} one-time when authorized.")
-    if arrive_net is not None:
-        parts.append(f"Rough cash to arrive ready: ~{_money(arrive_net)} after DLA.")
-    parts.append("PCS Vector — Built For Soldiers; By Soldiers.")
-    return " ".join(parts)
+def _pct_change(old: int, new: int) -> int | None:
+    if old == 0:
+        return None
+    return int(round(((new - old) / old) * 100))
+
+
+def _dla_display(amount: float | None) -> str:
+    if amount is None:
+        return "—"
+    return _money(int(round(amount)))
 
 
 def render_bah_calculator() -> None:
@@ -254,30 +229,16 @@ def render_bah_calculator() -> None:
             delta = None
             annual = None
 
-        system_chip, system_plain = _system_plain(system)
+        system_chip = _system_chip(system)
         rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
         dep_label = _deps_label(int(num_deps))
 
         dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
         dla_amt = float(dla["dla_usd"]) if dla.get("found") else None
         arrive = _arrive_cash(rent_tgt, dla_amt, util_mid)
-
-        share = f"{pay_grade} @ {gaining}: {_money(total)}/mo ({system_chip})"
-        if current and delta is not None:
-            share += f" · {_money(int(delta))}/mo vs {current}"
-        if rent_tgt is not None:
-            share += f" · rent ~{_money(rent_tgt)}"
-
-        spouse = _spouse_blurb(
-            gaining=gaining,
-            total=total,
-            system_chip=system_chip,
-            rent_tgt=rent_tgt,
-            delta=int(delta) if delta is not None else None,
-            current=current,
-            dla_usd=dla_amt,
-            arrive_net=arrive["net"] if rent_tgt else None,
-        )
+        move_in = arrive["deposit"] + arrive["first_month"] if rent_tgt else 0
+        dla_covers = bool(arrive["dla"] and move_in and arrive["dla"] >= move_in)
+        move_gap_label = "Covered by DLA" if dla_covers else _money(arrive["net"])
 
         _store_snapshot(
             {
@@ -294,40 +255,38 @@ def render_bah_calculator() -> None:
                 "rent_target_usd": rent_tgt,
                 "dla_usd": dla_amt,
                 "arrive_cash_net_usd": arrive["net"],
-                "share_line": share,
-                "spouse_blurb": spouse,
             }
         )
 
-        # ── Loop 1: Primary result ──
+        # 1) Hierarchy: rent target is the shopping number; BAH is context
         st.markdown(
             f"""
             <div class="pcs-sticky-results">
                 <div class="pcs-out-label">{safe_html(gaining)} · {safe_html(system_chip)}</div>
-                <div class="pcs-sticky-results-main">
-                    <span class="pcs-sticky-results-amt">{_money(total)}</span>
-                    <span class="pcs-sticky-results-unit">/mo total</span>
+                <div class="pcs-out-dual">
+                    <div class="pcs-out-dual-primary">
+                        <div class="pcs-out-dual-k">Shop rent at or under</div>
+                        <div class="pcs-out-dual-v">{_money(rent_tgt)}<span>/mo</span></div>
+                    </div>
+                    <div class="pcs-out-dual-secondary">
+                        <div class="pcs-out-dual-k">{safe_html(system_chip)} package</div>
+                        <div class="pcs-out-dual-v-sm">{_money(total)}<span>/mo</span></div>
+                        <div class="pcs-out-dual-sub">{_money(total * 12)}/yr</div>
+                    </div>
                 </div>
                 <div class="pcs-sticky-results-meta pcs-out-profile">
-                    {safe_html(pay_grade)} · {safe_html(rank_label)} · {safe_html(dep_label)} · {int(yos)} years of service
-                    · {_money(total * 12)}/year
+                    {safe_html(pay_grade)} · {safe_html(rank_label)} · {safe_html(dep_label)} · {int(yos)} YOS
                 </div>
-                <div class="pcs-out-plain">{safe_html(system_plain)}</div>
                 <div class="pcs-sticky-results-grid">
-                    <div><b>Rent target</b><br>{_money(rent_tgt)}/mo</div>
-                    <div><b>DLA (one-time)</b><br>{safe_html(format_dla_usd(dla_amt) if dla_amt is not None else '—')}</div>
-                    <div><b>Move-in gap</b><br>{
-                        'Covered by DLA'
-                        if arrive['dla'] and rent_tgt and arrive['dla'] >= (arrive['deposit'] + arrive['first_month'])
-                        else _money(arrive['net'])
-                    }</div>
+                    <div><b>DLA</b><br>{safe_html(_dla_display(dla_amt))}</div>
+                    <div><b>Typical move-in</b><br>{_money(move_in) if move_in else '—'}</div>
+                    <div><b>Cash gap</b><br>{safe_html(move_gap_label)}</div>
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        # Package breakdown (only when it adds info beyond the total)
         if system == "OHA":
             util = pkg.get("oha_utility_usd")
             st.markdown(
@@ -352,36 +311,42 @@ def render_bah_calculator() -> None:
                 unsafe_allow_html=True,
             )
 
-        # Post-to-post compare — what changed + what to do
+        # 2) Compare with % + bar; 3) checklist instead of prose walls
         if current and cur and cur.get("found") and delta is not None:
             tone = "up" if delta > 0 else ("down" if delta < 0 else "flat")
             curr_tot = int(cur["total_monthly_usd"])
-            rent_line = (
-                f"Shop rent at or under <strong>{_money(rent_tgt)}/mo</strong> at {safe_html(gaining)}."
-                if rent_tgt
-                else f"Use the rent target above for {safe_html(gaining)}."
-            )
-            if delta < -100:
-                do_next = (
-                    f"Housing check drops {_money(abs(int(delta)))}/mo "
-                    f"(~{_money(abs(int(annual or 0)))}/yr). {rent_line} "
-                    "Don’t carry your old rent level forward."
+            pct = _pct_change(curr_tot, total)
+            pct_txt = f"{pct:+d}%" if pct is not None else ""
+            # Bar fill: new as % of old (capped 100 for display when higher)
+            bar_pct = min(max(int(round((total / curr_tot) * 100)), 4), 100) if curr_tot else 50
+
+            checks = []
+            if rent_tgt:
+                checks.append(f"Rent search: stay ≤ <strong>{_money(rent_tgt)}/mo</strong> at {safe_html(gaining)}")
+            if abs(int(delta)) >= 100:
+                direction = "less" if delta < 0 else "more"
+                checks.append(
+                    f"Budget: {_money(abs(int(delta)))}/mo {direction} than {safe_html(current)} "
+                    f"(~{_money(abs(int(annual or 0)))}/yr)"
                 )
-            elif delta > 100:
-                do_next = (
-                    f"Housing check rises {_money(int(delta))}/mo "
-                    f"(~{_money(int(annual or 0))}/yr). {rent_line} "
-                    "Keep the surplus — don’t inflate lifestyle on day one."
+            if dla_covers:
+                checks.append(
+                    f"Move-in: DLA (~{_dla_display(dla_amt)}) can cover typical deposit + first month "
+                    f"(~{_money(move_in)}) — keep a buffer for first+last leases / travel"
                 )
-            else:
-                do_next = (
-                    f"Totals are close. {rent_line} "
-                    "Local rent and utilities still decide how it feels."
+            elif arrive["dla"] and move_in:
+                checks.append(
+                    f"Move-in: plan ~{_money(arrive['net'])} beyond DLA for deposit + first month "
+                    f"(~{_money(move_in)} total)"
                 )
+            elif move_in:
+                checks.append(f"Move-in: plan ~{_money(move_in)} for deposit + first month")
+
+            checks_html = "".join(f"<li>{c}</li>" for c in checks)
             st.markdown(
                 f"""
                 <div class="pcs-bah-delta pcs-bah-delta-{tone} pcs-out-compare">
-                    <div class="pcs-out-compare-title">Post comparison</div>
+                    <div class="pcs-out-compare-title">vs {safe_html(current)}</div>
                     <div class="pcs-out-vs">
                         <div class="pcs-out-vs-col">
                             <div class="pcs-out-vs-k">Coming from</div>
@@ -390,7 +355,7 @@ def render_bah_calculator() -> None:
                         </div>
                         <div class="pcs-out-vs-mid">
                             <div class="pcs-out-vs-delta">{_money(int(delta))}/mo</div>
-                            <div class="pcs-out-vs-yr">{_money(int(annual or 0))}/yr</div>
+                            <div class="pcs-out-vs-yr">{safe_html(pct_txt)} · {_money(int(annual or 0))}/yr</div>
                         </div>
                         <div class="pcs-out-vs-col">
                             <div class="pcs-out-vs-k">Going to</div>
@@ -398,48 +363,50 @@ def render_bah_calculator() -> None:
                             <div class="pcs-out-vs-s">{safe_html(gaining)}</div>
                         </div>
                     </div>
-                    <div class="pcs-out-compare-action"><b>What to do:</b> {do_next}</div>
+                    <div class="pcs-out-bar-wrap" title="New package relative to old">
+                        <div class="pcs-out-bar-track">
+                            <div class="pcs-out-bar-fill pcs-out-bar-{tone}" style="width:{bar_pct}%;"></div>
+                        </div>
+                        <div class="pcs-out-bar-labels">
+                            <span>0</span>
+                            <span>New ≈ {bar_pct}% of old package</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    <div class="pcs-out-checks-title">Your next moves</div>
+                    <ul class="pcs-out-checks">{checks_html}</ul>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
+        else:
+            # No compare — still show action checklist
+            checks = []
+            if rent_tgt:
+                checks.append(f"Rent search: stay ≤ <strong>{_money(rent_tgt)}/mo</strong>")
+            if dla_covers:
+                checks.append(
+                    f"Move-in: DLA (~{_dla_display(dla_amt)}) can cover typical ~{_money(move_in)} move-in — keep a buffer"
+                )
+            elif move_in:
+                gap = arrive["net"] if arrive["dla"] else move_in
+                checks.append(f"Move-in: plan ~{_money(gap)} cash beyond any DLA")
+            if checks:
+                checks_html = "".join(f"<li>{c}</li>" for c in checks)
+                st.markdown(
+                    f"""
+                    <div class="pcs-out-arrive">
+                        <div class="pcs-out-checks-title">Your next moves</div>
+                        <ul class="pcs-out-checks">{checks_html}</ul>
+                        <span class="pcs-out-arrive-note">Set Coming from to compare against your current post.</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-        # Move-in cushion — honest about DLA covering costs
-        if rent_tgt and rent_tgt > 0:
-            move_in = arrive["deposit"] + arrive["first_month"]
-            dla_v = arrive["dla"]
-            if dla_v and dla_v >= move_in:
-                cushion_html = (
-                    f"<b>Move-in cushion:</b> Typical deposit + first month ≈ {_money(move_in)}. "
-                    f"DLA planning ({_money(dla_v)}) can cover that — "
-                    f"<strong>you may not need extra cash for a basic move-in</strong> if DLA hits on time. "
-                    f"Still keep a buffer: some leases want first + last + deposit, plus travel costs."
-                )
-            elif dla_v:
-                short = move_in - dla_v
-                cushion_html = (
-                    f"<b>Move-in cushion:</b> Typical deposit + first month ≈ {_money(move_in)}. "
-                    f"DLA planning ({_money(dla_v)}) leaves about <strong>{_money(short)}</strong> "
-                    f"to cover from savings or a travel advance. Confirm DLA timing with finance."
-                )
-            else:
-                cushion_html = (
-                    f"<b>Move-in cushion:</b> Plan about <strong>{_money(move_in)}</strong> "
-                    f"for deposit + first month (rent + utilities). No DLA figure on file for this profile."
-                )
-            st.markdown(
-                f"""
-                <div class="pcs-out-arrive">
-                    {cushion_html}
-                    <span class="pcs-out-arrive-note">Assumes ~1× rent deposit and mid-range utilities. Leases vary.</span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        # Intel + share
+        # Local intel / utilities only (no copy-paste blurb)
         info = get_installation_data(gaining) or {}
-        with st.expander(f"Local intel, utilities & text-to-share — {gaining}", expanded=False):
+        with st.expander(f"Local intel & utilities — {gaining}", expanded=False):
             notes = (info.get("notes") or "").strip()
             if notes:
                 st.markdown(notes)
@@ -450,11 +417,10 @@ def render_bah_calculator() -> None:
             if commute:
                 st.caption("Commute: " + commute)
             if areas:
-                st.markdown("**Off-post utilities** (typical 3BR planning ranges)")
+                st.markdown("**Off-post utilities** (typical 3BR)")
                 st.caption(
                     (util_ctx.get("as_of") or "2026")
                     + (f" · mid ~{_money(util_mid)}/mo" if util_mid else "")
-                    + " · verify with landlord"
                 )
                 rows = []
                 for a in areas[:4]:
@@ -472,7 +438,5 @@ def render_bah_calculator() -> None:
                 st.dataframe(rows, use_container_width=True, hide_index=True)
                 if areas[0].get("season_note"):
                     st.caption(areas[0]["season_note"])
-            st.markdown("**Copy for spouse / battle buddy**")
-            st.code(spouse, language=None)
 
-        st.caption("Planning figures only — verify on your LES and with finance / DTMO before you sign.")
+        st.caption("Planning figures · verify LES / finance / DTMO before you sign.")

@@ -147,7 +147,114 @@ CUSTOM_CSS = """
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .pcs-out-dual {
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        gap: 0.75rem;
+        align-items: end;
+        margin-bottom: 0.45rem;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-out-dual {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pcs-out-dual-k {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(197, 235, 212, 0.9);
+        margin-bottom: 0.2rem;
+    }
+
+    .pcs-out-dual-v {
+        font-size: 2.15rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: #fff;
+    }
+
+    .pcs-out-dual-v span,
+    .pcs-out-dual-v-sm span {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        margin-left: 0.2rem;
+    }
+
+    .pcs-out-dual-v-sm {
+        font-size: 1.45rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        color: rgba(255, 255, 255, 0.95);
+    }
+
+    .pcs-out-dual-sub {
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.65);
+        margin-top: 0.2rem;
+    }
+
+    .pcs-out-bar-wrap {
+        margin: 0.35rem 0 0.75rem 0;
+    }
+
+    .pcs-out-bar-track {
+        height: 8px;
+        background: #e8e4dc;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .pcs-out-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--pcs-accent);
+    }
+
+    .pcs-out-bar-up { background: var(--pcs-success); }
+    .pcs-out-bar-down { background: #b85c38; }
+    .pcs-out-bar-flat { background: var(--pcs-gold); }
+
+    .pcs-out-bar-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.68rem;
+        color: var(--pcs-muted);
+        margin-top: 0.25rem;
+    }
+
+    .pcs-out-checks-title {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--pcs-accent);
+        margin-bottom: 0.35rem;
+    }
+
+    .pcs-out-checks {
+        margin: 0;
+        padding-left: 1.15rem;
+        font-size: 0.88rem;
+        color: var(--pcs-slate);
+        line-height: 1.45;
+    }
+
+    .pcs-out-checks li {
+        margin-bottom: 0.3rem;
+    }
+
+    .pcs-out-checks strong {
+        color: var(--pcs-navy);
     }
 
     .pcs-out-profile {
