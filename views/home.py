@@ -9,12 +9,12 @@ from components.content import TRUST_SIGNALS
 from components.html_utils import safe_html
 
 
-def _render_sticky_header() -> None:
+def _render_header() -> None:
     st.markdown(
         f"""
-        <div class="pcs-sticky-bar">
-            <div class="pcs-sticky-brand">PCS Vector</div>
-            <div class="pcs-sticky-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
+        <div class="pcs-hero pcs-hero-compact">
+            <div class="pcs-brand-title">PCS Vector</div>
+            <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -41,8 +41,18 @@ def _render_referral_hook() -> None:
         bits.append(f"arrive ~${int(arrive):,}")
     meta = " · ".join(bits) if bits else "Uses your calculator results"
 
-    with st.expander(f"Buy / rent near {dest} — free referral", expanded=False):
-        st.caption(meta)
+    st.markdown(
+        f"""
+        <div class="pcs-ref-card">
+            <div class="pcs-ref-kicker">Free referral</div>
+            <h3 class="pcs-ref-title">Buy or rent near {safe_html(dest)}</h3>
+            <p class="pcs-ref-body">We’ll connect you with a partner who works military PCS moves.</p>
+            <div class="pcs-ref-meta">{safe_html(meta)}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    with st.container(border=True):
         c1, c2 = st.columns(2)
         with c1:
             name = st.text_input("Name", key="referral_name", placeholder="First Last")
@@ -59,6 +69,7 @@ def _render_referral_hook() -> None:
             key="referral_notes",
             placeholder="Report date, pets, schools…",
         )
+        st.caption("No spam. Soldiers helping Soldiers.")
         if st.button("Request free referral →", type="primary", use_container_width=True, key="referral_submit"):
             if not (email or "").strip() or "@" not in (email or ""):
                 st.error("Need a valid email.")
@@ -76,7 +87,7 @@ def _render_referral_hook() -> None:
                     "calculator": snap,
                 }
                 st.success(f"Got it — we’ll follow up near **{dest}**.")
-                st.caption("Built For Soldiers; By Soldiers · No spam.")
+                st.caption("Built For Soldiers; By Soldiers")
 
 
 def _render_faq() -> None:
@@ -91,7 +102,7 @@ def _render_faq() -> None:
 
 
 def render_home() -> None:
-    _render_sticky_header()
+    _render_header()
     render_bah_calculator()
     _render_referral_hook()
     _render_faq()

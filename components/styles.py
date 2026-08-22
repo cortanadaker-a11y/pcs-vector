@@ -67,47 +67,25 @@ CUSTOM_CSS = """
         padding-bottom: 0.55rem !important;
     }
 
-    .pcs-sticky-bar {
-        position: sticky;
-        top: 0;
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
-        color: #fff;
-        border-radius: 12px;
-        padding: 0.65rem 1rem;
-        margin: 0 0 0.55rem 0;
-        box-shadow: 0 8px 24px rgba(28, 28, 26, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+    .pcs-hero-compact {
+        padding: 2rem 1.85rem 1.65rem 1.85rem !important;
+        margin-bottom: 0.85rem !important;
     }
 
-    .pcs-sticky-brand {
-        font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: #fff;
+    .pcs-hero-compact .pcs-brand-title {
+        font-size: 2.75rem;
+        margin-bottom: 0.85rem;
     }
 
-    .pcs-sticky-tag {
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #c5ebd4;
-        background: rgba(168, 212, 188, 0.12);
-        border: 1px solid rgba(168, 212, 188, 0.35);
-        border-radius: 999px;
-        padding: 0.28rem 0.7rem;
+    .pcs-hero-compact .pcs-hero-tag {
+        margin-bottom: 0;
+        font-size: 0.78rem;
+        padding: 0.4rem 0.95rem;
     }
 
     .pcs-sticky-results {
         position: sticky;
-        top: 3.4rem;
+        top: 0.35rem;
         z-index: 998;
         background: linear-gradient(145deg, var(--pcs-hero-dark) 0%, var(--pcs-navy) 100%);
         color: #fff;

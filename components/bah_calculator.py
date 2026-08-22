@@ -17,14 +17,6 @@ from services.utility_costs import get_utility_costs_for_installation
 YOS_OPTIONS = list(range(0, 41))
 _NONE_CURRENT = "— Skip —"
 _DEP_OPTIONS = [0, 1, 2, 3, 4, 5]
-_QUICK_POSTS = [
-    "Fort Bragg, NC",
-    "Fort Hood, TX",
-    "Fort Campbell, KY",
-    "Joint Base Lewis-McChord, WA",
-    "Camp Humphreys, South Korea",
-    "USAG Rheinland-Pfalz, Germany",
-]
 CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
 
 
@@ -126,22 +118,8 @@ def render_bah_calculator() -> None:
         return
 
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
-    quick = [p for p in _QUICK_POSTS if p in installations]
 
     with st.container(border=True):
-        if quick:
-            row1, row2 = quick[:3], quick[3:6]
-            for row_i, row in enumerate((row1, row2)):
-                if not row:
-                    continue
-                cols = st.columns(3)
-                for i, post in enumerate(row):
-                    with cols[i]:
-                        label = post.split(",")[0].replace("Joint Base ", "JB ")
-                        if st.button(label, key=f"quick_{row_i}_{i}", use_container_width=True):
-                            st.session_state.bah_calc_gaining = post
-                            st.rerun()
-
         c1, c2, c3 = st.columns([1.3, 0.7, 0.9])
         with c1:
             pay_grade = st.selectbox(
