@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import streamlit as st
 
 from components.bah_calculator import get_calculator_snapshot, render_bah_calculator
@@ -17,6 +19,21 @@ from services.referral_lead import (
     format_rank_label,
     submit_referral_via_apps_script,
 )
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def _clean_email(raw: str | None) -> str:
+    """Normalize pasted emails (strip spaces / invisible chars)."""
+    text = (raw or "").strip()
+    # Remove zero-width / non-breaking spaces from mobile paste
+    for ch in ("\u200b", "\u200c", "\u200d", "\ufeff", "\xa0"):
+        text = text.replace(ch, "")
+    return text.strip()
+
+
+def _is_valid_email(raw: str | None) -> bool:
+    return bool(_EMAIL_RE.match(_clean_email(raw)))
 
 
 def _render_header() -> None:
@@ -79,67 +96,77 @@ def _render_referral_hook() -> None:
         st.divider()
         st.markdown("##### How we reach you")
 
-        n1, n2 = st.columns(2)
-        with n1:
-            first_name = st.text_input(
-                "First Name",
-                key="referral_first_name",
-                placeholder="First name",
+        # st.form guarantees widget values are captured with the submit click
+        with st.form("referral_form", clear_on_submit=False):
+            n1, n2 = st.columns(2)
+            with n1:
+                first_name = st.text_input(
+                    "First Name",
+                    key="referral_first_name",
+                    placeholder="First name",
+                )
+            with n2:
+                last_name = st.text_input(
+                    "Last Name",
+                    key="referral_last_name",
+                    placeholder="Last name",
+                )
+
+            email_address = st.text_input(
+                "Email address",
+                key="referral_email_address",
+                placeholder="you@email.com",
             )
-        with n2:
-            last_name = st.text_input(
-                "Last Name",
-                key="referral_last_name",
-                placeholder="Last name",
+
+            rent_buy_not_sure = st.radio(
+                "Rent/Buy/Not Sure",
+                options=list(INTEREST_OPTIONS),
+                horizontal=True,
+                key="referral_rent_buy_not_sure",
             )
 
-        email_address = st.text_input(
-            "Email address",
-            key="referral_email_address",
-            placeholder="you@email.com",
-        )
+            st.caption("Free · Built For Soldiers; By Soldiers")
+            submitted = st.form_submit_button(
+                "Get my free housing referral →",
+                type="primary",
+                use_container_width=True,
+            )
 
-        rent_buy_not_sure = st.radio(
-            "Rent/Buy/Not Sure",
-            options=list(INTEREST_OPTIONS),
-            horizontal=True,
-            key="referral_rent_buy_not_sure",
-        )
+        if submitted:
+            # Prefer session_state — most reliable with forms
+            first_name = str(st.session_state.get("referral_first_name") or first_name or "")
+            last_name = str(st.session_state.get("referral_last_name") or last_name or "")
+            email_address = _clean_email(
+                st.session_state.get("referral_email_address") or email_address
+            )
+            rent_buy_not_sure = str(
+                st.session_state.get("referral_rent_buy_not_sure") or rent_buy_not_sure or ""
+            )
 
-        st.caption("Free · Built For Soldiers; By Soldiers")
-
-        if st.button(
-            "Get my free housing referral →",
-            type="primary",
-            use_container_width=True,
-            key="referral_submit",
-        ):
             live = get_calculator_snapshot() or snap
             live_calc = _calc_fields_from_snap(live)
 
             row = build_referral_row(
                 destination=live_calc["destination"],
-                first_name=first_name or "",
-                last_name=last_name or "",
+                first_name=first_name,
+                last_name=last_name,
                 rank=live_calc["rank"],
-                rent_buy_not_sure=str(rent_buy_not_sure or ""),
+                rent_buy_not_sure=rent_buy_not_sure,
                 dependents=live_calc["dependents"],
-                email_address=email_address or "",
+                email_address=email_address,
             )
 
             if not live_calc["destination"]:
                 st.error("Set New post in the calculator above first.")
-            elif not row["First Name"] or not row["Last Name"]:
+            elif not row["First Name"].strip() or not row["Last Name"].strip():
                 st.error("Enter your first and last name.")
-            elif not row["Email address"] or "@" not in row["Email address"]:
-                st.error("Enter a valid email address.")
+            elif not _is_valid_email(row["Email address"]):
+                st.error("Enter a valid email address (example: name@email.com).")
             else:
                 st.session_state.referral_lead = {**row, "calculator": live}
 
-                # 1) Reliable path: Apps Script webhook → Sheet
-                script_ok, script_msg = submit_referral_via_apps_script(row)
+                script_ok, _script_msg = submit_referral_via_apps_script(row)
 
-                # 2) Browser Form POST (no-cors) — works for many Google Forms
                 st.html(
                     build_one_click_submit_html(row),
                     unsafe_allow_javascript=True,
@@ -155,9 +182,7 @@ def _render_referral_hook() -> None:
                     )
                     st.caption(
                         "If it doesn’t show in Form Responses within a minute, "
-                        f"[open this pre-filled form]({build_prefill_url(row)}) and click Submit once. "
-                        "For rock-solid capture, add the Apps Script webhook "
-                        "(see `scripts/google_apps_script_referral.js`)."
+                        f"[open this pre-filled form]({build_prefill_url(row)}) and click Submit once."
                     )
 
 
