@@ -3,21 +3,18 @@
 Live Form:
   https://docs.google.com/forms/d/e/1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/viewform
 
-Form questions → entry IDs (refreshed):
+Form questions → entry IDs:
+  Email Address            → entry.1162277939
   Destination              → entry.159372216
   First Name               → entry.1546051705
   Last Name                → entry.1445033394
   Rank                     → entry.1001940560
   Number of Dependents     → entry.1983274092
   Rent/Buy/Not Sure        → entry.1608004035
-
-Still missing on Form (add short answer titled exactly "Email address"):
-  Email address
 """
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 from typing import Any
@@ -29,6 +26,7 @@ logger = logging.getLogger("pcs_vector.referral")
 
 # Fields sent on the pre-filled Google Form URL
 REFERRAL_COLUMNS = (
+    "Email address",
     "Destination",
     "First Name",
     "Last Name",
@@ -37,10 +35,7 @@ REFERRAL_COLUMNS = (
     "Rent/Buy/Not Sure",
 )
 
-# Collected in-app; mapped once Form has a matching question + entry ID in secrets
-EXTRA_COLUMNS = (
-    "Email address",
-)
+EXTRA_COLUMNS: tuple[str, ...] = ()
 
 INTEREST_OPTIONS = ("Rent", "Buy", "Not sure")
 
@@ -49,6 +44,7 @@ _DEFAULT_FORM_ACTION = (
     "1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/formResponse"
 )
 _DEFAULT_ENTRIES = {
+    "Email address": "entry.1162277939",
     "Destination": "entry.159372216",
     "First Name": "entry.1546051705",
     "Last Name": "entry.1445033394",
