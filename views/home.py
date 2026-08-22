@@ -98,8 +98,10 @@ def _render_faq() -> None:
             "**Free?** Yes — calculator and referrals.\n\n"
             "**BAH / OHA / COLA?** BAH = flat U.S. housing. OHA = overseas rent up to a ceiling + utilities. "
             "COLA = everyday costs overseas / HI / PR — not rent.\n\n"
-            "**Arrive-ready cash?** Rough deposit + first month − DLA (when authorized). Confirm with finance.\n\n"
-            "**Official?** Planning figures from DoD / DTMO tables — verify on your LES."
+            "**Market rents?** Planning ranges sized to your dependents (1–4BR). "
+            "Compared to BAH or OHA ceiling, plus mid utilities.\n\n"
+            "**Low / mid / high?** What leftover (or shortfall) you have from BAH/OHA after rent + utilities.\n\n"
+            "**Official?** BAH/OHA/COLA/DLA from DoD tables. Rents & utils are estimates — verify LES and listings."
         )
 
 

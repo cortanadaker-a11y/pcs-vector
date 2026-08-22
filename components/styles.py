@@ -133,6 +133,101 @@ CUSTOM_CSS = """
         line-height: 1.35;
     }
 
+    .pcs-sticky-results-grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 640px) {
+        .pcs-sticky-results-grid-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .pcs-scen-wrap {
+        margin: 0 0 0.65rem 0;
+    }
+
+    .pcs-scen-title {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin-bottom: 0.4rem;
+    }
+
+    .pcs-scen-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.45rem;
+    }
+
+    @media (max-width: 640px) {
+        .pcs-scen-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pcs-scen {
+        border-radius: 10px;
+        border: 1px solid var(--pcs-border);
+        padding: 0.65rem 0.75rem;
+        background: var(--pcs-surface);
+    }
+
+    .pcs-scen-ok {
+        border-color: #c8ddd0;
+        background: #f0f7f3;
+    }
+
+    .pcs-scen-short {
+        border-color: #e8cfc4;
+        background: #faf4f1;
+    }
+
+    .pcs-scen-k {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-muted);
+        margin-bottom: 0.2rem;
+    }
+
+    .pcs-scen-rent {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+        letter-spacing: -0.02em;
+    }
+
+    .pcs-scen-sub {
+        font-size: 0.75rem;
+        color: var(--pcs-slate);
+        margin: 0.15rem 0 0.35rem 0;
+    }
+
+    .pcs-scen-left {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--pcs-navy);
+    }
+
+    .pcs-scen-short .pcs-scen-left {
+        color: #9a4a2e;
+    }
+
+    .pcs-scen-ok .pcs-scen-left {
+        color: var(--pcs-success);
+    }
+
+    .pcs-scen-left span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--pcs-muted);
+        margin-left: 0.15rem;
+    }
+
     .pcs-sticky-results-grid b {
         color: #c5ebd4;
         font-weight: 700;
