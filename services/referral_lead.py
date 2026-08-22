@@ -1,9 +1,9 @@
-"""Housing referral leads — mapped to the PCS Vector Google Form.
+"""Housing referral leads — Google Form / Apps Script webhook.
 
 Live Form:
   https://docs.google.com/forms/d/e/1FAIpQLSeok5DcRqIU9QhzOGXCGAVd8UbW21LNK_S601kzOwb4FJ1Wyg/viewform
 
-Form questions → entry IDs:
+Form entry IDs:
   Destination          → entry.159372216
   First Name           → entry.1546051705
   Last Name            → entry.1445033394
@@ -13,12 +13,13 @@ Form questions → entry IDs:
 
 from __future__ import annotations
 
-import html as html_lib
 import json
 import logging
 import os
 from typing import Any
 from urllib.parse import urlencode
+
+import requests
 
 logger = logging.getLogger("pcs_vector.referral")
 
@@ -112,20 +113,19 @@ def _from_secrets(path: str) -> str | None:
         return None
 
 
-def google_form_configured() -> bool:
-    url = (
-        _from_secrets("google_form.form_action_url")
-        or os.environ.get("PCS_GOOGLE_FORM_ACTION_URL", "")
-        or _DEFAULT_FORM_ACTION
-    )
-    return bool(url and "formResponse" in url)
-
-
 def _form_action_url() -> str:
     return (
         _from_secrets("google_form.form_action_url")
         or os.environ.get("PCS_GOOGLE_FORM_ACTION_URL", "")
         or _DEFAULT_FORM_ACTION
+    ).strip()
+
+
+def _apps_script_url() -> str:
+    return (
+        _from_secrets("google_form.apps_script_url")
+        or os.environ.get("PCS_GOOGLE_APPS_SCRIPT_URL", "")
+        or ""
     ).strip()
 
 
@@ -150,7 +150,6 @@ def _entry_map() -> dict[str, str]:
 
 
 def _payload_pairs(row: dict[str, str]) -> list[tuple[str, str]]:
-    """(entry.ID, value) pairs for Form fields we know how to map."""
     entries = _entry_map()
     pairs: list[tuple[str, str]] = []
     for header in REFERRAL_COLUMNS:
@@ -165,7 +164,6 @@ def _payload_pairs(row: dict[str, str]) -> list[tuple[str, str]]:
 
 
 def build_prefill_url(row: dict[str, str]) -> str:
-    """Pre-filled viewform URL (fields filled; Soldier may still hit Submit)."""
     view = _form_action_url().replace("/formResponse", "/viewform")
     params: dict[str, str] = {"usp": "pp_url"}
     for eid, value in _payload_pairs(row):
@@ -173,74 +171,73 @@ def build_prefill_url(row: dict[str, str]) -> str:
     return f"{view}?{urlencode(params)}"
 
 
-def build_direct_submit_url(row: dict[str, str]) -> str:
-    """formResponse URL that attempts to record the response in one navigation."""
-    action = _form_action_url()
-    params: dict[str, str] = {"submit": "Submit"}
-    for eid, value in _payload_pairs(row):
-        params[eid] = value
-    return f"{action}?{urlencode(params)}"
+def submit_referral_via_apps_script(row: dict[str, str]) -> tuple[bool, str]:
+    """POST JSON to a Google Apps Script web app (most reliable)."""
+    url = _apps_script_url()
+    if not url:
+        return False, "Apps Script webhook not configured."
+    try:
+        resp = requests.post(url, json=row, timeout=20)
+        if resp.status_code >= 400:
+            return False, f"Apps Script HTTP {resp.status_code}"
+        # Script may return text/json
+        body = (resp.text or "").strip()
+        if body.lower().startswith("{") and '"ok"' in body.lower() and "false" in body.lower():
+            return False, body[:200]
+        return True, "Saved via Apps Script."
+    except requests.RequestException as exc:
+        logger.exception("Apps Script submit failed")
+        return False, str(exc)
 
 
 def build_one_click_submit_html(row: dict[str, str]) -> str:
-    """JS that runs in-page (st.html + unsafe_allow_javascript) to POST the Form.
+    """In-page JS: no-cors fetch to formResponse (often records) + open confirmation.
 
-    Strategy (best UX that still works around Google blocking server POSTs):
-      1. POST via a temporary form targeting a new tab (records response when allowed)
-      2. Also open the pre-filled Form so the Soldier sees confirmation / can Submit
-         if Google blocked the silent POST.
+    Google frequently blocks server-side Form POSTs. Browser fetch with mode
+    no-cors is a common pattern that still writes the response.
     """
     action = _form_action_url()
     prefill = build_prefill_url(row)
     pairs = _payload_pairs(row)
-
-    # Build inputs in JS to avoid quote-escaping headaches
     fields_json = json.dumps([{ "name": eid, "value": val } for eid, val in pairs])
     action_js = json.dumps(action)
     prefill_js = json.dumps(prefill)
 
     return f"""
-<div id="pcs-ref-status" style="font-family:system-ui,sans-serif;font-size:0.92rem;color:#2a4a3f;">
-  Sending your referral to Google Form…
+<div id="pcs-ref-status" style="font-family:system-ui,sans-serif;font-size:0.92rem;color:#2a4a3f;padding:0.25rem 0;">
+  Sending your referral…
 </div>
 <script>
 (function () {{
   var action = {action_js};
   var prefill = {prefill_js};
   var fields = {fields_json};
+  var status = document.getElementById("pcs-ref-status");
 
-  function postForm() {{
-    var form = document.createElement("form");
-    form.method = "POST";
-    form.action = action;
-    form.target = "_blank";
-    form.style.display = "none";
-    fields.forEach(function (f) {{
-      var input = document.createElement("input");
-      input.type = "hidden";
-      input.name = f.name;
-      input.value = f.value;
-      form.appendChild(input);
-    }});
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(function () {{
-      try {{ form.remove(); }} catch (e) {{}}
-    }}, 1000);
+  function setStatus(msg) {{
+    if (status) status.textContent = msg;
   }}
 
   try {{
-    postForm();
-    var el = document.getElementById("pcs-ref-status");
-    if (el) {{
-      el.textContent = "Referral sent. Check the new tab for Google’s confirmation.";
-    }}
+    var body = new FormData();
+    fields.forEach(function (f) {{ body.append(f.name, f.value); }});
+
+    // no-cors: response is opaque, but Google Forms usually still records it
+    fetch(action, {{
+      method: "POST",
+      mode: "no-cors",
+      body: body,
+      credentials: "omit",
+    }}).then(function () {{
+      setStatus("Referral sent to Google Form.");
+    }}).catch(function () {{
+      // Fallback: open pre-filled form in a new tab
+      window.open(prefill, "_blank", "noopener,noreferrer");
+      setStatus("Opened Google Form with your answers — click Submit if needed.");
+    }});
   }} catch (err) {{
-    window.open(prefill, "_blank");
-    var el2 = document.getElementById("pcs-ref-status");
-    if (el2) {{
-      el2.textContent = "Opened the Google Form with your answers — click Submit there.";
-    }}
+    window.open(prefill, "_blank", "noopener,noreferrer");
+    setStatus("Opened Google Form with your answers — click Submit if needed.");
   }}
 }})();
 </script>
@@ -251,11 +248,10 @@ __all__ = [
     "EXTRA_COLUMNS",
     "INTEREST_OPTIONS",
     "REFERRAL_COLUMNS",
-    "build_direct_submit_url",
     "build_one_click_submit_html",
     "build_prefill_url",
     "build_referral_row",
     "format_dependents_label",
     "format_rank_label",
-    "google_form_configured",
+    "submit_referral_via_apps_script",
 ]

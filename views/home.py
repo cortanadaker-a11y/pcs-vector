@@ -15,6 +15,7 @@ from services.referral_lead import (
     build_referral_row,
     format_dependents_label,
     format_rank_label,
+    submit_referral_via_apps_script,
 )
 
 
@@ -31,7 +32,6 @@ def _render_header() -> None:
 
 
 def _calc_fields_from_snap(snap: dict) -> dict[str, str]:
-    """Carry-over fields from what the Soldier entered in the calculator."""
     grade = str(snap.get("pay_grade") or "")
     num_deps = int(snap.get("num_dependents") or 0)
     return {
@@ -136,19 +136,29 @@ def _render_referral_hook() -> None:
             else:
                 st.session_state.referral_lead = {**row, "calculator": live}
 
-                # One click: browser POSTs to Google Form (and opens confirmation tab)
+                # 1) Reliable path: Apps Script webhook → Sheet
+                script_ok, script_msg = submit_referral_via_apps_script(row)
+
+                # 2) Browser Form POST (no-cors) — works for many Google Forms
                 st.html(
                     build_one_click_submit_html(row),
                     unsafe_allow_javascript=True,
                 )
-                st.success(
-                    f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
-                )
-                st.caption(
-                    "A Google tab should open with your referral. "
-                    "Allow pop-ups for this site if you don’t see it. "
-                    f"[Backup: open pre-filled form]({build_prefill_url(row)})"
-                )
+
+                if script_ok:
+                    st.success(
+                        f"You’re in — referral saved for **{row['Destination']}**."
+                    )
+                else:
+                    st.success(
+                        f"You’re in — we’ll follow up about housing near **{row['Destination']}**."
+                    )
+                    st.caption(
+                        "If it doesn’t show in Form Responses within a minute, "
+                        f"[open this pre-filled form]({build_prefill_url(row)}) and click Submit once. "
+                        "For rock-solid capture, add the Apps Script webhook "
+                        "(see `scripts/google_apps_script_referral.js`)."
+                    )
 
 
 def _render_faq() -> None:
