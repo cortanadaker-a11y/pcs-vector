@@ -307,7 +307,8 @@ def _render_referral_hook() -> None:
     if ready:
         body_html = (
             f"We have verified military experts in <strong>{dest_html}</strong> "
-            f"ready to help you find a home today."
+            f"that can help you find a new home today — "
+            f"<em class=\"pcs-ref-free\">free of charge</em>."
         )
         summary_html = (
             f'<div class="pcs-ref-summary" title="Carried over from your calculator">'
@@ -321,7 +322,8 @@ def _render_referral_hook() -> None:
     else:
         body_html = (
             "Set your New post above — then we’ll match you with verified military "
-            "experts who can help you find a home today."
+            "experts who can help you find a new home today — "
+            '<em class="pcs-ref-free">free of charge</em>.'
         )
         summary_html = ""
 

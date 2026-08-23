@@ -1861,6 +1861,13 @@ CUSTOM_CSS = """
         text-underline-offset: 0.15em;
     }
 
+    .pcs-ref-body .pcs-ref-free {
+        font-style: normal;
+        font-weight: 800;
+        color: #a8d4bc;
+        letter-spacing: 0.01em;
+    }
+
     .pcs-ref-summary {
         display: flex;
         flex-wrap: wrap;
