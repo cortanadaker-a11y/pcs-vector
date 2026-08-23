@@ -390,7 +390,7 @@ def render_bah_calculator() -> None:
         _render_html(
             f"""
             <div class="pcs-sticky-results">
-                <div class="pcs-out-label">{safe_html(gaining)} · {safe_html(system_chip)}</div>
+                <div class="pcs-out-label">{safe_html(gaining)}</div>
                 <div class="pcs-out-dual">
                     <div class="pcs-out-dual-primary">
                         <div class="pcs-out-dual-k">{safe_html(primary_k)}</div>
