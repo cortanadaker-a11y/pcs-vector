@@ -1823,7 +1823,10 @@ CUSTOM_CSS = """
     }
 
     .pcs-ref-kicker {
-        display: inline-block;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
         font-size: 0.66rem;
         font-weight: 800;
         letter-spacing: 0.1em;
@@ -1831,8 +1834,22 @@ CUSTOM_CSS = """
         color: #1a2e28;
         background: #a8d4bc;
         border-radius: 999px;
-        padding: 0.22rem 0.65rem;
+        padding: 0.22rem 0.35rem 0.22rem 0.65rem;
         margin-bottom: 0.55rem;
+        width: fit-content;
+        max-width: 100%;
+    }
+
+    .pcs-ref-free-badge {
+        display: inline-block;
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #a8d4bc;
+        background: #1a2e28;
+        border-radius: 999px;
+        padding: 0.18rem 0.55rem;
     }
 
     .pcs-ref-title {
@@ -1859,13 +1876,6 @@ CUSTOM_CSS = """
         text-decoration: underline;
         text-decoration-color: rgba(168, 212, 188, 0.75);
         text-underline-offset: 0.15em;
-    }
-
-    .pcs-ref-body .pcs-ref-free {
-        font-style: normal;
-        font-weight: 800;
-        color: #a8d4bc;
-        letter-spacing: 0.01em;
     }
 
     .pcs-ref-summary {
