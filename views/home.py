@@ -329,10 +329,7 @@ def _render_referral_hook() -> None:
         st.markdown(
             f"""
             <div id="pcs-referral" class="pcs-ref-head">
-                <div class="pcs-ref-kicker">
-                    Free match · military housing pros
-                    <span class="pcs-ref-free-badge">Free of charge</span>
-                </div>
+                <div class="pcs-ref-kicker">Free match · military housing pros</div>
                 <div class="pcs-ref-title">Your next home is one step away</div>
                 <p class="pcs-ref-body">{body_html}</p>
                 {summary_html}
