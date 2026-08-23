@@ -408,7 +408,7 @@ def render_bah_calculator() -> None:
                     {f'· COLA {_money_html(cola)}' if cola else ''}
                 </div>
                 <div class="pcs-sticky-results-grid pcs-sticky-results-grid-4">
-                    <div><b>Utilities</b><br>{_money_html(util_n) if util_n else '—'}</div>
+                    <div><b>Utilities (est.)</b><br>{_money_html(util_n) if util_n else '—'}</div>
                     <div><b>DLA</b><br>{_dla_html(dla_amt)}</div>
                     <div><b>Move-in cash</b><br>{_money_html(move_in) if move_in else '—'}</div>
                     <div><b>Still need</b><br>{gap_html}</div>
