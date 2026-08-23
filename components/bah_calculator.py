@@ -324,7 +324,6 @@ def render_bah_calculator() -> None:
             delta = None
             annual = None
 
-        system_chip = _system_chip(system)
         rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
         dep_label = _deps_label(int(num_deps))
 
