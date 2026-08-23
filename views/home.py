@@ -48,7 +48,7 @@ def _render_header() -> None:
             <div class="pcs-hero-pills">
                 <span>2026 rates</span>
                 <span>68+ posts</span>
-                <span>Free forever</span>
+                <span>Free</span>
             </div>
         </div>
         """,
