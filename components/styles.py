@@ -7,33 +7,37 @@ CUSTOM_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap');
 
     :root {
-        --pcs-ink: #ffffff;
-        --pcs-navy: #1C2D22;
-        --pcs-navy-light: #2a4033;
-        --pcs-slate: rgba(255, 255, 255, 0.72);
-        --pcs-muted: rgba(255, 255, 255, 0.55);
-        --pcs-bg: #121E16;
-        --pcs-surface: #1C2D22;
-        --pcs-accent: #D4AF37;
-        --pcs-accent-soft: #e0c25a;
-        --pcs-accent-hover: #c49a2e;
-        --pcs-gold: #D4AF37;
-        --pcs-border: rgba(255, 255, 255, 0.15);
-        --pcs-success: #34d399;
-        --pcs-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-        --pcs-radius: 1.35rem;
-        --pcs-hero-dark: #121E16;
-        --pcs-army-deep: #121E16;
-        --pcs-army-card: #1C2D22;
-        --pcs-army-gold: #D4AF37;
-        --pcs-orange: #ea580c;
-        --pcs-orange-hover: #c2410c;
+        --pcs-ink: #F4F7F5;
+        --pcs-navy: #243528;
+        --pcs-navy-light: #2f4534;
+        --pcs-slate: #D5DDD8;
+        --pcs-muted: #B7C2BC;
+        --pcs-bg: #152019;
+        --pcs-surface: #243528;
+        --pcs-accent: #E0BC4A;
+        --pcs-accent-soft: #f0d56a;
+        --pcs-accent-hover: #c9a63a;
+        --pcs-gold: #E0BC4A;
+        --pcs-border: rgba(255, 255, 255, 0.22);
+        --pcs-success: #4ade80;
+        --pcs-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+        --pcs-radius: 1.25rem;
+        --pcs-hero-dark: #152019;
+        --pcs-army-deep: #152019;
+        --pcs-army-card: #243528;
+        --pcs-army-gold: #E0BC4A;
+        --pcs-orange: #f97316;
+        --pcs-orange-hover: #ea580c;
+        --pcs-panel: #1a2a20;
+        --pcs-panel-deep: #121c16;
+        --pcs-text: #F4F7F5;
+        --pcs-text-dim: #C5D0CA;
     }
 
     .stApp {
         background: var(--pcs-army-deep) !important;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: #fff;
+        color: var(--pcs-text);
     }
 
     [data-testid="stAppViewContainer"],
@@ -42,9 +46,14 @@ CUSTOM_CSS = """
         background: var(--pcs-army-deep) !important;
     }
 
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"] {
+        background: transparent !important;
+    }
+
     [data-testid="stSidebar"] {
-        background: #0e1812 !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        background: #101a14 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.14);
         box-shadow: none;
     }
 
@@ -56,13 +65,13 @@ CUSTOM_CSS = """
 
     [data-testid="stSidebar"] .stCaption,
     [data-testid="stSidebar"] .stMarkdown p {
-        color: rgba(255, 255, 255, 0.7) !important;
+        color: var(--pcs-text-dim) !important;
     }
 
     .block-container {
-        padding-top: 0.75rem !important;
-        padding-bottom: 2.5rem !important;
-        max-width: 640px;
+        padding-top: 0.55rem !important;
+        padding-bottom: 2.75rem !important;
+        max-width: 560px;
     }
 
     /* Primary CTAs — partner orange */
@@ -102,17 +111,12 @@ CUSTOM_CSS = """
         gap: 0.4rem;
     }
 
+    .pcs-hero-pills {
+        display: none; /* Loop 9: tighten brand — pills clutter the calc face */
+    }
+
     .pcs-hero-pills span {
-        display: inline-block;
-        font-size: 0.68rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.92);
-        background: rgba(0, 0, 0, 0.35);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
-        padding: 0.28rem 0.65rem;
+        display: none;
     }
 
     /* ── Singular dark calculator face ── */
@@ -127,75 +131,80 @@ CUSTOM_CSS = """
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
         background: var(--pcs-army-card) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 1.5rem !important;
-        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.45) !important;
-        padding: 1rem 1.05rem 1.15rem 1.05rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 1.35rem !important;
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5) !important;
+        padding: 0.85rem 0.9rem 1rem 0.9rem !important;
+    }
+
+    /* Tighter vertical rhythm inside the face */
+    .pcs-calc-face [data-testid="stVerticalBlock"] > div {
+        gap: 0.28rem !important;
+    }
+
+    .pcs-calc-face [data-testid="stHorizontalBlock"] {
+        gap: 0.45rem !important;
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.85rem 0;
-        padding-bottom: 0.85rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        margin: 0 0 0.65rem 0;
+        padding-bottom: 0.55rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
     }
 
     .pcs-face-brand-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 0.55rem 0.75rem;
-        margin-bottom: 0.55rem;
+        gap: 0.4rem 0.65rem;
+        margin-bottom: 0;
     }
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1.85rem;
+        font-size: 1.45rem;
         font-weight: 900;
         letter-spacing: -0.03em;
-        color: #fff;
+        color: var(--pcs-text);
         margin: 0;
         line-height: 1.1;
     }
 
     .pcs-calc-face [data-testid="stAlert"],
     .pcs-calc-dark [data-testid="stAlert"] {
-        background: rgba(0, 0, 0, 0.4) !important;
-        color: #fff !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: var(--pcs-panel) !important;
+        color: var(--pcs-text) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
     }
 
     .pcs-face-brand .pcs-hero-tag {
         margin: 0;
-        font-size: 0.68rem;
-        padding: 0.28rem 0.7rem;
-        background: rgba(212, 175, 55, 0.18);
-        border: 1px solid rgba(212, 175, 55, 0.45);
-        color: var(--pcs-army-gold);
+        font-size: 0.64rem;
+        padding: 0.22rem 0.55rem;
+        background: rgba(224, 188, 74, 0.2);
+        border: 1px solid rgba(224, 188, 74, 0.55);
+        color: #F2D56A;
+        font-weight: 800;
     }
 
     .pcs-face-brand .pcs-hero-lead {
-        margin: 0 0 0.65rem 0;
-        font-size: 0.88rem;
-        line-height: 1.45;
-        color: rgba(255, 255, 255, 0.78);
-        max-width: 36rem;
-        font-weight: 500;
+        display: none;
     }
 
     .pcs-face-divider {
         height: 1px;
-        margin: 1rem 0 0.85rem 0;
-        background: rgba(255, 255, 255, 0.12);
+        margin: 0.75rem 0 0.65rem 0;
+        background: rgba(255, 255, 255, 0.16);
         border: 0;
     }
 
     .pcs-panel-label {
-        font-size: 0.62rem;
+        font-size: 0.64rem;
         font-weight: 800;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.55);
-        margin: 0.15rem 0 0.45rem 0;
+        color: var(--pcs-text-dim);
+        margin: 0.1rem 0 0.35rem 0;
     }
 
     /* Partner HTML calculator panels */
@@ -209,26 +218,28 @@ CUSTOM_CSS = """
 
     #pcs-inputs-panel.pcs-partner-panel,
     .pcs-partner-panel {
-        background: rgba(0, 0, 0, 0.42);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 1rem;
-        padding: 0.85rem 0.9rem;
-        margin: 0 0 0.75rem 0;
+        background: var(--pcs-panel);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.95rem;
+        padding: 0.75rem 0.8rem;
+        margin: 0 0 0.65rem 0;
     }
 
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.58) !important;
-        margin-top: 0.15rem;
+        background: var(--pcs-panel-deep) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        margin-top: 0.1rem;
+        padding: 0.9rem 0.85rem !important;
     }
 
     .pcs-partner-arrow {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.5rem;
-        padding: 0 0.15rem 0.7rem 0.15rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-        margin-bottom: 0.55rem;
+        gap: 0.45rem;
+        padding: 0 0.1rem 0.65rem 0.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        margin-bottom: 0.5rem;
     }
 
     .pcs-partner-arrow-solo {
@@ -236,28 +247,29 @@ CUSTOM_CSS = """
     }
 
     .pcs-partner-arrow-amt {
-        font-size: 1.85rem;
+        font-size: 1.75rem;
         font-weight: 900;
         letter-spacing: -0.03em;
-        color: #ffffff;
+        color: #FFFFFF;
         line-height: 1.05;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
     }
 
     .pcs-partner-arrow-amt.muted {
-        color: #c8d0cc;
+        color: #DCE5E0;
     }
 
     .pcs-partner-arrow-glyph {
         color: var(--pcs-army-gold);
-        font-size: 1.45rem;
+        font-size: 1.4rem;
         font-weight: 900;
         flex-shrink: 0;
     }
 
     .pcs-partner-per {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--pcs-text-dim);
         margin-left: 0.2rem;
     }
 
@@ -266,12 +278,12 @@ CUSTOM_CSS = """
         align-items: center;
         justify-content: space-between;
         gap: 0.5rem;
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         font-weight: 800;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #b8c4be;
-        margin-bottom: 0.55rem;
+        color: #D0DBD5;
+        margin-bottom: 0.5rem;
     }
 
     .pcs-partner-rollup {
@@ -279,175 +291,195 @@ CUSTOM_CSS = """
         align-items: center;
         justify-content: space-between;
         gap: 0.5rem;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 0.75rem;
-        padding: 0.55rem 0.7rem;
-        margin-bottom: 0.65rem;
-        font-size: 0.72rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 0.7rem;
+        padding: 0.5rem 0.65rem;
+        margin-bottom: 0.55rem;
+        font-size: 0.74rem;
         font-weight: 800;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: var(--pcs-army-gold);
+        color: #F2D56A;
     }
 
     .pcs-partner-rollup-badge {
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         font-weight: 900;
-        padding: 0.2rem 0.5rem;
+        padding: 0.22rem 0.55rem;
         border-radius: 0.4rem;
         border: 1px solid transparent;
         letter-spacing: 0.04em;
     }
 
     .pcs-partner-rollup-badge.pcs-roll-down {
-        background: rgba(16, 185, 129, 0.22);
-        color: #6ee7b7;
-        border-color: rgba(16, 185, 129, 0.4);
+        background: rgba(16, 185, 129, 0.28);
+        color: #A7F3D0;
+        border-color: rgba(16, 185, 129, 0.5);
     }
 
     .pcs-partner-rollup-badge.pcs-roll-up {
-        background: rgba(245, 158, 11, 0.22);
-        color: #fcd34d;
-        border-color: rgba(245, 158, 11, 0.4);
+        background: rgba(245, 158, 11, 0.28);
+        color: #FDE68A;
+        border-color: rgba(245, 158, 11, 0.5);
     }
 
     .pcs-partner-rollup-badge.pcs-roll-flat {
-        background: rgba(156, 163, 175, 0.22);
-        color: #e5e7eb;
-        border-color: rgba(156, 163, 175, 0.4);
+        background: rgba(156, 163, 175, 0.28);
+        color: #F3F4F6;
+        border-color: rgba(156, 163, 175, 0.5);
     }
 
     .pcs-partner-breakdown {
-        padding-top: 0.35rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
-        margin-top: 0.15rem;
+        padding-top: 0.3rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        margin-top: 0.1rem;
     }
 
     .pcs-partner-breakdown-title {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 800;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #b8c4be;
-        margin: 0.35rem 0 0.45rem 0;
+        color: #D0DBD5;
+        margin: 0.3rem 0 0.4rem 0;
     }
 
     .pcs-partner-meta {
-        margin-top: 0.65rem;
-        font-size: 0.78rem;
+        margin-top: 0.55rem;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: #c5d0ca;
+        color: #D5DDD8;
         line-height: 1.4;
     }
 
     .pcs-calc-face .pcs-est-row {
-        background: rgba(0, 0, 0, 0.4);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        padding: 0.55rem 0.6rem;
+        margin-bottom: 0.35rem;
     }
 
     .pcs-calc-face .pcs-est-label {
-        color: #aeb8b2;
+        color: #C5D0CA;
+        font-size: 0.66rem;
     }
 
     .pcs-calc-face .pcs-est-side {
-        color: #d7e0db;
+        color: #E4EBE7;
+        font-size: 0.84rem;
     }
 
     .pcs-calc-face .pcs-est-side-new {
-        color: #ffffff;
+        color: #FFFFFF;
+        font-weight: 800;
     }
 
     .pcs-calc-face .pcs-out-fit {
-        margin-top: 0.65rem;
-        font-size: 0.88rem;
-        color: #e8efe9 !important;
+        margin-top: 0.55rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: #F4F7F5 !important;
+        padding: 0.6rem 0.7rem;
     }
 
     .pcs-calc-face .pcs-out-fit-fit {
-        background: rgba(16, 185, 129, 0.18);
-        border-color: rgba(16, 185, 129, 0.4);
-        color: #bbf7d0 !important;
+        background: rgba(16, 185, 129, 0.22);
+        border-color: rgba(16, 185, 129, 0.45);
+        color: #D1FAE5 !important;
     }
 
     .pcs-calc-face .pcs-out-fit-tight {
-        background: rgba(248, 113, 113, 0.15);
-        border-color: rgba(248, 113, 113, 0.35);
-        color: #fecaca !important;
+        background: rgba(248, 113, 113, 0.2);
+        border-color: rgba(248, 113, 113, 0.4);
+        color: #FEE2E2 !important;
     }
 
-    /* Brighter labels on dark face */
+    .pcs-calc-face .pcs-out-fit strong {
+        color: #FFFFFF !important;
+        font-weight: 900;
+    }
+
+    /* High-contrast widget labels */
     .pcs-calc-face label,
     .pcs-calc-face [data-testid="stWidgetLabel"] p {
-        color: #e8efe9 !important;
-        font-weight: 700 !important;
-        font-size: 0.78rem !important;
-        letter-spacing: 0.04em;
+        color: #F4F7F5 !important;
+        font-weight: 800 !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
     }
 
     .pcs-calc-face div[data-baseweb="select"] > div {
-        border-color: rgba(212, 175, 55, 0.55) !important;
-        color: #ffffff !important;
+        background-color: #0f1813 !important;
+        border-color: rgba(224, 188, 74, 0.65) !important;
+        color: #FFFFFF !important;
         font-weight: 700 !important;
+        min-height: 2.55rem !important;
+    }
+
+    .pcs-calc-face div[data-baseweb="select"] span,
+    .pcs-calc-face div[data-baseweb="select"] div {
+        color: #FFFFFF !important;
+    }
+
+    .pcs-calc-face div[data-baseweb="select"] svg {
+        fill: #F2D56A !important;
+        color: #F2D56A !important;
+    }
+
+    .pcs-calc-face [data-testid="stCheckbox"] label span,
+    .pcs-calc-face [data-testid="stRadio"] label p,
+    .pcs-calc-face [data-testid="stCaption"] {
+        color: #D5DDD8 !important;
+    }
+
+    .pcs-calc-face [data-testid="stTextInput"] input {
+        background: #0f1813 !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.28) !important;
+        font-weight: 600 !important;
+    }
+
+    .pcs-calc-face [data-testid="stTextInput"] input::placeholder {
+        color: #8A9690 !important;
     }
 
     .pcs-calc-face .pcs-bah-section-label,
     .pcs-calc-dark .pcs-bah-section-label {
-        color: var(--pcs-army-gold) !important;
+        color: #F2D56A !important;
+        font-size: 0.7rem !important;
+        margin: 0.45rem 0 0.35rem 0 !important;
     }
 
-    .pcs-calc-face [data-testid="stMarkdownContainer"] p,
-    .pcs-calc-face [data-testid="stMarkdownContainer"] span,
-    .pcs-calc-face [data-testid="stCaption"],
-    .pcs-calc-face label,
-    .pcs-calc-face .stCheckbox label span,
-    .pcs-calc-dark [data-testid="stMarkdownContainer"] p,
-    .pcs-calc-dark [data-testid="stMarkdownContainer"] span,
-    .pcs-calc-dark [data-testid="stCaption"],
-    .pcs-calc-dark label,
-    .pcs-calc-dark .stCheckbox label span {
-        color: rgba(255, 255, 255, 0.88) !important;
+    .pcs-bah-delta-badge {
+        font-size: 0.82rem !important;
+        padding: 0.28rem 0.6rem !important;
     }
 
-    .pcs-calc-face div[data-baseweb="select"] > div,
-    .pcs-calc-dark div[data-baseweb="select"] > div {
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        border-color: rgba(212, 175, 55, 0.45) !important;
-        color: #fff !important;
-        border-radius: 0.75rem !important;
-        min-height: 2.65rem;
+    .pcs-bah-delta-badge.pcs-delta-up {
+        background: rgba(16, 185, 129, 0.28) !important;
+        color: #A7F3D0 !important;
+        border-color: rgba(16, 185, 129, 0.5) !important;
     }
 
-    .pcs-calc-face div[data-baseweb="select"] svg,
-    .pcs-calc-dark div[data-baseweb="select"] svg {
-        fill: var(--pcs-army-gold) !important;
-        color: var(--pcs-army-gold) !important;
+    .pcs-bah-delta-badge.pcs-delta-down {
+        background: rgba(239, 68, 68, 0.28) !important;
+        color: #FECACA !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
     }
 
-    .pcs-calc-face [data-testid="stRadio"] label,
-    .pcs-calc-dark [data-testid="stRadio"] label {
-        color: rgba(255, 255, 255, 0.9) !important;
-    }
-
-    .pcs-calc-face [data-testid="stTextInput"] input,
-    .pcs-calc-dark [data-testid="stTextInput"] input {
-        background: rgba(0, 0, 0, 0.5) !important;
-        color: #fff !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 0.75rem !important;
-    }
-
-    .pcs-calc-face [data-testid="stTextInput"] input::placeholder,
-    .pcs-calc-dark [data-testid="stTextInput"] input::placeholder {
-        color: rgba(255, 255, 255, 0.4) !important;
+    .pcs-bah-delta-badge.pcs-delta-flat {
+        background: rgba(156, 163, 175, 0.28) !important;
+        color: #F3F4F6 !important;
+        border-color: rgba(156, 163, 175, 0.5) !important;
     }
 
     .pcs-calc-face [data-testid="stExpander"],
     .pcs-calc-dark [data-testid="stExpander"] {
-        background: rgba(0, 0, 0, 0.35) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 0.85rem !important;
+        background: var(--pcs-panel) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 0.75rem !important;
     }
 
     .pcs-calc-face [data-testid="stExpander"] summary,
@@ -456,7 +488,7 @@ CUSTOM_CSS = """
     .pcs-calc-dark [data-testid="stExpander"] summary,
     .pcs-calc-dark [data-testid="stExpander"] p,
     .pcs-calc-dark [data-testid="stExpander"] span {
-        color: rgba(255, 255, 255, 0.88) !important;
+        color: #E8EFEA !important;
     }
 
     .pcs-calc-face [data-testid="stDataFrame"],
@@ -466,9 +498,7 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-intro {
-        margin: 0.05rem 0 0.65rem 0;
-        padding-bottom: 0.55rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        display: none; /* partner face: no extra intro chrome */
     }
 
     .pcs-calc-intro-kicker {
@@ -2348,51 +2378,51 @@ CUSTOM_CSS = """
     }
 
     .pcs-ref-head {
-        margin: 0.1rem 0 0.75rem 0;
-        padding: 0.95rem 1rem;
+        margin: 0.05rem 0 0.55rem 0;
+        padding: 0.75rem 0.8rem;
         scroll-margin-top: 0.75rem;
-        border-radius: 1rem;
-        background: rgba(0, 0, 0, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #fff;
+        border-radius: 0.95rem;
+        background: var(--pcs-panel);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--pcs-text);
     }
 
     .pcs-ref-kicker {
         display: inline-block;
-        font-size: 0.66rem;
+        font-size: 0.64rem;
         font-weight: 800;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #1a2e28;
-        background: #a8d4bc;
+        color: #152019;
+        background: #F2D56A;
         border-radius: 999px;
-        padding: 0.22rem 0.65rem;
-        margin-bottom: 0.55rem;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.4rem;
     }
 
     .pcs-ref-title {
         display: block;
-        font-size: 1.32rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin: 0 0 0.4rem 0;
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        margin: 0 0 0.3rem 0;
         letter-spacing: -0.03em;
         line-height: 1.2;
     }
 
     .pcs-ref-body {
-        font-size: 0.92rem;
-        color: rgba(255, 255, 255, 0.88);
-        line-height: 1.45;
-        margin: 0 0 0.7rem 0;
+        font-size: 0.9rem;
+        color: #E4EBE7;
+        line-height: 1.4;
+        margin: 0 0 0.5rem 0;
         max-width: 40rem;
     }
 
     .pcs-ref-body strong {
-        color: #ffffff;
+        color: #FFFFFF;
         font-weight: 800;
         text-decoration: underline;
-        text-decoration-color: rgba(168, 212, 188, 0.75);
+        text-decoration-color: rgba(242, 213, 106, 0.75);
         text-underline-offset: 0.15em;
     }
 
@@ -2400,23 +2430,22 @@ CUSTOM_CSS = """
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 0.2rem 0.4rem;
-        font-size: 0.8rem;
+        gap: 0.2rem 0.35rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.95);
+        color: #FFFFFF;
         line-height: 1.35;
         margin: 0;
-        padding: 0.4rem 0.7rem;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 0.35rem 0.6rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 999px;
         width: fit-content;
         max-width: 100%;
-        backdrop-filter: blur(6px);
     }
 
     .pcs-ref-summary-sep {
-        color: rgba(168, 212, 188, 0.85);
+        color: #F2D56A;
         font-weight: 800;
     }
 
@@ -2431,51 +2460,52 @@ CUSTOM_CSS = """
     }
 
     .pcs-faq-label {
-        margin-top: 1rem !important;
+        margin-top: 0.65rem !important;
+        color: #F2D56A !important;
     }
 
     .pcs-faq-grid {
         display: grid;
-        gap: 0.55rem;
+        gap: 0.45rem;
     }
 
     .pcs-faq-item {
         display: grid;
         gap: 0.15rem;
         padding: 0.55rem 0.7rem;
-        background: rgba(0, 0, 0, 0.35);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 10px;
     }
 
     .pcs-faq-item strong {
-        color: var(--pcs-army-gold);
+        color: #F2D56A;
         font-size: 0.88rem;
         font-weight: 800;
     }
 
     .pcs-faq-item span {
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 0.84rem;
+        color: #E4EBE7;
+        font-size: 0.86rem;
         line-height: 1.4;
     }
 
     .pcs-footer {
-        margin: 1.1rem 0 0.15rem 0;
-        padding: 0.75rem 0.15rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 0.85rem 0 0.1rem 0;
+        padding: 0.65rem 0.1rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 0;
         background: transparent;
         border-left: none;
         border-right: none;
         border-bottom: none;
         font-size: 0.76rem;
-        color: rgba(255, 255, 255, 0.5);
+        color: #B7C2BC;
         line-height: 1.45;
     }
 
     .pcs-footer strong {
-        color: var(--pcs-army-gold);
+        color: #F2D56A;
         font-weight: 800;
     }
 

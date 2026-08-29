@@ -43,11 +43,6 @@ def _render_header() -> None:
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
             </div>
-            <div class="pcs-hero-pills">
-                <span>2026 rates</span>
-                <span>68+ posts</span>
-                <span>Free</span>
-            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -159,17 +154,17 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         transform: translateX(-50%);
         bottom: 0.85rem;
         z-index: 99999;
-        width: min(780px, calc(100vw - 1.5rem));
+        width: min(540px, calc(100vw - 1.25rem));
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.75rem;
-        padding: 0.65rem 0.85rem 0.65rem 1rem;
+        gap: 0.65rem;
+        padding: 0.6rem 0.75rem 0.6rem 0.85rem;
         border-radius: 14px;
-        background: linear-gradient(145deg, #1a2e28 0%, #2a4a3f 100%);
-        color: #fff;
-        box-shadow: 0 12px 36px rgba(28, 28, 26, 0.28);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #243528;
+        color: #F4F7F5;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
         transition: opacity 0.2s ease, transform 0.2s ease;
       }}
@@ -183,17 +178,17 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         flex: 1;
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-kicker {{
-        font-size: 0.65rem;
+        font-size: 0.64rem;
         font-weight: 800;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: rgba(168, 212, 188, 0.95);
-        margin-bottom: 0.15rem;
+        color: #F2D56A;
+        margin-bottom: 0.12rem;
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-line {{
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: rgba(255,255,255,0.92);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #F4F7F5;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -203,17 +198,17 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         appearance: none;
         border: none;
         cursor: pointer;
-        background: #ea580c;
+        background: #f97316;
         color: #fff;
         font-weight: 900;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         letter-spacing: -0.01em;
-        padding: 0.55rem 0.9rem;
+        padding: 0.55rem 0.85rem;
         border-radius: 10px;
-        box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+        box-shadow: 0 4px 14px rgba(249, 115, 22, 0.45);
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-btn:hover {{
-        background: #c2410c;
+        background: #ea580c;
       }}
       @media (max-width: 560px) {{
         #pcs-sticky-ref-bar {{
@@ -355,11 +350,10 @@ def _render_referral_hook() -> None:
         f"""
         <div id="pcs-referral" class="pcs-ref-head">
             <div class="pcs-ref-kicker">Free match · military housing pros</div>
-            <div class="pcs-ref-title">Your next home is one step away</div>
+            <div class="pcs-ref-title">Get matched at your new post</div>
             <p class="pcs-ref-body">{body_html}</p>
             {summary_html}
         </div>
-        <p class="pcs-bah-section-label">Tell us how to reach you</p>
         """,
         unsafe_allow_html=True,
     )
@@ -392,7 +386,7 @@ def _render_referral_hook() -> None:
             key="referral_rent_buy_not_sure",
         )
 
-        st.caption("Learn how to adjust housing at your new post · Veteran-led · Free")
+        st.caption("Veteran-led · free · no spam")
         submitted = st.form_submit_button(
             "Connect with a housing pro →",
             type="primary",

@@ -578,4 +578,4 @@ def render_bah_calculator() -> None:
                     "use this table to compare real-world bills."
                 )
 
-    st.caption("Planning figures only · verify on your LES / with finance before you sign a lease.")
+    st.caption("Planning figures · verify LES / finance before you sign.")
