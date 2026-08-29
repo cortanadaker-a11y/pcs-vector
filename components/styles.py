@@ -7,34 +7,34 @@ CUSTOM_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap');
 
     :root {
-        /* One dark card + high-contrast light controls */
+        /* Exact PVector.html palette */
         --pcs-ink: #FFFFFF;
-        --pcs-navy: #2F4638;
-        --pcs-navy-light: #3A5545;
-        --pcs-slate: #EEF4F0;
-        --pcs-muted: #D8E3DC;
-        --pcs-bg: #18241E;
-        --pcs-surface: #2F4638;
-        --pcs-accent: #E8C84A;
-        --pcs-accent-soft: #F3DC7A;
-        --pcs-accent-hover: #C9A83A;
-        --pcs-gold: #E8C84A;
-        --pcs-border: rgba(255, 255, 255, 0.22);
-        --pcs-success: #6EE7B7;
-        --pcs-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
-        --pcs-radius: 1.2rem;
-        --pcs-hero-dark: #18241E;
-        --pcs-army-deep: #18241E;
-        --pcs-army-card: #2F4638;
-        --pcs-army-gold: #E8C84A;
-        --pcs-orange: #FB923C;
-        --pcs-orange-hover: #F97316;
-        --pcs-panel: transparent;
-        --pcs-panel-deep: rgba(0, 0, 0, 0.28);
+        --pcs-navy: #1C2D22;
+        --pcs-navy-light: #243830;
+        --pcs-slate: #D1D5DB;
+        --pcs-muted: #9CA3AF;
+        --pcs-bg: #121E16;
+        --pcs-surface: #1C2D22;
+        --pcs-accent: #D4AF37;
+        --pcs-accent-soft: #E0C25A;
+        --pcs-accent-hover: #B8962E;
+        --pcs-gold: #D4AF37;
+        --pcs-border: rgba(255, 255, 255, 0.15);
+        --pcs-success: #34D399;
+        --pcs-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        --pcs-radius: 1.5rem;
+        --pcs-hero-dark: #121E16;
+        --pcs-army-deep: #121E16;
+        --pcs-army-card: #1C2D22;
+        --pcs-army-gold: #D4AF37;
+        --pcs-orange: #EA580C;
+        --pcs-orange-hover: #C2410C;
+        --pcs-panel: rgba(0, 0, 0, 0.4);
+        --pcs-panel-deep: rgba(0, 0, 0, 0.6);
         --pcs-text: #FFFFFF;
-        --pcs-text-dim: #E4EEE8;
-        --pcs-control: #F3F1EC;
-        --pcs-control-text: #152019;
+        --pcs-text-dim: #D1D5DB;
+        --pcs-control: rgba(0, 0, 0, 0.5);
+        --pcs-control-text: #FFFFFF;
     }
 
     .stApp {
@@ -72,9 +72,9 @@ CUSTOM_CSS = """
     }
 
     .block-container {
-        padding-top: 0.55rem !important;
+        padding-top: 0.75rem !important;
         padding-bottom: 2.75rem !important;
-        max-width: 560px;
+        max-width: 36rem; /* max-w-xl like PVector.html */
     }
 
     /* Primary CTAs — partner orange */
@@ -133,39 +133,39 @@ CUSTOM_CSS = """
 
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        background: var(--pcs-army-card) !important;
-        border: 1px solid rgba(255, 255, 255, 0.24) !important;
-        border-radius: 1.25rem !important;
-        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.45) !important;
-        padding: 1rem 1rem 1.05rem 1rem !important;
+        background: #1C2D22 !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 1.5rem !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
+        padding: 1rem 1.1rem 1.15rem 1.1rem !important;
     }
 
-    /* Flatten nested panels → one continuous calculator face */
-    .pcs-face-section,
+    /* Nested panels like PVector.html */
     #pcs-inputs-panel,
-    #pcs-match-panel,
-    .pcs-partner-panel {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        margin: 0 0 0.15rem 0 !important;
+    .pcs-face-section-inputs {
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1rem !important;
+        padding: 0.85rem 0.9rem !important;
+        margin: 0 0 0.85rem 0 !important;
     }
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.28) !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
-        border-radius: 0.85rem !important;
-        padding: 0.85rem 0.85rem !important;
-        margin: 0.55rem 0 0.75rem 0 !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1rem !important;
+        padding: 0.9rem 0.95rem !important;
+        margin: 0 0 0.85rem 0 !important;
     }
 
+    #pcs-match-panel,
     .pcs-face-section-match {
-        margin-top: 0.35rem !important;
-        padding-top: 0.75rem !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0.15rem 0 0 0 !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
     }
 
     .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
@@ -186,32 +186,35 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.7rem 0;
+        margin: 0 0 0.75rem 0;
         padding: 0 0 0.65rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1.5rem;
+        font-size: 1.35rem;
         font-weight: 900;
         letter-spacing: -0.03em;
         color: #FFFFFF;
-        margin: 0 0 0.18rem 0;
+        margin: 0 0 0.15rem 0;
         line-height: 1.1;
     }
 
     .pcs-face-tagline {
-        font-size: 0.78rem;
+        font-size: 0.72rem;
         font-weight: 700;
-        letter-spacing: 0.02em;
-        color: #F2D56A;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #D4AF37;
         margin: 0;
         line-height: 1.25;
     }
 
-    #pcs-inputs-panel .pcs-calc-top .pcs-panel-label {
-        margin-bottom: 0.55rem;
+    /* Hide Step labels — HTML demo has none */
+    #pcs-inputs-panel .pcs-panel-label,
+    .pcs-face-section-inputs .pcs-panel-label {
+        display: none;
     }
 
     .pcs-calc-face [data-testid="stAlert"],
@@ -512,73 +515,218 @@ CUSTOM_CSS = """
         font-weight: 900;
     }
 
-    /* Light controls on dark card — max readability */
+    /* Dark selects like PVector.html */
     .pcs-calc-face div[data-baseweb="select"] > div {
-        background-color: var(--pcs-control) !important;
-        border: 1.5px solid #C9B056 !important;
-        color: var(--pcs-control-text) !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #FFFFFF !important;
         font-weight: 700 !important;
-        min-height: 2.7rem !important;
-        border-radius: 0.7rem !important;
+        font-size: 0.875rem !important;
+        min-height: 2.75rem !important;
+        border-radius: 0.75rem !important;
+    }
+
+    /* Rank (first select in row) gets gold border */
+    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child div[data-baseweb="select"] > div {
+        border-color: rgba(212, 175, 55, 0.5) !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] span,
     .pcs-calc-face div[data-baseweb="select"] div {
-        color: var(--pcs-control-text) !important;
+        color: #FFFFFF !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] svg {
-        fill: #6B5A20 !important;
-        color: #6B5A20 !important;
+        fill: #D4AF37 !important;
+        color: #D4AF37 !important;
     }
 
     .pcs-calc-face label,
     .pcs-calc-face [data-testid="stWidgetLabel"] p {
-        color: #FFFFFF !important;
-        font-weight: 800 !important;
-        font-size: 0.74rem !important;
-        letter-spacing: 0.05em;
+        color: #D1D5DB !important;
+        font-weight: 700 !important;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
+    }
+
+    /* Rank label gold */
+    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child label,
+    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p {
+        color: #D4AF37 !important;
     }
 
     .pcs-calc-face [data-testid="stCheckbox"] label span,
     .pcs-calc-face [data-testid="stRadio"] label p,
     .pcs-calc-face [data-testid="stCaption"] {
-        color: #E8F0EB !important;
+        color: #9CA3AF !important;
         text-transform: none !important;
         letter-spacing: 0 !important;
-        font-size: 0.86rem !important;
-        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input {
-        background: var(--pcs-control) !important;
-        color: var(--pcs-control-text) !important;
-        border: 1.5px solid #C9B056 !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         font-weight: 600 !important;
-        border-radius: 0.7rem !important;
-        min-height: 2.7rem !important;
+        border-radius: 0.75rem !important;
+        min-height: 2.75rem !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input::placeholder {
-        color: #7A857E !important;
+        color: #6B7280 !important;
     }
 
-    /* Dropdown menus */
     div[data-baseweb="popover"] ul,
     div[data-baseweb="menu"] {
-        background: #F3F1EC !important;
-        color: #152019 !important;
+        background: #1C2D22 !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
 
     div[data-baseweb="popover"] li,
     div[data-baseweb="menu"] li {
-        color: #152019 !important;
+        color: #FFFFFF !important;
     }
 
     div[data-baseweb="popover"] li:hover,
     div[data-baseweb="menu"] li:hover {
-        background: #E5E1D8 !important;
+        background: rgba(212, 175, 55, 0.2) !important;
+    }
+
+    /* Partner arrow — single line like HTML */
+    .pcs-partner-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0 0.25rem 0.65rem 0.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 0.45rem;
+    }
+
+    .pcs-partner-arrow-amt {
+        font-size: 1.875rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        letter-spacing: -0.02em;
+        line-height: 1;
+    }
+
+    .pcs-partner-arrow-amt.muted {
+        color: #D1D5DB;
+    }
+
+    .pcs-partner-arrow-glyph {
+        color: #D4AF37;
+        font-size: 1.5rem;
+        font-weight: 900;
+    }
+
+    .pcs-partner-arrow-loc,
+    .pcs-results-kicker {
+        display: none;
+    }
+
+    .pcs-partner-delta-row {
+        color: #9CA3AF;
+        font-size: 0.7rem;
+    }
+
+    .pcs-partner-rollup {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        color: #D4AF37;
+    }
+
+    .pcs-calc-face .pcs-est-row {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.65rem 0.7rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .pcs-calc-face .pcs-est-label {
+        color: #9CA3AF;
+        font-size: 0.65rem;
+        order: 0;
+        flex: 1;
+        text-align: center;
+    }
+
+    .pcs-calc-face .pcs-est-side {
+        color: #D1D5DB;
+        font-size: 0.875rem;
+        font-weight: 700;
+        flex: 1;
+    }
+
+    .pcs-calc-face .pcs-est-side-new {
+        color: #FFFFFF;
+        text-align: right;
+        flex: 1;
+    }
+
+    .pcs-est-heads {
+        display: none;
+    }
+
+    .pcs-match-body {
+        color: #9CA3AF;
+        font-size: 0.75rem;
+        text-align: center;
+        margin: 0.35rem 0 0.65rem 0;
+    }
+
+    .pcs-face-section-match .pcs-panel-label,
+    .pcs-match-top .pcs-panel-label {
+        display: none;
+    }
+
+    .pcs-ref-summary {
+        margin: 0 auto 0.65rem auto;
+        background: rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.1);
+        font-size: 0.75rem;
+    }
+
+    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+        background: #EA580C !important;
+        border: none !important;
+        min-height: 3.25rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 900 !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35) !important;
+    }
+
+    .pcs-out-fit {
+        display: none; /* denser — details live in expander */
+    }
+
+    .pcs-partner-meta {
+        color: #9CA3AF;
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+    }
+
+    .pcs-calc-face [data-testid="stExpander"] {
+        background: rgba(0, 0, 0, 0.35) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .pcs-footer {
+        color: #6B7280 !important;
+        border-top-color: rgba(255, 255, 255, 0.1) !important;
+        font-size: 0.7rem !important;
+        text-align: center;
     }
 
     .pcs-calc-face .pcs-bah-section-label,

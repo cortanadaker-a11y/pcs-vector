@@ -309,43 +309,10 @@ def _render_referral_hook() -> None:
     calc = _calc_fields_from_snap(snap)
 
     dest = calc["destination"]
-    dest_html = safe_html(dest) if dest else "your new post"
-    rank_html = safe_html(calc["rank"] or "—")
-    deps_short_html = safe_html(calc.get("dependents_short") or "—")
     ready = bool(dest)
 
-    if ready:
-        body_html = (
-            f"Verified military housing pros in <strong>{dest_html}</strong> "
-            f"can help you rent or buy — free, no obligation."
-        )
-        summary_html = (
-            f'<div class="pcs-ref-summary" title="From your calculator">'
-            f"<span>{dest_html}</span>"
-            f'<span class="pcs-ref-summary-sep">·</span>'
-            f"<span>{rank_html}</span>"
-            f'<span class="pcs-ref-summary-sep">·</span>'
-            f"<span>{deps_short_html}</span>"
-            f"</div>"
-        )
-    else:
-        body_html = (
-            "Set <strong>Going to</strong> above — Destination, Rank, and Dependents "
-            "carry into this free match."
-        )
-        summary_html = ""
-
-    st.markdown(
-        f"""
-        <div id="pcs-match-start"></div>
-        <div id="pcs-referral" class="pcs-match-top">
-            <div class="pcs-panel-label">Step 2 · Free housing match</div>
-            <p class="pcs-match-body">{body_html}</p>
-            {summary_html}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Compact contact strip → orange CTA (PVector.html bottom pattern)
+    st.markdown('<div id="pcs-match-start"></div><div id="pcs-referral"></div>', unsafe_allow_html=True)
 
     with st.form("referral_form", clear_on_submit=False):
         n1, n2 = st.columns(2)
@@ -354,18 +321,21 @@ def _render_referral_hook() -> None:
                 "First name",
                 key="referral_first_name",
                 placeholder="First",
+                label_visibility="collapsed",
             )
         with n2:
             last_name = st.text_input(
                 "Last name",
                 key="referral_last_name",
                 placeholder="Last",
+                label_visibility="collapsed",
             )
 
         email_address = st.text_input(
             "Email",
             key="referral_email_address",
-            placeholder="you@email.com",
+            placeholder="Email address",
+            label_visibility="collapsed",
         )
 
         rent_buy_not_sure = st.radio(
@@ -373,15 +343,16 @@ def _render_referral_hook() -> None:
             options=list(INTEREST_OPTIONS),
             horizontal=True,
             key="referral_rent_buy_not_sure",
+            label_visibility="collapsed",
         )
 
-        st.caption("Under a minute · pre-filled form · free")
         submitted = st.form_submit_button(
-            "Get free housing help →",
+            "Connect With A PCS Wayfinder ➔",
             type="primary",
             use_container_width=True,
             disabled=not ready,
         )
+        st.caption("Learn how to adjust housing at your new post · Veteran-Led · Free")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")

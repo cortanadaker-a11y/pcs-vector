@@ -290,20 +290,34 @@ def render_bah_calculator() -> None:
         unsafe_allow_html=True,
     )
 
+    if "bah_calc_gaining" not in st.session_state:
+        st.session_state.bah_calc_gaining = (
+            "Fort Bragg, NC" if "Fort Bragg, NC" in installations else installations[0]
+        )
+    # Default Current like the HTML demo (comparison visible immediately)
+    if "bah_calc_current" not in st.session_state:
+        default_cur = "Fort Campbell, KY"
+        if default_cur not in installations or default_cur == st.session_state.bah_calc_gaining:
+            default_cur = next(
+                (p for p in installations if p != st.session_state.bah_calc_gaining),
+                _NONE_CURRENT,
+            )
+        st.session_state.bah_calc_current = default_cur
+
     r1, r2, r3 = st.columns(3)
     with r1:
         pay_grade = st.selectbox(
             "Rank",
             options=grades,
             index=grades.index("E-5") if "E-5" in grades else 0,
-            format_func=lambda g: f"{g} — {PAY_GRADE_TO_RANK.get(g, g)}",
+            format_func=lambda g: g,
             key="bah_calc_grade",
         )
     with r2:
         num_deps = st.selectbox(
             "Dependents",
             options=[0, 1, 2, 3, 4, 5],
-            index=1,
+            index=0,
             format_func=_deps_label,
             key="bah_calc_deps_n",
         )
@@ -317,23 +331,18 @@ def render_bah_calculator() -> None:
             help="Years of service — used for COLA.",
         )
 
-    if "bah_calc_gaining" not in st.session_state:
-        st.session_state.bah_calc_gaining = (
-            "Fort Bragg, NC" if "Fort Bragg, NC" in installations else installations[0]
-        )
-
     d1, d2 = st.columns(2)
     with d1:
         current_raw = st.selectbox(
-            "Coming from",
+            "Current Post",
             options=[_NONE_CURRENT] + installations,
             key="bah_calc_current",
-            help="Optional. Pick a post to compare BAH side by side.",
+            help="Skip compare = target only.",
         )
         current = None if current_raw == _NONE_CURRENT else current_raw
     with d2:
         gaining = st.selectbox(
-            "Going to",
+            "Target Post",
             options=installations,
             key="bah_calc_gaining",
         )
@@ -458,17 +467,7 @@ def render_bah_calculator() -> None:
         cur_rent_hi = int(cur_market["high_usd"])
         cur_mid = int(cur_market["mid_usd"])
 
-    # Partner-style header: big BAH → BAH (or single target when Skip)
-    cola_row = ""
-    if cola:
-        cola_row = f"""
-        <div class="pcs-est-row">
-            <span class="pcs-est-side">—</span>
-            <span class="pcs-est-label">COLA</span>
-            <span class="pcs-est-side pcs-est-side-new">{_money_html(cola)}/mo</span>
-        </div>
-        """
-
+    # PVector.html results layout (real rates — no fake mortgage/gas)
     if has_compare and cur_face is not None and new_face is not None:
         bah_delta = int(new_face) - int(cur_face)
         if bah_delta > 0:
@@ -477,74 +476,51 @@ def render_bah_calculator() -> None:
             delta_cls, delta_txt = "pcs-delta-down", f"-{_money_html(abs(bah_delta))}/mo"
         else:
             delta_cls, delta_txt = "pcs-delta-flat", "$0/mo"
-        yr_bit = (
-            f" · {_money_html(int(bah_delta) * 12)}/yr"
-            if bah_delta != 0
-            else ""
-        )
         arrow_html = f"""
-        <div class="pcs-results-kicker">Your PCS money snapshot</div>
         <div class="pcs-partner-arrow">
-            <div class="pcs-partner-arrow-col">
-                <div class="pcs-partner-arrow-loc">Coming from</div>
-                <span class="pcs-partner-arrow-amt muted">{_money_html(cur_face)}</span>
-            </div>
+            <span class="pcs-partner-arrow-amt muted">{_money_html(cur_face)}</span>
             <span class="pcs-partner-arrow-glyph">➔</span>
-            <div class="pcs-partner-arrow-col pcs-partner-arrow-col-new">
-                <div class="pcs-partner-arrow-loc">Going to</div>
-                <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
-            </div>
+            <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
         </div>
         <div class="pcs-partner-delta-row">
-            <span>Monthly {safe_html(new_face_k)} change</span>
-            <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}{yr_bit}</span>
+            <span>Monthly BAH Delta</span>
+            <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}</span>
         </div>
         """
         if cur_mid and cur_mid > 0:
             rent_pct = int(round(((market_mid - cur_mid) / cur_mid) * 100))
             if rent_pct < 0:
-                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% CHEAPER RENT"
+                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% CHEAPER"
             elif rent_pct > 0:
-                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% HIGHER RENT"
+                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% MORE EXP."
             else:
-                roll_cls, roll_txt = "pcs-roll-flat", "SIMILAR RENT"
+                roll_cls, roll_txt = "pcs-roll-flat", "EQUAL COST"
             rollup_html = f"""
             <div class="pcs-partner-rollup">
-                <span>Typical {bed_label} rent pressure</span>
+                <span>Overall Cost Index Rollup</span>
                 <span class="pcs-partner-rollup-badge {roll_cls}">{roll_txt}</span>
             </div>
             """
         else:
             rollup_html = ""
-        left_rent = f"{_money_html(cur_rent_lo)}–{_money_html(cur_rent_hi)}"
+        left_rent = f"{_money_html(cur_rent_lo)} – {_money_html(cur_rent_hi)}"
         left_util = f"{_money_html(int(cur_util_n or 0))}/mo"
-        col_heads = """
-        <div class="pcs-est-heads">
-            <span>From</span><span></span><span>Going to</span>
-        </div>
-        """
     else:
         arrow_html = f"""
-        <div class="pcs-results-kicker">Your PCS money snapshot</div>
-        <div class="pcs-partner-arrow pcs-partner-arrow-solo">
-            <div class="pcs-partner-arrow-col">
-                <div class="pcs-partner-arrow-loc">{safe_html(new_face_k)} · {safe_html(gaining)}</div>
-                <span class="pcs-partner-arrow-amt">{_money_html(new_face)}<span class="pcs-partner-per">/mo</span></span>
-            </div>
+        <div class="pcs-partner-arrow">
+            <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
         </div>
         <div class="pcs-partner-delta-row">
-            <span>Total package (housing{('+ COLA' if cola else '')})</span>
-            <span class="pcs-bah-delta-badge pcs-delta-flat">{_money_html(total)}/mo</span>
+            <span>{safe_html(new_face_k)} · {safe_html(gaining)}</span>
+            <span class="pcs-bah-delta-badge pcs-delta-flat">{_money_html(total)}/mo total</span>
         </div>
         """
         rollup_html = ""
         left_rent = "—"
         left_util = "—"
-        col_heads = """
-        <div class="pcs-est-heads pcs-est-heads-solo">
-            <span></span><span></span><span>Going to</span>
-        </div>
-        """
+
+    right_rent = f"{_money_html(market_low)} – {_money_html(market_high)}"
+    right_util = f"{_money_html(util_n)}/mo" if util_n else "—"
 
     _render_html(
         f"""
@@ -552,39 +528,27 @@ def render_bah_calculator() -> None:
             {arrow_html}
             {rollup_html}
             <div class="pcs-partner-breakdown">
-                <div class="pcs-partner-breakdown-title">Move costs at a glance</div>
-                {col_heads}
+                <div class="pcs-partner-breakdown-title">Itemized Expense Breakdown</div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_rent}</span>
-                    <span class="pcs-est-label">Typical {bed_label} rent (est.)</span>
-                    <span class="pcs-est-side pcs-est-side-new">{_money_html(market_low)}–{_money_html(market_high)}</span>
+                    <span class="pcs-est-label">Typical Rent</span>
+                    <span class="pcs-est-side pcs-est-side-new">{right_rent}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_util}</span>
-                    <span class="pcs-est-label">Utilities (est.)</span>
-                    <span class="pcs-est-side pcs-est-side-new">{(_money_html(util_n) + '/mo') if util_n else '—'}</span>
+                    <span class="pcs-est-label">Utilities Est.</span>
+                    <span class="pcs-est-side pcs-est-side-new">{right_util}</span>
                 </div>
-                {cola_row}
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">DLA (one-time)</span>
+                    <span class="pcs-est-label">DLA</span>
                     <span class="pcs-est-side pcs-est-side-new">{_dla_html(dla_amt)}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">Move-in cash (est.)</span>
-                    <span class="pcs-est-side pcs-est-side-new">{_money_html(move_in) if move_in else '—'}</span>
-                </div>
-                <div class="pcs-est-row pcs-est-row-emph">
-                    <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">Still need after DLA</span>
+                    <span class="pcs-est-label">Still Need After DLA</span>
                     <span class="pcs-est-side pcs-est-side-new">{gap_txt}</span>
                 </div>
-            </div>
-            <div class="pcs-out-fit pcs-out-fit-{fit_tone}">{fit_line}</div>
-            <div class="pcs-partner-meta">
-                {safe_html(pay_grade)} · {safe_html(rank_label)} · {safe_html(dep_label)} deps · {int(yos)} YOS
-                · package {_money_html(total)}/mo
             </div>
         </div>
         """
