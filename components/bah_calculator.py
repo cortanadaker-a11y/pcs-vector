@@ -60,47 +60,68 @@ def _deps_label(n: int) -> str:
     return str(int(n))
 
 
-def _wrap_inputs_panel() -> None:
-    """Wrap Streamlit input widgets in a partner-style nested panel."""
+def wrap_dom_panel(
+    *,
+    start_id: str,
+    end_id: str,
+    panel_id: str,
+    panel_class: str = "pcs-partner-panel",
+) -> None:
+    """Wrap Streamlit blocks between markers into one visual panel."""
     components.html(
-        """
+        f"""
 <script>
-(function () {
+(function () {{
   var doc = window.parent.document;
-  function wrap() {
-    var start = doc.getElementById("pcs-inputs-start");
-    var end = doc.getElementById("pcs-inputs-end");
+  var startId = {start_id!r};
+  var endId = {end_id!r};
+  var panelId = {panel_id!r};
+  var panelClass = {panel_class!r};
+  function wrap() {{
+    var start = doc.getElementById(startId);
+    var end = doc.getElementById(endId);
     if (!start || !end) return;
-    var existing = doc.getElementById("pcs-inputs-panel");
+    var existing = doc.getElementById(panelId);
     if (existing && existing.contains(start) && existing.contains(end)) return;
-    if (existing) {
-      try { existing.replaceWith.apply(existing, Array.from(existing.childNodes)); } catch (e) {}
-    }
+    if (existing) {{
+      try {{
+        while (existing.firstChild) {{
+          existing.parentNode.insertBefore(existing.firstChild, existing);
+        }}
+        existing.remove();
+      }} catch (e) {{}}
+    }}
     var panel = doc.createElement("div");
-    panel.id = "pcs-inputs-panel";
-    panel.className = "pcs-partner-panel pcs-partner-inputs";
-
-    // Collect nodes from start through end across Streamlit element wrappers
-    var nodes = [];
+    panel.id = panelId;
+    panel.className = panelClass;
     var root = start.closest('[data-testid="stVerticalBlock"]') || start.parentNode;
     if (!root) return;
+    var nodes = [];
     var collecting = false;
-    var kids = Array.from(root.children);
-    kids.forEach(function (el) {
+    Array.from(root.children).forEach(function (el) {{
       if (el.contains(start) || el === start) collecting = true;
       if (collecting) nodes.push(el);
       if (el.contains(end) || el === end) collecting = false;
-    });
+    }});
     if (!nodes.length) return;
     nodes[0].parentNode.insertBefore(panel, nodes[0]);
-    nodes.forEach(function (el) { panel.appendChild(el); });
-  }
+    nodes.forEach(function (el) {{ panel.appendChild(el); }});
+  }}
   wrap();
-  [80, 250, 600].forEach(function (ms) { setTimeout(wrap, ms); });
-})();
+  [80, 250, 600].forEach(function (ms) {{ setTimeout(wrap, ms); }});
+}})();
 </script>
         """,
         height=0,
+    )
+
+
+def _wrap_inputs_panel() -> None:
+    wrap_dom_panel(
+        start_id="pcs-inputs-start",
+        end_id="pcs-inputs-end",
+        panel_id="pcs-inputs-panel",
+        panel_class="pcs-partner-panel pcs-partner-inputs",
     )
 
 

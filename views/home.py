@@ -8,7 +8,11 @@ import re
 import streamlit as st
 import streamlit.components.v1 as components
 
-from components.bah_calculator import get_calculator_snapshot, render_bah_calculator
+from components.bah_calculator import (
+    get_calculator_snapshot,
+    render_bah_calculator,
+    wrap_dom_panel,
+)
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
@@ -146,10 +150,10 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         gap: 0.65rem;
         padding: 0.6rem 0.75rem 0.6rem 0.85rem;
         border-radius: 14px;
-        background: #243528;
-        color: #F4F7F5;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: #314B3C;
+        color: #FFFFFF;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.28);
         font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
         transition: opacity 0.2s ease, transform 0.2s ease;
       }}
@@ -167,13 +171,13 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #F2D56A;
+        color: #F0D060;
         margin-bottom: 0.12rem;
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-line {{
         font-size: 0.8rem;
         font-weight: 700;
-        color: #F4F7F5;
+        color: #FFFFFF;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -183,17 +187,17 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         appearance: none;
         border: none;
         cursor: pointer;
-        background: #f97316;
+        background: #FB923C;
         color: #fff;
         font-weight: 900;
         font-size: 0.8rem;
         letter-spacing: -0.01em;
         padding: 0.55rem 0.85rem;
         border-radius: 10px;
-        box-shadow: 0 4px 14px rgba(249, 115, 22, 0.45);
+        box-shadow: 0 4px 14px rgba(251, 146, 60, 0.45);
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-btn:hover {{
-        background: #ea580c;
+        background: #F97316;
       }}
       @media (max-width: 560px) {{
         #pcs-sticky-ref-bar {{
@@ -333,10 +337,10 @@ def _render_referral_hook() -> None:
 
     st.markdown(
         f"""
-        <div id="pcs-referral" class="pcs-ref-head">
-            <div class="pcs-ref-kicker">Step 2 · Free housing match</div>
-            <div class="pcs-ref-title">Talk to a pro near your new post</div>
-            <p class="pcs-ref-body">{body_html}</p>
+        <div id="pcs-match-start"></div>
+        <div id="pcs-referral" class="pcs-match-top">
+            <div class="pcs-panel-label">Step 2 · Free housing match</div>
+            <p class="pcs-match-body">{body_html}</p>
             {summary_html}
         </div>
         """,
@@ -371,13 +375,21 @@ def _render_referral_hook() -> None:
             key="referral_rent_buy_not_sure",
         )
 
-        st.caption("Takes under a minute · opens a pre-filled form · free")
+        st.caption("Under a minute · pre-filled form · free")
         submitted = st.form_submit_button(
             "Get free housing help →",
             type="primary",
             use_container_width=True,
             disabled=not ready,
         )
+
+    st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
+    wrap_dom_panel(
+        start_id="pcs-match-start",
+        end_id="pcs-match-end",
+        panel_id="pcs-match-panel",
+        panel_class="pcs-partner-panel pcs-partner-match",
+    )
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -446,17 +458,13 @@ def render_home() -> None:
     with st.container(border=True):
         _tag_page_face()
         render_bah_calculator()
-        st.markdown(
-            '<div class="pcs-face-divider" aria-hidden="true"></div>',
-            unsafe_allow_html=True,
-        )
         _render_referral_hook()
         _render_faq()
         st.markdown(
             """
             <div class="pcs-footer">
                 <strong>PCS Vector</strong> · For Soldiers; By Soldiers
-                <span>· Planning figures only — verify with finance before you spend.</span>
+                <span>· Verify with finance before you spend.</span>
             </div>
             """,
             unsafe_allow_html=True,

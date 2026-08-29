@@ -7,31 +7,33 @@ CUSTOM_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap');
 
     :root {
-        --pcs-ink: #F4F7F5;
-        --pcs-navy: #243528;
-        --pcs-navy-light: #2f4534;
-        --pcs-slate: #D5DDD8;
-        --pcs-muted: #B7C2BC;
-        --pcs-bg: #152019;
-        --pcs-surface: #243528;
-        --pcs-accent: #E0BC4A;
-        --pcs-accent-soft: #f0d56a;
-        --pcs-accent-hover: #c9a63a;
-        --pcs-gold: #E0BC4A;
-        --pcs-border: rgba(255, 255, 255, 0.22);
-        --pcs-success: #4ade80;
-        --pcs-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
-        --pcs-radius: 1.25rem;
-        --pcs-hero-dark: #152019;
-        --pcs-army-deep: #152019;
-        --pcs-army-card: #243528;
-        --pcs-army-gold: #E0BC4A;
-        --pcs-orange: #f97316;
-        --pcs-orange-hover: #ea580c;
-        --pcs-panel: #1a2a20;
-        --pcs-panel-deep: #121c16;
-        --pcs-text: #F4F7F5;
-        --pcs-text-dim: #C5D0CA;
+        /* Lighter army greens + brighter text for readability */
+        --pcs-ink: #FFFFFF;
+        --pcs-navy: #314B3C;
+        --pcs-navy-light: #3D5A48;
+        --pcs-slate: #E8F0EB;
+        --pcs-muted: #D2DDD6;
+        --pcs-bg: #1B2A22;
+        --pcs-surface: #314B3C;
+        --pcs-accent: #F0D060;
+        --pcs-accent-soft: #F7E08A;
+        --pcs-accent-hover: #D4B445;
+        --pcs-gold: #F0D060;
+        --pcs-border: rgba(255, 255, 255, 0.28);
+        --pcs-success: #6EE7B7;
+        --pcs-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        --pcs-radius: 1.15rem;
+        --pcs-hero-dark: #1B2A22;
+        --pcs-army-deep: #1B2A22;
+        --pcs-army-card: #314B3C;
+        --pcs-army-gold: #F0D060;
+        --pcs-orange: #FB923C;
+        --pcs-orange-hover: #F97316;
+        --pcs-panel: #3A5747;
+        --pcs-panel-deep: #274033;
+        --pcs-text: #FFFFFF;
+        --pcs-text-dim: #E2EBE5;
+        --pcs-control: #1E3228;
     }
 
     .stApp {
@@ -282,19 +284,49 @@ CUSTOM_CSS = """
     }
 
     #pcs-inputs-panel.pcs-partner-panel,
+    #pcs-match-panel.pcs-partner-panel,
     .pcs-partner-panel {
         background: var(--pcs-panel);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.26);
         border-radius: 0.95rem;
-        padding: 0.75rem 0.8rem;
-        margin: 0 0 0.65rem 0;
+        padding: 0.85rem 0.9rem;
+        margin: 0 0 0.55rem 0;
+    }
+
+    #pcs-match-start,
+    #pcs-match-end {
+        height: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .pcs-match-top {
+        margin: 0 0 0.45rem 0;
+    }
+
+    .pcs-match-body {
+        margin: 0 0 0.45rem 0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: #F2F7F4;
+        font-weight: 500;
+    }
+
+    .pcs-match-body strong {
+        color: #FFFFFF;
+        font-weight: 800;
+        text-decoration: underline;
+        text-decoration-color: rgba(240, 208, 96, 0.8);
+        text-underline-offset: 0.12em;
     }
 
     .pcs-partner-results {
         background: var(--pcs-panel-deep) !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.26) !important;
         margin-top: 0.1rem;
-        padding: 0.9rem 0.85rem !important;
+        margin-bottom: 0.55rem;
+        padding: 0.95rem 0.9rem !important;
     }
 
     .pcs-partner-arrow {
@@ -419,25 +451,33 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face .pcs-est-row {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         padding: 0.55rem 0.6rem;
         margin-bottom: 0.35rem;
     }
 
     .pcs-calc-face .pcs-est-label {
-        color: #C5D0CA;
-        font-size: 0.66rem;
+        color: #DCE6E0;
+        font-size: 0.68rem;
     }
 
     .pcs-calc-face .pcs-est-side {
-        color: #E4EBE7;
-        font-size: 0.84rem;
+        color: #F2F7F4;
+        font-size: 0.86rem;
     }
 
     .pcs-calc-face .pcs-est-side-new {
         color: #FFFFFF;
         font-weight: 800;
+    }
+
+    .pcs-calc-face .pcs-face-divider {
+        display: none;
+    }
+
+    .pcs-calc-face [data-testid="stExpander"] {
+        margin-top: 0.15rem !important;
     }
 
     .pcs-calc-face .pcs-out-fit {
@@ -476,11 +516,11 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face div[data-baseweb="select"] > div {
-        background-color: #0f1813 !important;
-        border-color: rgba(224, 188, 74, 0.65) !important;
+        background-color: var(--pcs-control) !important;
+        border-color: rgba(240, 208, 96, 0.75) !important;
         color: #FFFFFF !important;
         font-weight: 700 !important;
-        min-height: 2.55rem !important;
+        min-height: 2.6rem !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] span,
@@ -489,25 +529,37 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face div[data-baseweb="select"] svg {
-        fill: #F2D56A !important;
-        color: #F2D56A !important;
+        fill: #F7E08A !important;
+        color: #F7E08A !important;
     }
 
     .pcs-calc-face [data-testid="stCheckbox"] label span,
     .pcs-calc-face [data-testid="stRadio"] label p,
     .pcs-calc-face [data-testid="stCaption"] {
-        color: #D5DDD8 !important;
+        color: #E8F0EB !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input {
-        background: #0f1813 !important;
+        background: var(--pcs-control) !important;
         color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.28) !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
         font-weight: 600 !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input::placeholder {
-        color: #8A9690 !important;
+        color: #9AABA2 !important;
+    }
+
+    /* Baseweb dropdown menu readability */
+    div[data-baseweb="popover"] ul,
+    div[data-baseweb="menu"] {
+        background: #24362C !important;
+        color: #FFFFFF !important;
+    }
+
+    div[data-baseweb="popover"] li,
+    div[data-baseweb="menu"] li {
+        color: #FFFFFF !important;
     }
 
     .pcs-calc-face .pcs-bah-section-label,
@@ -2442,53 +2494,8 @@ CUSTOM_CSS = """
         margin: 0.5rem 0 0.35rem 0;
     }
 
-    .pcs-ref-head {
-        margin: 0.05rem 0 0.55rem 0;
-        padding: 0.75rem 0.8rem;
+    #pcs-referral {
         scroll-margin-top: 0.75rem;
-        border-radius: 0.95rem;
-        background: var(--pcs-panel);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: var(--pcs-text);
-    }
-
-    .pcs-ref-kicker {
-        display: inline-block;
-        font-size: 0.64rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #152019;
-        background: #F2D56A;
-        border-radius: 999px;
-        padding: 0.2rem 0.55rem;
-        margin-bottom: 0.4rem;
-    }
-
-    .pcs-ref-title {
-        display: block;
-        font-size: 1.15rem;
-        font-weight: 900;
-        color: #FFFFFF;
-        margin: 0 0 0.3rem 0;
-        letter-spacing: -0.03em;
-        line-height: 1.2;
-    }
-
-    .pcs-ref-body {
-        font-size: 0.9rem;
-        color: #E4EBE7;
-        line-height: 1.4;
-        margin: 0 0 0.5rem 0;
-        max-width: 40rem;
-    }
-
-    .pcs-ref-body strong {
-        color: #FFFFFF;
-        font-weight: 800;
-        text-decoration: underline;
-        text-decoration-color: rgba(242, 213, 106, 0.75);
-        text-underline-offset: 0.15em;
     }
 
     .pcs-ref-summary {
@@ -2496,21 +2503,21 @@ CUSTOM_CSS = """
         flex-wrap: wrap;
         align-items: center;
         gap: 0.2rem 0.35rem;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 700;
         color: #FFFFFF;
         line-height: 1.35;
         margin: 0;
-        padding: 0.35rem 0.6rem;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.4rem 0.65rem;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.22);
         border-radius: 999px;
         width: fit-content;
         max-width: 100%;
     }
 
     .pcs-ref-summary-sep {
-        color: #F2D56A;
+        color: #F0D060;
         font-weight: 800;
     }
 
@@ -2538,39 +2545,39 @@ CUSTOM_CSS = """
         display: grid;
         gap: 0.15rem;
         padding: 0.55rem 0.7rem;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.22);
         border-radius: 10px;
     }
 
     .pcs-faq-item strong {
-        color: #F2D56A;
-        font-size: 0.88rem;
+        color: #F0D060;
+        font-size: 0.9rem;
         font-weight: 800;
     }
 
     .pcs-faq-item span {
-        color: #E4EBE7;
-        font-size: 0.86rem;
+        color: #F2F7F4;
+        font-size: 0.88rem;
         line-height: 1.4;
     }
 
     .pcs-footer {
-        margin: 0.85rem 0 0.1rem 0;
-        padding: 0.65rem 0.1rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.14);
+        margin: 0.55rem 0 0.05rem 0;
+        padding: 0.55rem 0.1rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 0;
         background: transparent;
         border-left: none;
         border-right: none;
         border-bottom: none;
-        font-size: 0.76rem;
-        color: #B7C2BC;
+        font-size: 0.78rem;
+        color: #D2DDD6;
         line-height: 1.45;
     }
 
     .pcs-footer strong {
-        color: #F2D56A;
+        color: #F0D060;
         font-weight: 800;
     }
 
