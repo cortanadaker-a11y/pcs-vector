@@ -485,7 +485,7 @@ def render_bah_calculator() -> None:
         if cola_idx is not None:
             cola_note = f" · index {cola_idx}"
         elif system == "OHA" and cola == 0:
-            cola_note = " · none at this locality"
+            cola_note = " · none at this location"
         allowance_rows += f"""
         <div class="pcs-est-row">
             <span class="pcs-est-side">{left_cola}</span>
