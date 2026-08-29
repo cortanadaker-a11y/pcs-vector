@@ -43,10 +43,6 @@ def _render_header() -> None:
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
             </div>
-            <p class="pcs-hero-lead">
-                See your BAH, OHA, COLA, and move-in cash for your next post —
-                then get matched with a housing pro who knows the area.
-            </p>
             <div class="pcs-hero-pills">
                 <span>2026 rates</span>
                 <span>68+ posts</span>

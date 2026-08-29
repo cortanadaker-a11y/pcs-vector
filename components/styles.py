@@ -194,8 +194,202 @@ CUSTOM_CSS = """
         font-weight: 800;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.45);
+        color: rgba(255, 255, 255, 0.55);
         margin: 0.15rem 0 0.45rem 0;
+    }
+
+    /* Partner HTML calculator panels */
+    #pcs-inputs-start,
+    #pcs-inputs-end {
+        height: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    #pcs-inputs-panel.pcs-partner-panel,
+    .pcs-partner-panel {
+        background: rgba(0, 0, 0, 0.42);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 1rem;
+        padding: 0.85rem 0.9rem;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .pcs-partner-results {
+        background: rgba(0, 0, 0, 0.58) !important;
+        margin-top: 0.15rem;
+    }
+
+    .pcs-partner-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0 0.15rem 0.7rem 0.15rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        margin-bottom: 0.55rem;
+    }
+
+    .pcs-partner-arrow-solo {
+        justify-content: flex-start;
+    }
+
+    .pcs-partner-arrow-amt {
+        font-size: 1.85rem;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color: #ffffff;
+        line-height: 1.05;
+    }
+
+    .pcs-partner-arrow-amt.muted {
+        color: #c8d0cc;
+    }
+
+    .pcs-partner-arrow-glyph {
+        color: var(--pcs-army-gold);
+        font-size: 1.45rem;
+        font-weight: 900;
+        flex-shrink: 0;
+    }
+
+    .pcs-partner-per {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.7);
+        margin-left: 0.2rem;
+    }
+
+    .pcs-partner-delta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #b8c4be;
+        margin-bottom: 0.55rem;
+    }
+
+    .pcs-partner-rollup {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 0.75rem;
+        padding: 0.55rem 0.7rem;
+        margin-bottom: 0.65rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pcs-army-gold);
+    }
+
+    .pcs-partner-rollup-badge {
+        font-size: 0.72rem;
+        font-weight: 900;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.4rem;
+        border: 1px solid transparent;
+        letter-spacing: 0.04em;
+    }
+
+    .pcs-partner-rollup-badge.pcs-roll-down {
+        background: rgba(16, 185, 129, 0.22);
+        color: #6ee7b7;
+        border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .pcs-partner-rollup-badge.pcs-roll-up {
+        background: rgba(245, 158, 11, 0.22);
+        color: #fcd34d;
+        border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .pcs-partner-rollup-badge.pcs-roll-flat {
+        background: rgba(156, 163, 175, 0.22);
+        color: #e5e7eb;
+        border-color: rgba(156, 163, 175, 0.4);
+    }
+
+    .pcs-partner-breakdown {
+        padding-top: 0.35rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        margin-top: 0.15rem;
+    }
+
+    .pcs-partner-breakdown-title {
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #b8c4be;
+        margin: 0.35rem 0 0.45rem 0;
+    }
+
+    .pcs-partner-meta {
+        margin-top: 0.65rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #c5d0ca;
+        line-height: 1.4;
+    }
+
+    .pcs-calc-face .pcs-est-row {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .pcs-calc-face .pcs-est-label {
+        color: #aeb8b2;
+    }
+
+    .pcs-calc-face .pcs-est-side {
+        color: #d7e0db;
+    }
+
+    .pcs-calc-face .pcs-est-side-new {
+        color: #ffffff;
+    }
+
+    .pcs-calc-face .pcs-out-fit {
+        margin-top: 0.65rem;
+        font-size: 0.88rem;
+        color: #e8efe9 !important;
+    }
+
+    .pcs-calc-face .pcs-out-fit-fit {
+        background: rgba(16, 185, 129, 0.18);
+        border-color: rgba(16, 185, 129, 0.4);
+        color: #bbf7d0 !important;
+    }
+
+    .pcs-calc-face .pcs-out-fit-tight {
+        background: rgba(248, 113, 113, 0.15);
+        border-color: rgba(248, 113, 113, 0.35);
+        color: #fecaca !important;
+    }
+
+    /* Brighter labels on dark face */
+    .pcs-calc-face label,
+    .pcs-calc-face [data-testid="stWidgetLabel"] p {
+        color: #e8efe9 !important;
+        font-weight: 700 !important;
+        font-size: 0.78rem !important;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .pcs-calc-face div[data-baseweb="select"] > div {
+        border-color: rgba(212, 175, 55, 0.55) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
     }
 
     .pcs-calc-face .pcs-bah-section-label,
