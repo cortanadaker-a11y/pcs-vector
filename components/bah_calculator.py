@@ -80,16 +80,8 @@ def wrap_dom_panel(
     var start = doc.getElementById(startId);
     var end = doc.getElementById(endId);
     if (!start || !end) return;
-    var existing = doc.getElementById(panelId);
-    if (existing && existing.contains(start) && existing.contains(end)) return;
-    if (existing) {{
-      try {{
-        while (existing.firstChild) {{
-          existing.parentNode.insertBefore(existing.firstChild, existing);
-        }}
-        existing.remove();
-      }} catch (e) {{}}
-    }}
+    // Never unwrap/rebuild — remounting Streamlit widgets crashes on rerun
+    if (doc.getElementById(panelId)) return;
     var panel = doc.createElement("div");
     panel.id = panelId;
     panel.className = panelClass;
@@ -107,7 +99,7 @@ def wrap_dom_panel(
     nodes.forEach(function (el) {{ panel.appendChild(el); }});
   }}
   wrap();
-  [80, 250, 600].forEach(function (ms) {{ setTimeout(wrap, ms); }});
+  [100, 300].forEach(function (ms) {{ setTimeout(wrap, ms); }});
 }})();
 </script>
         """,
@@ -227,14 +219,19 @@ def render_bah_calculator() -> None:
             key="bah_calc_grade",
         )
     with r2:
-        num_deps = st.selectbox(
+        num_deps_raw = st.selectbox(
             "Dependents",
             options=[0, 1, 2, 3, 4, 5],
             index=0,
             format_func=_deps_label,
             key="bah_calc_deps_n",
         )
-        with_dependents = int(num_deps) > 0
+        try:
+            num_deps = int(num_deps_raw)
+        except (TypeError, ValueError):
+            num_deps = 0
+        num_deps = max(0, min(5, num_deps))
+        with_dependents = num_deps > 0
     with r3:
         yos = st.selectbox(
             "YOS",
@@ -260,13 +257,17 @@ def render_bah_calculator() -> None:
             key="bah_calc_gaining",
         )
 
-    barracks_on = False
-    if not with_dependents:
-        barracks_on = st.checkbox(
-            "Barracks + meal card (may lower COLA)",
-            value=False,
-            key="bah_calc_barracks",
-        )
+    # Always render this widget (never mount/unmount) — toggling it with
+    # dependents was crashing Streamlit on rerun.
+    barracks_on = st.checkbox(
+        "Barracks + meal card (may lower COLA)",
+        value=False,
+        key="bah_calc_barracks",
+        disabled=with_dependents,
+        help="Only applies with 0 dependents.",
+    )
+    if with_dependents:
+        barracks_on = False
 
     st.markdown('<div id="pcs-inputs-end"></div>', unsafe_allow_html=True)
     _wrap_inputs_panel()

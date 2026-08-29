@@ -131,16 +131,20 @@ CUSTOM_CSS = """
         overflow: hidden;
     }
 
-    /* Larger outer frame — contrasts against page + dark inner stack */
+    /*
+     * Outer framing box (PVector.html <section class="bg-army-card">):
+     * one large #1C2D22 card on #121E16 page.
+     */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        background: #243830 !important;
-        border: 1px solid rgba(212, 175, 55, 0.35) !important;
-        border-radius: 1.65rem !important;
-        box-shadow:
-            0 0 0 1px rgba(255, 255, 255, 0.06),
-            0 28px 56px rgba(0, 0, 0, 0.55) !important;
-        padding: 1.15rem 1.2rem 1.25rem 1.2rem !important;
+        background: #1C2D22 !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 1.5rem !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
+        padding: 1.15rem 1.15rem 1.25rem 1.15rem !important;
+        max-width: 36rem;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 
     /*
