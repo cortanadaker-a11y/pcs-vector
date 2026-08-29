@@ -72,9 +72,9 @@ CUSTOM_CSS = """
     }
 
     .block-container {
-        padding-top: 0.75rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 2.75rem !important;
-        max-width: 36rem; /* max-w-xl like PVector.html */
+        max-width: 40rem; /* slightly larger outer frame */
     }
 
     /* Primary CTAs — partner orange */
@@ -131,41 +131,52 @@ CUSTOM_CSS = """
         overflow: hidden;
     }
 
+    /* Larger outer frame — contrasts against page + dark inner stack */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        background: #1C2D22 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 1.5rem !important;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
-        padding: 1rem 1.1rem 1.15rem 1.1rem !important;
+        background: #243830 !important;
+        border: 1px solid rgba(212, 175, 55, 0.35) !important;
+        border-radius: 1.65rem !important;
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.06),
+            0 28px 56px rgba(0, 0, 0, 0.55) !important;
+        padding: 1.15rem 1.2rem 1.25rem 1.2rem !important;
     }
 
-    /* Nested panels like PVector.html */
+    /*
+     * Connected inner stack (one dark well):
+     * inputs (top) → results (middle) → match (bottom)
+     */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
-        background: rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 1rem !important;
-        padding: 0.85rem 0.9rem !important;
-        margin: 0 0 0.85rem 0 !important;
+        background: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-bottom: none !important;
+        border-radius: 1.1rem 1.1rem 0 0 !important;
+        padding: 0.95rem 1rem 0.85rem 1rem !important;
+        margin: 0 !important;
     }
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 1rem !important;
-        padding: 0.9rem 0.95rem !important;
-        margin: 0 0 0.85rem 0 !important;
+        background: rgba(0, 0, 0, 0.65) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 0 !important;
+        padding: 0.95rem 1rem !important;
+        margin: 0 !important;
     }
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: transparent !important;
-        border: none !important;
-        padding: 0.15rem 0 0 0 !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
+        background: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-top: none !important;
+        border-radius: 0 0 1.1rem 1.1rem !important;
+        padding: 0.9rem 1rem 1rem 1rem !important;
+        margin: 0 0 0.35rem 0 !important;
     }
 
     .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
@@ -173,7 +184,14 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face [data-testid="stVerticalBlock"] > div {
-        gap: 0.22rem !important;
+        gap: 0 !important; /* no gaps between connected stack sections */
+    }
+
+    /* Keep small gaps only inside form/column rows */
+    .pcs-calc-face [data-testid="stForm"] [data-testid="stVerticalBlock"] > div,
+    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div,
+    #pcs-match-panel [data-testid="stVerticalBlock"] > div {
+        gap: 0.35rem !important;
     }
 
     .pcs-calc-face [data-testid="stHorizontalBlock"] {
@@ -515,20 +533,19 @@ CUSTOM_CSS = """
         font-weight: 900;
     }
 
-    /* Dark selects like PVector.html */
+    /* Darker fields + white font (inside the connected well) */
     .pcs-calc-face div[data-baseweb="select"] > div {
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-color: #0B1210 !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
         color: #FFFFFF !important;
         font-weight: 700 !important;
-        font-size: 0.875rem !important;
-        min-height: 2.75rem !important;
+        font-size: 0.9rem !important;
+        min-height: 2.8rem !important;
         border-radius: 0.75rem !important;
     }
 
-    /* Rank (first select in row) gets gold border */
     .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child div[data-baseweb="select"] > div {
-        border-color: rgba(212, 175, 55, 0.5) !important;
+        border-color: rgba(212, 175, 55, 0.55) !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] span,
@@ -543,14 +560,13 @@ CUSTOM_CSS = """
 
     .pcs-calc-face label,
     .pcs-calc-face [data-testid="stWidgetLabel"] p {
-        color: #D1D5DB !important;
+        color: #E5E7EB !important;
         font-weight: 700 !important;
-        font-size: 0.7rem !important;
+        font-size: 0.72rem !important;
         letter-spacing: 0.04em;
         text-transform: uppercase;
     }
 
-    /* Rank label gold */
     .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child label,
     .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p {
         color: #D4AF37 !important;
@@ -559,24 +575,24 @@ CUSTOM_CSS = """
     .pcs-calc-face [data-testid="stCheckbox"] label span,
     .pcs-calc-face [data-testid="stRadio"] label p,
     .pcs-calc-face [data-testid="stCaption"] {
-        color: #9CA3AF !important;
+        color: #D1D5DB !important;
         text-transform: none !important;
         letter-spacing: 0 !important;
-        font-size: 0.8rem !important;
+        font-size: 0.82rem !important;
         font-weight: 500 !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input {
-        background: rgba(0, 0, 0, 0.5) !important;
+        background: #0B1210 !important;
         color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
         font-weight: 600 !important;
         border-radius: 0.75rem !important;
-        min-height: 2.75rem !important;
+        min-height: 2.8rem !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input::placeholder {
-        color: #6B7280 !important;
+        color: #9CA3AF !important;
     }
 
     div[data-baseweb="popover"] ul,
