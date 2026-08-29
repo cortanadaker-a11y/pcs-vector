@@ -313,9 +313,6 @@ def render_bah_calculator() -> None:
     dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
     dla_amt = float(dla["dla_usd"]) if dla.get("found") else None
     arrive = _arrive_cash(market_mid, dla_amt, util_mid)
-    move_in = arrive["gross"] if market_mid else 0
-    dla_covers = bool(arrive["dla"] and move_in and arrive["dla"] >= move_in)
-    move_gap_label = "DLA covers this" if dla_covers else _money(arrive["net"])
 
     _store_snapshot(
         {
@@ -341,12 +338,6 @@ def render_bah_calculator() -> None:
     new_face, new_face_k = _housing_face(pkg)
     util_n = int(util_mid or 0)
     bed_label = f"{bedrooms}BR"
-
-    gap_txt = (
-        safe_html(move_gap_label)
-        if move_gap_label == "DLA covers this"
-        else (_money_html(arrive["net"]) if arrive.get("net") is not None else "—")
-    )
 
     has_compare = bool(current and cur and cur.get("found"))
     cur_face = None
@@ -537,11 +528,6 @@ def render_bah_calculator() -> None:
                     <span class="pcs-est-side">—</span>
                     <span class="pcs-est-label">DLA (one-time)</span>
                     <span class="pcs-est-side pcs-est-side-new">{_dla_html(dla_amt)}</span>
-                </div>
-                <div class="pcs-est-row">
-                    <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">Cash still needed after DLA</span>
-                    <span class="pcs-est-side pcs-est-side-new">{gap_txt}</span>
                 </div>
             </div>
             <div class="pcs-partner-foot">Planning figures · verify LES / finance / DTMO before you sign</div>
