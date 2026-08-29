@@ -132,32 +132,41 @@ CUSTOM_CSS = """
     }
 
     /*
-     * DOUBLE BORDER like PVector.html:
-     *  1) Outer card edge (white/15 on #1C2D22)
-     *  2) Padding band (card color shows through = frame)
-     *  3) Inner well edge (white/10 on darker black/40–60)
+     * TRUE DOUBLE BORDER (always visible):
+     *  outer ring = outline on the page
+     *  inner ring = border on the card
+     * Matches PVector.html: page #121E16 → card edge → inset well
      */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
         background: #1C2D22 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
         border-radius: 1.5rem !important;
+        outline: 1px solid rgba(255, 255, 255, 0.14) !important;
+        outline-offset: 7px !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
-        /* Generous inset so the outer border reads as a real frame */
-        padding: 1.15rem 1.15rem 1.25rem 1.15rem !important;
+        padding: 1.2rem 1.2rem 1.3rem 1.2rem !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
+        margin-top: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    /* Kill Streamlit’s own thin border so ours is the only card edge */
+    [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face > div,
+    [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark > div {
+        border: none !important;
     }
 
     /*
-     * Connected inner well — one continuous second border
-     * inputs (top) → results (middle) → match (bottom)
+     * Connected inner well — third visual edge inside the card
+     * (inputs → results → match as one unit)
      */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
         background: rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-bottom: none !important;
         border-radius: 1rem 1rem 0 0 !important;
         padding: 0.95rem 1rem 0.85rem 1rem !important;
@@ -167,8 +176,8 @@ CUSTOM_CSS = """
     .pcs-face-section-results,
     .pcs-partner-results {
         background: rgba(0, 0, 0, 0.6) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
         border-radius: 0 !important;
@@ -179,11 +188,23 @@ CUSTOM_CSS = """
     #pcs-match-panel,
     .pcs-face-section-match {
         background: rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-top: none !important;
         border-radius: 0 0 1rem 1rem !important;
         padding: 0.9rem 1rem 1rem 1rem !important;
         margin: 0 !important;
+    }
+
+    /* Nuke theme-blue labels (was #1e3a5f from config.toml) */
+    .pcs-calc-face [data-testid="stWidgetLabel"],
+    .pcs-calc-face [data-testid="stWidgetLabel"] p,
+    .pcs-calc-face [data-testid="stWidgetLabel"] span,
+    .pcs-calc-face label,
+    .pcs-calc-face label p,
+    .pcs-calc-face label span,
+    .stApp [data-testid="stWidgetLabel"] p,
+    .stApp label[data-baseweb] {
+        color: #E5E7EB !important;
     }
 
     .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
@@ -575,7 +596,8 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child label,
-    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p {
+    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p,
+    .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] span {
         color: #D4AF37 !important;
     }
 
