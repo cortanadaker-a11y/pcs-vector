@@ -191,11 +191,109 @@ CUSTOM_CSS = """
         display: none;
     }
 
+    .pcs-face-sub {
+        margin: 0.4rem 0 0.5rem 0;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        color: #D5DDD8;
+        font-weight: 500;
+    }
+
+    .pcs-steps {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.45rem;
+        margin-top: 0.15rem;
+    }
+
+    .pcs-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #AEB8B2;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        padding: 0.22rem 0.55rem;
+    }
+
+    .pcs-step b {
+        color: #F2D56A;
+        font-weight: 900;
+    }
+
+    .pcs-step-on {
+        color: #F4F7F5;
+        background: rgba(224, 188, 74, 0.16);
+        border-color: rgba(224, 188, 74, 0.45);
+    }
+
+    .pcs-step-sep {
+        color: #F2D56A;
+        font-weight: 900;
+        font-size: 0.85rem;
+    }
+
     .pcs-face-divider {
         height: 1px;
         margin: 0.75rem 0 0.65rem 0;
         background: rgba(255, 255, 255, 0.16);
         border: 0;
+    }
+
+    .pcs-results-kicker {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #F2D56A;
+        margin: 0 0 0.55rem 0;
+    }
+
+    .pcs-partner-arrow-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pcs-partner-arrow-col-new {
+        text-align: right;
+    }
+
+    .pcs-partner-arrow-loc {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #C5D0CA;
+        margin-bottom: 0.2rem;
+    }
+
+    .pcs-est-heads {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.35rem;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #AEB8B2;
+        margin-bottom: 0.3rem;
+        padding: 0 0.15rem;
+    }
+
+    .pcs-est-heads span:last-child {
+        text-align: right;
+        color: #F2D56A;
+    }
+
+    .pcs-est-row-emph {
+        border-color: rgba(224, 188, 74, 0.4) !important;
+        background: rgba(224, 188, 74, 0.1) !important;
     }
 
     .pcs-panel-label {
@@ -2514,19 +2612,31 @@ CUSTOM_CSS = """
     }
 
     @media (max-width: 640px) {
-        .pcs-hero-compact .pcs-brand-title {
-            font-size: 2.05rem;
+        .pcs-face-brand .pcs-brand-title {
+            font-size: 1.28rem;
         }
-        .pcs-hero-lead {
-            font-size: 0.88rem;
+        .pcs-face-sub {
+            font-size: 0.76rem;
         }
-        .pcs-calc-intro-title {
-            font-size: 1.02rem;
+        .pcs-partner-arrow-amt {
+            font-size: 1.45rem;
+        }
+        .pcs-calc-face .pcs-est-label {
+            font-size: 0.58rem;
+        }
+        .pcs-calc-face .pcs-est-side {
+            font-size: 0.76rem;
         }
         .pcs-footer span {
             display: block;
             margin-top: 0.2rem;
         }
+    }
+
+    /* Larger primary CTA for thumb reach */
+    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+        min-height: 3rem !important;
+        font-size: 1rem !important;
     }
 
     .pcs-bottom-line {

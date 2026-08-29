@@ -43,6 +43,14 @@ def _render_header() -> None:
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
             </div>
+            <p class="pcs-face-sub">
+                Quick PCS money estimate — BAH / OHA / COLA / DLA — then free housing help at your new post.
+            </p>
+            <div class="pcs-steps" aria-hidden="true">
+                <span class="pcs-step pcs-step-on"><b>1</b> Estimate</span>
+                <span class="pcs-step-sep">→</span>
+                <span class="pcs-step"><b>2</b> Get matched</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -239,14 +247,14 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
 
   bar.innerHTML =
     '<div class="pcs-sticky-ref-meta">' +
-      '<div class="pcs-sticky-ref-kicker">Free housing match</div>' +
+      '<div class="pcs-sticky-ref-kicker">Step 2 · Free housing help</div>' +
       '<div class="pcs-sticky-ref-line" title="' +
         String(data.destFull).replace(/"/g, "&quot;") +
       '">' +
         String(data.dest) + " · " + String(data.rank) + " · " + String(data.deps) +
       "</div>" +
     "</div>" +
-    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Get matched →</button>';
+    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Get free help →</button>';
 
   root.classList.add("pcs-has-sticky-ref");
 
@@ -327,11 +335,11 @@ def _render_referral_hook() -> None:
 
     if ready:
         body_html = (
-            f"We have verified military experts in <strong>{dest_html}</strong> "
-            f"that can help you find a new home today."
+            f"Verified military housing pros in <strong>{dest_html}</strong> "
+            f"can help you rent or buy — free, no obligation."
         )
         summary_html = (
-            f'<div class="pcs-ref-summary" title="Carried over from your calculator">'
+            f'<div class="pcs-ref-summary" title="From your calculator">'
             f"<span>{dest_html}</span>"
             f'<span class="pcs-ref-summary-sep">·</span>'
             f"<span>{rank_html}</span>"
@@ -341,16 +349,16 @@ def _render_referral_hook() -> None:
         )
     else:
         body_html = (
-            "Set your New post above — then we’ll match you with verified military "
-            "experts who can help you find a new home today."
+            "Set <strong>Going to</strong> above — Destination, Rank, and Dependents "
+            "carry into this free match."
         )
         summary_html = ""
 
     st.markdown(
         f"""
         <div id="pcs-referral" class="pcs-ref-head">
-            <div class="pcs-ref-kicker">Free match · military housing pros</div>
-            <div class="pcs-ref-title">Get matched at your new post</div>
+            <div class="pcs-ref-kicker">Step 2 · Free housing match</div>
+            <div class="pcs-ref-title">Talk to a pro near your new post</div>
             <p class="pcs-ref-body">{body_html}</p>
             {summary_html}
         </div>
@@ -386,9 +394,9 @@ def _render_referral_hook() -> None:
             key="referral_rent_buy_not_sure",
         )
 
-        st.caption("Veteran-led · free · no spam")
+        st.caption("Takes under a minute · opens a pre-filled form · free")
         submitted = st.form_submit_button(
-            "Connect with a housing pro →",
+            "Get free housing help →",
             type="primary",
             use_container_width=True,
             disabled=not ready,
@@ -441,21 +449,16 @@ def _render_referral_hook() -> None:
 
 
 def _render_faq() -> None:
-    st.markdown(
-        '<p class="pcs-bah-section-label pcs-faq-label">Quick answers</p>',
-        unsafe_allow_html=True,
-    )
     with st.expander("What do these numbers mean?", expanded=False):
         st.markdown(
             """
 <div class="pcs-faq-grid">
-  <div class="pcs-faq-item"><strong>Is this free?</strong><span>Yes — calculator and housing match.</span></div>
-  <div class="pcs-faq-item"><strong>BAH</strong><span>U.S. housing pay. Flat rate — keep what’s left if rent is lower.</span></div>
-  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas: rent up to a max, plus a utilities allowance.</span></div>
-  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs (OCONUS, AK, HI, PR). Not for rent.</span></div>
-  <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized. Confirm with finance.</span></div>
-  <div class="pcs-faq-item"><strong>Rent ranges</strong><span>Planning estimates by family size — not official quotes.</span></div>
-  <div class="pcs-faq-item"><strong>Official?</strong><span>Built from DoD tables. Always verify on your LES before you sign.</span></div>
+  <div class="pcs-faq-item"><strong>Free?</strong><span>Yes — calculator and housing match.</span></div>
+  <div class="pcs-faq-item"><strong>BAH</strong><span>U.S. housing pay. Keep leftover if rent is lower.</span></div>
+  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas rent up to a max + utilities allowance.</span></div>
+  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs. Not for rent.</span></div>
+  <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized.</span></div>
+  <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges — verify before you sign.</span></div>
 </div>
             """,
             unsafe_allow_html=True,
