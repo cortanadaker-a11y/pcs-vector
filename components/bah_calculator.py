@@ -188,7 +188,7 @@ def render_bah_calculator() -> None:
             <div class="pcs-face-brand">
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
-                <div class="pcs-face-mini">BAH · OHA · COLA · DLA · 2026</div>
+                <div class="pcs-face-mini">2026 BAH · OHA · COLA · DLA</div>
             </div>
         </div>
         """,
@@ -247,7 +247,7 @@ def render_bah_calculator() -> None:
             "Current Post",
             options=[_NONE_CURRENT] + installations,
             key="bah_calc_current",
-            help="Skip compare = target only.",
+            help="Pick a post to compare. Use Skip compare for target only.",
         )
         current = None if current_raw == _NONE_CURRENT else current_raw
     with d2:
@@ -423,17 +423,20 @@ def render_bah_calculator() -> None:
             <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}</span>
         </div>
         """
+        # Honest math: % change in our estimated typical-rent midpoint
+        # (planning data) — NOT an official DoD COL / COLA index.
         if cur_mid and cur_mid > 0:
             rent_pct = int(round(((market_mid - cur_mid) / cur_mid) * 100))
             if rent_pct < 0:
-                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% CHEAPER"
+                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% lower"
             elif rent_pct > 0:
-                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% MORE EXP."
+                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% higher"
             else:
-                roll_cls, roll_txt = "pcs-roll-flat", "EQUAL COST"
+                roll_cls, roll_txt = "pcs-roll-flat", "about the same"
             rollup_html = f"""
             <div class="pcs-partner-rollup">
-                <span>Overall Cost Index Rollup</span>
+                <span>Typical {bed_label} rent (est.)</span>
+                <span class="pcs-partner-rollup-mids">{_money_html(cur_mid)} → {_money_html(market_mid)}</span>
                 <span class="pcs-partner-rollup-badge {roll_cls}">{roll_txt}</span>
             </div>
             """
@@ -516,30 +519,32 @@ def render_bah_calculator() -> None:
             {arrow_html}
             {rollup_html}
             <div class="pcs-partner-breakdown">
-                <div class="pcs-partner-breakdown-title">Allowances</div>
+                <div class="pcs-est-heads-live"><span>Current</span><span></span><span>Target</span></div>
+                <div class="pcs-partner-breakdown-title">Allowances (official tables)</div>
                 {allowance_rows}
-                <div class="pcs-partner-breakdown-title">Local costs &amp; move-in</div>
+                <div class="pcs-partner-breakdown-title">Local costs &amp; move-in (estimates)</div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_rent}</span>
-                    <span class="pcs-est-label">Typical Rent (est.)</span>
+                    <span class="pcs-est-label">Typical {bed_label} rent</span>
                     <span class="pcs-est-side pcs-est-side-new">{right_rent}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_util}</span>
-                    <span class="pcs-est-label">Utilities Est.</span>
+                    <span class="pcs-est-label">Utilities (est.)</span>
                     <span class="pcs-est-side pcs-est-side-new">{right_util}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">DLA</span>
+                    <span class="pcs-est-label">DLA (one-time)</span>
                     <span class="pcs-est-side pcs-est-side-new">{_dla_html(dla_amt)}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">—</span>
-                    <span class="pcs-est-label">Still Need After DLA</span>
+                    <span class="pcs-est-label">Cash still needed after DLA</span>
                     <span class="pcs-est-side pcs-est-side-new">{gap_txt}</span>
                 </div>
             </div>
+            <div class="pcs-partner-foot">Planning figures · verify LES / finance / DTMO before you sign</div>
         </div>
         """
     )

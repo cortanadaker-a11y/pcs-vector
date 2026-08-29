@@ -313,6 +313,29 @@ def _render_referral_hook() -> None:
 
     # Compact contact strip → orange CTA (PVector.html bottom pattern)
     st.markdown('<div id="pcs-match-start"></div><div id="pcs-referral"></div>', unsafe_allow_html=True)
+    # Disable browser "Please fill out this field" / enter-to-submit tooltips
+    components.html(
+        """
+<script>
+(function () {
+  var doc = window.parent.document;
+  function disarm() {
+    doc.querySelectorAll('form').forEach(function (f) {
+      f.setAttribute('novalidate', 'novalidate');
+      f.setAttribute('autocomplete', 'on');
+    });
+    doc.querySelectorAll('input').forEach(function (inp) {
+      inp.removeAttribute('required');
+      inp.setAttribute('aria-required', 'false');
+    });
+  }
+  disarm();
+  [50, 200, 500].forEach(function (ms) { setTimeout(disarm, ms); });
+})();
+</script>
+        """,
+        height=0,
+    )
 
     with st.form("referral_form", clear_on_submit=False):
         n1, n2 = st.columns(2)
@@ -321,29 +344,24 @@ def _render_referral_hook() -> None:
                 "First name",
                 key="referral_first_name",
                 placeholder="First",
-                label_visibility="collapsed",
             )
         with n2:
             last_name = st.text_input(
                 "Last name",
                 key="referral_last_name",
                 placeholder="Last",
-                label_visibility="collapsed",
             )
 
         email_address = st.text_input(
             "Email",
             key="referral_email_address",
-            placeholder="Email address",
-            label_visibility="collapsed",
+            placeholder="you@email.com",
         )
 
-        rent_buy_not_sure = st.radio(
+        rent_buy_not_sure = st.selectbox(
             "Looking to…",
             options=list(INTEREST_OPTIONS),
-            horizontal=True,
             key="referral_rent_buy_not_sure",
-            label_visibility="collapsed",
         )
 
         submitted = st.form_submit_button(
@@ -352,7 +370,7 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Free housing help at your new post · CONUS & OCONUS · Veteran-Led")
+        st.caption("Free · CONUS & OCONUS · tap the button when ready — no browser popups")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -407,6 +425,7 @@ def _render_referral_hook() -> None:
   <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs OCONUS. Not for rent — shown in the rundown.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized.</span></div>
   <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges — verify before you sign.</span></div>
+  <div class="pcs-faq-item"><strong>Rent % badge</strong><span>Change in estimated typical rent mid between posts — not an official COL index.</span></div>
 </div>
             """,
             unsafe_allow_html=True,
