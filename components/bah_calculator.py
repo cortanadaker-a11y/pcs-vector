@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
 from components.html_utils import safe_html
@@ -21,6 +22,40 @@ from services.utility_costs import get_utility_costs_for_installation
 YOS_OPTIONS = list(range(0, 41))
 _NONE_CURRENT = "— Skip —"
 CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
+
+
+def _tag_calculator_dark_skin() -> None:
+    """Mark the Streamlit bordered calculator container for dark army/gold CSS."""
+    st.markdown('<div id="pcs-calc-marker" aria-hidden="true"></div>', unsafe_allow_html=True)
+    components.html(
+        """
+<script>
+(function () {
+  var doc = window.parent.document;
+  function tag() {
+    var marker = doc.getElementById("pcs-calc-marker");
+    if (!marker) return;
+    var wrap = marker.closest('[data-testid="stVerticalBlockBorderWrapper"]');
+    if (wrap) wrap.classList.add("pcs-calc-dark");
+  }
+  tag();
+  [50, 200, 500].forEach(function (ms) { setTimeout(tag, ms); });
+})();
+</script>
+        """,
+        height=0,
+    )
+
+
+def _housing_face(pkg: dict[str, Any]) -> tuple[int | None, str]:
+    """Primary housing allowance shown in comparisons (real tables — not partner ×0.82)."""
+    system = pkg.get("housing_system") or "BAH"
+    if system == "OHA" and pkg.get("oha_rent_max_usd") is not None:
+        return int(pkg["oha_rent_max_usd"]), "OHA rent max"
+    if pkg.get("housing_monthly_usd") is not None:
+        label = "BAH" if system != "OHA" else "OHA housing"
+        return int(pkg["housing_monthly_usd"]), label
+    return None, "BAH"
 
 
 def _money(n: int | None) -> str:
@@ -199,6 +234,7 @@ def render_bah_calculator() -> None:
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
 
     with st.container(border=True):
+        _tag_calculator_dark_skin()
         st.markdown(
             """
             <div class="pcs-calc-intro">
@@ -386,17 +422,84 @@ def render_bah_calculator() -> None:
             else _money_html(arrive["net"])
         )
 
+        compare_block = ""
+        estimate_rows = ""
+        has_compare = bool(current and cur and cur.get("found"))
+        if has_compare:
+            cur_face, cur_face_k = _housing_face(cur)
+            new_face, new_face_k = _housing_face(pkg)
+            if cur_face is not None and new_face is not None:
+                bah_delta = int(new_face) - int(cur_face)
+                if bah_delta > 0:
+                    delta_cls = "pcs-delta-up"
+                    delta_txt = f"+{_money_html(bah_delta)}/mo"
+                elif bah_delta < 0:
+                    delta_cls = "pcs-delta-down"
+                    delta_txt = f"-{_money_html(abs(bah_delta))}/mo"
+                else:
+                    delta_cls = "pcs-delta-flat"
+                    delta_txt = "$0/mo"
+
+                cur_short = safe_html(str(current))
+                new_short = safe_html(str(gaining))
+                compare_block = f"""
+                <div class="pcs-bah-arrow-compare">
+                    <div class="pcs-bah-arrow-row">
+                        <div class="pcs-bah-arrow-side">
+                            <div class="pcs-bah-arrow-k">Current · {safe_html(cur_face_k)}</div>
+                            <div class="pcs-bah-arrow-amt pcs-bah-arrow-amt-muted">{_money_html(cur_face)}</div>
+                            <div class="pcs-bah-arrow-loc">{cur_short}</div>
+                        </div>
+                        <div class="pcs-bah-arrow-glyph" aria-hidden="true">➔</div>
+                        <div class="pcs-bah-arrow-side pcs-bah-arrow-side-new">
+                            <div class="pcs-bah-arrow-k">New · {safe_html(new_face_k)}</div>
+                            <div class="pcs-bah-arrow-amt">{_money_html(new_face)}</div>
+                            <div class="pcs-bah-arrow-loc">{new_short}</div>
+                        </div>
+                    </div>
+                    <div class="pcs-bah-delta-line">
+                        <span>Monthly {safe_html(new_face_k)} delta</span>
+                        <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}</span>
+                    </div>
+                </div>
+                """
+
+                cur_is_oconus = (cur.get("housing_system") or "") in ("OHA", "BAH_PLUS_COLA")
+                cur_util_ctx = get_utility_costs_for_installation(
+                    current, is_oconus=cur_is_oconus
+                )
+                cur_util_n = _util_mid(cur_util_ctx.get("areas") or []) or 0
+                cur_market = get_family_market_rent(current, num_dependents=int(num_deps))
+                cur_rent_lo = int(cur_market["low_usd"])
+                cur_rent_hi = int(cur_market["high_usd"])
+                estimate_rows = f"""
+                <div class="pcs-est-block">
+                    <div class="pcs-est-title">Planning estimates</div>
+                    <div class="pcs-est-row">
+                        <span class="pcs-est-side">{_money_html(cur_rent_lo)}–{_money_html(cur_rent_hi)}</span>
+                        <span class="pcs-est-label">Typical rent (est.)</span>
+                        <span class="pcs-est-side pcs-est-side-new">{_money_html(market_low)}–{_money_html(market_high)}</span>
+                    </div>
+                    <div class="pcs-est-row">
+                        <span class="pcs-est-side">{_money_html(int(cur_util_n))}/mo</span>
+                        <span class="pcs-est-label">Utilities (est.)</span>
+                        <span class="pcs-est-side pcs-est-side-new">{(_money_html(util_n) + '/mo') if util_n else '—'}</span>
+                    </div>
+                </div>
+                """
+
         _render_html(
             f"""
             <div class="pcs-sticky-results">
-                <div class="pcs-out-label">{safe_html(gaining)}</div>
+                {compare_block}
+                <div class="pcs-out-label">{'New post · ' if has_compare else ''}{safe_html(gaining)}</div>
                 <div class="pcs-out-dual">
                     <div class="pcs-out-dual-primary">
                         <div class="pcs-out-dual-k">{safe_html(primary_k)}</div>
                         <div class="pcs-out-dual-v">{primary_v}<span>/mo</span></div>
                     </div>
                     <div class="pcs-out-dual-secondary">
-                        <div class="pcs-out-dual-k">Typical {bed_label} rent</div>
+                        <div class="pcs-out-dual-k">Typical {bed_label} rent (est.)</div>
                         <div class="pcs-out-dual-v-sm">{_money_html(market_low)}–{_money_html(market_high)}</div>
                         <div class="pcs-out-dual-sub">Mid {_money_html(market_mid)} · {safe_html(dep_label)}</div>
                     </div>
@@ -413,6 +516,7 @@ def render_bah_calculator() -> None:
                     <div><b>Move-in cash</b><br>{_money_html(move_in) if move_in else '—'}</div>
                     <div><b>Still need</b><br>{gap_html}</div>
                 </div>
+                {estimate_rows}
             </div>
             """
         )
@@ -536,7 +640,7 @@ def render_bah_calculator() -> None:
                 """
             )
         else:
-            st.caption("Pick a Current post above to compare both locations side by side.")
+            st.caption("Optional: set Current post above to see BAH → new post side by side.")
 
         info = get_installation_data(gaining) or {}
         with st.expander(f"Local areas & utility ranges — {gaining}", expanded=False):
