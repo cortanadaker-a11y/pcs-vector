@@ -512,16 +512,6 @@ CUSTOM_CSS = """
         font-weight: 900;
     }
 
-    /* High-contrast widget labels */
-    .pcs-calc-face label,
-    .pcs-calc-face [data-testid="stWidgetLabel"] p {
-        color: #F4F7F5 !important;
-        font-weight: 800 !important;
-        font-size: 0.72rem !important;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-    }
-
     /* Light controls on dark card — max readability */
     .pcs-calc-face div[data-baseweb="select"] > div {
         background-color: var(--pcs-control) !important;
