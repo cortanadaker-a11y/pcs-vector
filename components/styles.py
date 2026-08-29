@@ -132,8 +132,10 @@ CUSTOM_CSS = """
     }
 
     /*
-     * Outer framing box (PVector.html <section class="bg-army-card">):
-     * one large #1C2D22 card on #121E16 page.
+     * DOUBLE BORDER like PVector.html:
+     *  1) Outer card edge (white/15 on #1C2D22)
+     *  2) Padding band (card color shows through = frame)
+     *  3) Inner well edge (white/10 on darker black/40–60)
      */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
@@ -141,6 +143,7 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 1.5rem !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
+        /* Generous inset so the outer border reads as a real frame */
         padding: 1.15rem 1.15rem 1.25rem 1.15rem !important;
         max-width: 36rem;
         margin-left: auto !important;
@@ -148,26 +151,26 @@ CUSTOM_CSS = """
     }
 
     /*
-     * Connected inner stack (one dark well):
+     * Connected inner well — one continuous second border
      * inputs (top) → results (middle) → match (bottom)
      */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
-        background: rgba(0, 0, 0, 0.55) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-bottom: none !important;
-        border-radius: 1.1rem 1.1rem 0 0 !important;
+        border-radius: 1rem 1rem 0 0 !important;
         padding: 0.95rem 1rem 0.85rem 1rem !important;
         margin: 0 !important;
     }
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.65) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
         border-radius: 0 !important;
         padding: 0.95rem 1rem !important;
         margin: 0 !important;
@@ -175,12 +178,12 @@ CUSTOM_CSS = """
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: rgba(0, 0, 0, 0.55) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-top: none !important;
-        border-radius: 0 0 1.1rem 1.1rem !important;
+        border-radius: 0 0 1rem 1rem !important;
         padding: 0.9rem 1rem 1rem 1rem !important;
-        margin: 0 0 0.35rem 0 !important;
+        margin: 0 !important;
     }
 
     .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
