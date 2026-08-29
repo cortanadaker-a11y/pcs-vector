@@ -342,8 +342,20 @@ CUSTOM_CSS = """
     }
 
     .pcs-est-row-emph {
-        border-color: rgba(224, 188, 74, 0.4) !important;
-        background: rgba(224, 188, 74, 0.1) !important;
+        border-color: rgba(212, 175, 55, 0.45) !important;
+        background: rgba(212, 175, 55, 0.12) !important;
+    }
+
+    .pcs-est-row-emph .pcs-est-label {
+        color: #D4AF37 !important;
+    }
+
+    .pcs-calc-face [data-testid="stRadio"] > div {
+        gap: 0.75rem !important;
+    }
+
+    .pcs-calc-face [data-testid="stRadio"] label {
+        color: #E5E7EB !important;
     }
 
     .pcs-panel-label {
