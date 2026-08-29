@@ -7,7 +7,7 @@ from typing import Any
 import streamlit as st
 import streamlit.components.v1 as components
 
-from components.form_options import PAY_GRADE_TO_RANK, RANK_PAY_GRADES
+from components.form_options import RANK_PAY_GRADES
 from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
 from services.dla_rates import get_dla_rate
@@ -15,7 +15,6 @@ from services.housing_allowances import compare_housing_packages
 from services.installation_data import (
     SUPPORTED_INSTALLATIONS,
     get_family_market_rent,
-    get_installation_data,
 )
 from services.utility_costs import get_utility_costs_for_installation
 
@@ -174,96 +173,10 @@ def _system_chip(system: str) -> str:
     return "BAH"
 
 
-def _pct_change(old: int, new: int) -> int | None:
-    if old == 0:
-        return None
-    return int(round(((new - old) / old) * 100))
-
-
 def _dla_html(amount: float | None) -> str:
     if amount is None:
         return "—"
     return _money_html(int(round(amount)))
-
-
-def _package_side_html(pkg: dict[str, Any], *, side_label: str) -> str:
-    """Spell out BAH / OHA / COLA lines + total for one post in the compare panel."""
-    install = safe_html(str(pkg.get("installation") or "—"))
-    system = pkg.get("housing_system") or "BAH"
-    housing = pkg.get("housing_monthly_usd")
-    cola = int(pkg.get("cola_monthly_usd") or 0)
-    total = pkg.get("total_monthly_usd")
-    cola_idx = pkg.get("cola_index")
-
-    rows: list[str] = []
-    if system == "OHA":
-        rent = pkg.get("oha_rent_max_usd")
-        util = pkg.get("oha_utility_usd")
-        rows.append('<div class="pcs-pkg-sys">Overseas Housing Allowance (OHA) + COLA</div>')
-        if rent is not None:
-            rows.append(
-                f'<div class="pcs-pkg-row"><span>OHA rent max</span>'
-                f"<strong>{_money_html(int(rent))}/mo</strong></div>"
-            )
-        if util is not None:
-            rows.append(
-                f'<div class="pcs-pkg-row"><span>OHA utilities</span>'
-                f"<strong>{_money_html(int(util))}/mo</strong></div>"
-            )
-        if housing is not None:
-            rows.append(
-                f'<div class="pcs-pkg-row"><span>OHA housing total</span>'
-                f"<strong>{_money_html(int(housing))}/mo</strong></div>"
-            )
-        if cola_idx is None and cola == 0:
-            rows.append(
-                '<div class="pcs-pkg-row"><span>COLA (Cost of Living)</span>'
-                "<strong>$0/mo</strong></div>"
-                '<div class="pcs-pkg-note">No COLA at this locality right now</div>'
-            )
-        else:
-            idx_bit = f" (index {cola_idx})" if cola_idx is not None else ""
-            rows.append(
-                f'<div class="pcs-pkg-row"><span>COLA (Cost of Living){safe_html(idx_bit)}</span>'
-                f"<strong>{_money_html(cola)}/mo</strong></div>"
-            )
-    elif system == "BAH_PLUS_COLA":
-        rows.append(
-            '<div class="pcs-pkg-sys">Basic Allowance for Housing (BAH) + COLA</div>'
-        )
-        rows.append(
-            f'<div class="pcs-pkg-row"><span>BAH</span>'
-            f"<strong>{_money_html(int(housing) if housing is not None else None)}/mo</strong></div>"
-        )
-        idx_bit = f" (index {cola_idx})" if cola_idx is not None else ""
-        rows.append(
-            f'<div class="pcs-pkg-row"><span>COLA (Cost of Living){safe_html(idx_bit)}</span>'
-            f"<strong>{_money_html(cola)}/mo</strong></div>"
-        )
-    else:
-        rows.append('<div class="pcs-pkg-sys">Basic Allowance for Housing (BAH)</div>')
-        rows.append(
-            f'<div class="pcs-pkg-row"><span>BAH</span>'
-            f"<strong>{_money_html(int(housing) if housing is not None else None)}/mo</strong></div>"
-        )
-        if cola:
-            rows.append(
-                f'<div class="pcs-pkg-row"><span>COLA (Cost of Living)</span>'
-                f"<strong>{_money_html(cola)}/mo</strong></div>"
-            )
-
-    rows.append(
-        f'<div class="pcs-pkg-total"><span>Total</span>'
-        f"<strong>{_money_html(int(total) if total is not None else None)}/mo</strong></div>"
-    )
-
-    return (
-        f'<div class="pcs-pkg-side">'
-        f'<div class="pcs-pkg-side-k">{safe_html(side_label)}</div>'
-        f'<div class="pcs-pkg-side-loc">{install}</div>'
-        f'{"".join(rows)}'
-        f"</div>"
-    )
 
 
 def render_bah_calculator() -> None:
@@ -388,17 +301,12 @@ def render_bah_calculator() -> None:
     market_low = int(market["low_usd"])
     market_high = int(market["high_usd"])
     bedrooms = int(market["bedrooms"])
-    # Allowance that pays rent (BAH / OHA ceiling) — not COLA
-    rent_budget = int(oha_rent) if system == "OHA" and oha_rent is not None else housing
 
     cur = result.get("current")
     delta = result.get("monthly_delta_usd")
-    annual = result.get("annual_delta_usd")
     if not (current and cur and cur.get("found") and delta is not None):
         delta = None
-        annual = None
 
-    rank_label = PAY_GRADE_TO_RANK.get(pay_grade, pay_grade)
     dep_label = _deps_label(int(num_deps))
 
     dla = get_dla_rate(pay_grade, with_dependents=with_dependents)
@@ -432,21 +340,6 @@ def render_bah_calculator() -> None:
     new_face, new_face_k = _housing_face(pkg)
     util_n = int(util_mid or 0)
     bed_label = f"{bedrooms}BR"
-    all_in_mid = market_mid + util_n
-    leftover_mid = rent_budget - all_in_mid
-    if leftover_mid >= 0:
-        fit_line = (
-            f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo — "
-            f"<strong>{_money_html(leftover_mid)}/mo</strong> left in {safe_html(new_face_k)}."
-        )
-        fit_tone = "fit"
-    else:
-        fit_line = (
-            f"Typical {bed_label} + utilities ≈ {_money_html(all_in_mid)}/mo — "
-            f"<strong>{_money_html(abs(leftover_mid))}/mo</strong> over {safe_html(new_face_k)}. "
-            f"Shop closer to {_money_html(market_low)}–{_money_html(market_high)}."
-        )
-        fit_tone = "tight"
 
     gap_txt = (
         safe_html(move_gap_label)
@@ -554,63 +447,4 @@ def render_bah_calculator() -> None:
         """
     )
 
-    detail_bits: list[str] = []
-    if system in ("OHA", "BAH_PLUS_COLA"):
-        detail_bits.append(_package_side_html(pkg, side_label="Target package"))
-    if has_compare and cur:
-        detail_bits.append(_package_side_html(cur, side_label="Current package"))
-        if delta is not None:
-            detail_bits.append(
-                f'<div class="pcs-partner-meta">Package total delta: '
-                f"{_money_html(int(delta))}/mo"
-                f"{f' · {_money_html(int(annual))}/yr' if annual is not None else ''}"
-                f"</div>"
-            )
 
-    info = get_installation_data(gaining) or {}
-    with st.expander("More detail · package & local utilities", expanded=False):
-        if detail_bits:
-            _render_html("".join(detail_bits))
-        notes = (info.get("notes") or "").strip()
-        if notes:
-            st.markdown(notes)
-        areas_list = info.get("major_areas") or []
-        commute = (info.get("commute_notes") or "").strip()
-        if areas_list:
-            st.caption("Nearby: " + ", ".join(areas_list[:4]))
-        if commute:
-            st.caption(commute)
-        if areas:
-            st.caption(
-                (util_ctx.get("as_of") or "2026")
-                + " · typical off-post bills (electric, heat/gas, water/trash, internet)"
-            )
-            if not util_ctx.get("found", True):
-                st.caption("Using a regional estimate — local bills can differ.")
-            rows = []
-            for a in areas[:5]:
-                tot = a.get("total_utilities_usd_mo") or {}
-                e = a.get("electric_usd_mo") or {}
-                gas = a.get("gas_or_heat_usd_mo") or {}
-                w = a.get("water_trash_usd_mo") or {}
-                net = a.get("internet_usd_mo") or {}
-                rows.append(
-                    {
-                        "Area": a.get("name", "—"),
-                        "Electric": f"${e.get('low', 0)}–${e.get('high', 0)}",
-                        "Heat / gas": f"${gas.get('low', 0)}–${gas.get('high', 0)}",
-                        "Water / trash": f"${w.get('low', 0)}–${w.get('high', 0)}",
-                        "Internet": f"${net.get('low', 0)}–${net.get('high', 0)}",
-                        "Total / mo": f"${tot.get('low', 0)}–${tot.get('high', 0)}",
-                    }
-                )
-            st.dataframe(rows, use_container_width=True, hide_index=True)
-            if areas[0].get("season_note"):
-                st.caption(areas[0]["season_note"])
-            if system == "OHA":
-                st.caption(
-                    "OHA already includes a utilities allowance in your package above — "
-                    "use this table to compare real-world bills."
-                )
-
-    st.caption("Planning figures · verify LES / finance before you sign.")
