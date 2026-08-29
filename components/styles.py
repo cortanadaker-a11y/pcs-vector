@@ -134,7 +134,12 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 1.35rem !important;
         box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5) !important;
-        padding: 0.85rem 0.9rem 1rem 0.9rem !important;
+        padding: 0.7rem 0.75rem 0.9rem 0.75rem !important;
+    }
+
+    /* First block in the face is the inputs panel — no floating header above it */
+    .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
+        margin-top: 0 !important;
     }
 
     /* Tighter vertical rhythm inside the face */
@@ -146,19 +151,24 @@ CUSTOM_CSS = """
         gap: 0.45rem !important;
     }
 
+    /* Unified calculator top: brand + Step 1 inside one panel */
+    .pcs-calc-top {
+        margin: 0 0 0.35rem 0;
+    }
+
     .pcs-face-brand {
-        margin: 0 0 0.15rem 0;
-        padding: 0 0 0.55rem 0;
-        border-bottom: none;
+        margin: 0 0 0.7rem 0;
+        padding: 0 0 0.65rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1.55rem;
+        font-size: 1.5rem;
         font-weight: 900;
         letter-spacing: -0.03em;
         color: #FFFFFF;
-        margin: 0 0 0.2rem 0;
+        margin: 0 0 0.18rem 0;
         line-height: 1.1;
     }
 
@@ -169,6 +179,14 @@ CUSTOM_CSS = """
         color: #F2D56A;
         margin: 0;
         line-height: 1.25;
+    }
+
+    #pcs-inputs-panel.pcs-partner-panel {
+        padding-top: 0.95rem;
+    }
+
+    #pcs-inputs-panel .pcs-calc-top .pcs-panel-label {
+        margin-bottom: 0.5rem;
     }
 
     .pcs-calc-face [data-testid="stAlert"],
@@ -185,21 +203,14 @@ CUSTOM_CSS = """
         border: 0;
     }
 
-    /* Brand sits flush on top of Step 1 inputs panel */
-    .pcs-calc-face .pcs-face-brand + div,
-    .pcs-calc-face #pcs-inputs-panel {
-        margin-top: 0;
+    /* Kill Streamlit gaps that split brand from Step 1 widgets */
+    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
+        gap: 0.25rem !important;
     }
 
-    #pcs-inputs-panel.pcs-partner-panel {
-        margin-top: 0;
-        border-top-left-radius: 0.85rem;
-        border-top-right-radius: 0.85rem;
-    }
-
-    #pcs-inputs-panel .pcs-panel-label {
-        margin-top: 0;
-        padding-top: 0;
+    #pcs-inputs-panel > div:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
 
     .pcs-results-kicker {

@@ -34,18 +34,6 @@ def _is_valid_email(raw: str | None) -> bool:
     return bool(_EMAIL_RE.match(_clean_email(raw)))
 
 
-def _render_header() -> None:
-    st.markdown(
-        """
-        <div class="pcs-face-brand">
-            <div class="pcs-brand-title">PCS Vector</div>
-            <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def _tag_page_face() -> None:
     """Mark the singular calculator face container for dark CSS."""
     st.markdown('<div id="pcs-face-marker" aria-hidden="true"></div>', unsafe_allow_html=True)
@@ -457,7 +445,6 @@ def _render_faq() -> None:
 def render_home() -> None:
     with st.container(border=True):
         _tag_page_face()
-        _render_header()
         render_bah_calculator()
         st.markdown(
             '<div class="pcs-face-divider" aria-hidden="true"></div>',
@@ -468,7 +455,7 @@ def render_home() -> None:
         st.markdown(
             """
             <div class="pcs-footer">
-                <strong>PCS Vector</strong> · Built For Soldiers; By Soldiers
+                <strong>PCS Vector</strong> · For Soldiers; By Soldiers
                 <span>· Planning figures only — verify with finance before you spend.</span>
             </div>
             """,
