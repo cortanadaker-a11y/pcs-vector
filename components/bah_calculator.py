@@ -188,8 +188,8 @@ def render_bah_calculator() -> None:
             <div class="pcs-face-brand">
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
+                <div class="pcs-face-mini">BAH · OHA · COLA · DLA · 2026</div>
             </div>
-            <div class="pcs-panel-label">Step 1 · Rank, family &amp; posts</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -361,7 +361,43 @@ def render_bah_calculator() -> None:
         cur_rent_hi = int(cur_market["high_usd"])
         cur_mid = int(cur_market["mid_usd"])
 
-    # PVector.html results layout (real rates — no fake mortgage/gas)
+    # System labels for arrow delta (BAH vs OHA)
+    system_chip = _system_chip(system)
+    delta_label = "Monthly housing delta"
+    if system == "OHA":
+        delta_label = "Monthly OHA delta"
+    elif system == "BAH_PLUS_COLA":
+        delta_label = "Monthly BAH delta"
+
+    # Current-side allowance lines (for compare)
+    cur_oha_rent = cur_oha_util = cur_cola = None
+    cur_housing_line = "—"
+    if has_compare and cur:
+        cur_sys = cur.get("housing_system") or "BAH"
+        if cur_sys == "OHA":
+            if cur.get("oha_rent_max_usd") is not None:
+                cur_oha_rent = int(cur["oha_rent_max_usd"])
+            if cur.get("oha_utility_usd") is not None:
+                cur_oha_util = int(cur["oha_utility_usd"])
+            cur_housing_line = (
+                f"{_money_html(cur_oha_rent)}" if cur_oha_rent is not None else "—"
+            )
+        else:
+            if cur.get("housing_monthly_usd") is not None:
+                cur_housing_line = _money_html(int(cur["housing_monthly_usd"]))
+        cur_cola = int(cur.get("cola_monthly_usd") or 0)
+
+    # Target-side OHA / COLA lines
+    oha_util = int(pkg["oha_utility_usd"]) if pkg.get("oha_utility_usd") is not None else None
+    cola_idx = pkg.get("cola_index")
+    if system == "OHA":
+        housing_row_label = "OHA rent max"
+        housing_row_val = _money_html(oha_rent) if oha_rent is not None else "—"
+    else:
+        housing_row_label = "BAH"
+        housing_row_val = _money_html(housing)
+
+    # PVector.html results layout + OCONUS OHA/COLA fields
     if has_compare and cur_face is not None and new_face is not None:
         bah_delta = int(new_face) - int(cur_face)
         if bah_delta > 0:
@@ -371,13 +407,14 @@ def render_bah_calculator() -> None:
         else:
             delta_cls, delta_txt = "pcs-delta-flat", "$0/mo"
         arrow_html = f"""
+        <div class="pcs-system-chip">{safe_html(system_chip)} · {safe_html(gaining)}</div>
         <div class="pcs-partner-arrow">
             <span class="pcs-partner-arrow-amt muted">{_money_html(cur_face)}</span>
             <span class="pcs-partner-arrow-glyph">➔</span>
             <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
         </div>
         <div class="pcs-partner-delta-row">
-            <span>Monthly BAH Delta</span>
+            <span>{delta_label}</span>
             <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}</span>
         </div>
         """
@@ -399,22 +436,72 @@ def render_bah_calculator() -> None:
             rollup_html = ""
         left_rent = f"{_money_html(cur_rent_lo)} – {_money_html(cur_rent_hi)}"
         left_util = f"{_money_html(int(cur_util_n or 0))}/mo"
+        left_housing = cur_housing_line
+        left_oha_util = _money_html(cur_oha_util) if cur_oha_util is not None else "—"
+        left_cola = _money_html(cur_cola) if cur_cola else "—"
     else:
         arrow_html = f"""
+        <div class="pcs-system-chip">{safe_html(system_chip)} · {safe_html(gaining)}</div>
         <div class="pcs-partner-arrow">
             <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
         </div>
         <div class="pcs-partner-delta-row">
-            <span>{safe_html(new_face_k)} · {safe_html(gaining)}</span>
+            <span>{safe_html(new_face_k)}</span>
             <span class="pcs-bah-delta-badge pcs-delta-flat">{_money_html(total)}/mo total</span>
         </div>
         """
         rollup_html = ""
         left_rent = "—"
         left_util = "—"
+        left_housing = "—"
+        left_oha_util = "—"
+        left_cola = "—"
 
     right_rent = f"{_money_html(market_low)} – {_money_html(market_high)}"
     right_util = f"{_money_html(util_n)}/mo" if util_n else "—"
+
+    # OCONUS / COLA allowance rows (always show when relevant on target)
+    allowance_rows = f"""
+        <div class="pcs-est-row">
+            <span class="pcs-est-side">{left_housing}</span>
+            <span class="pcs-est-label">{safe_html(housing_row_label)}</span>
+            <span class="pcs-est-side pcs-est-side-new">{housing_row_val}</span>
+        </div>
+    """
+    if system == "OHA" or (has_compare and cur and (cur.get("housing_system") == "OHA")):
+        right_oha_util = _money_html(oha_util) if oha_util is not None else "—"
+        allowance_rows += f"""
+        <div class="pcs-est-row">
+            <span class="pcs-est-side">{left_oha_util}</span>
+            <span class="pcs-est-label">OHA utilities</span>
+            <span class="pcs-est-side pcs-est-side-new">{right_oha_util}</span>
+        </div>
+        """
+    # COLA: show for OHA, BAH+COLA, or when either side has COLA
+    show_cola = system in ("OHA", "BAH_PLUS_COLA") or cola > 0 or (cur_cola or 0) > 0
+    if show_cola:
+        cola_note = ""
+        if cola_idx is not None:
+            cola_note = f" · index {cola_idx}"
+        elif system == "OHA" and cola == 0:
+            cola_note = " · none at this locality"
+        allowance_rows += f"""
+        <div class="pcs-est-row">
+            <span class="pcs-est-side">{left_cola}</span>
+            <span class="pcs-est-label">COLA{safe_html(cola_note)}</span>
+            <span class="pcs-est-side pcs-est-side-new">{_money_html(cola)}/mo</span>
+        </div>
+        """
+    left_total = "—"
+    if has_compare and cur and cur.get("total_monthly_usd") is not None:
+        left_total = _money_html(int(cur["total_monthly_usd"]))
+    allowance_rows += f"""
+        <div class="pcs-est-row pcs-est-row-emph">
+            <span class="pcs-est-side">{left_total}</span>
+            <span class="pcs-est-label">Total package</span>
+            <span class="pcs-est-side pcs-est-side-new">{_money_html(total)}/mo</span>
+        </div>
+    """
 
     _render_html(
         f"""
@@ -422,10 +509,12 @@ def render_bah_calculator() -> None:
             {arrow_html}
             {rollup_html}
             <div class="pcs-partner-breakdown">
-                <div class="pcs-partner-breakdown-title">Itemized Expense Breakdown</div>
+                <div class="pcs-partner-breakdown-title">Allowances</div>
+                {allowance_rows}
+                <div class="pcs-partner-breakdown-title">Local costs &amp; move-in</div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_rent}</span>
-                    <span class="pcs-est-label">Typical Rent</span>
+                    <span class="pcs-est-label">Typical Rent (est.)</span>
                     <span class="pcs-est-side pcs-est-side-new">{right_rent}</span>
                 </div>
                 <div class="pcs-est-row">

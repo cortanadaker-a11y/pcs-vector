@@ -352,7 +352,7 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Learn how to adjust housing at your new post · Veteran-Led · Free")
+        st.caption("Free housing help at your new post · CONUS & OCONUS · Veteran-Led")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -403,8 +403,8 @@ def _render_referral_hook() -> None:
 <div class="pcs-faq-grid">
   <div class="pcs-faq-item"><strong>Free?</strong><span>Yes — calculator and housing match.</span></div>
   <div class="pcs-faq-item"><strong>BAH</strong><span>U.S. housing pay. Keep leftover if rent is lower.</span></div>
-  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas rent up to a max + utilities allowance.</span></div>
-  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs. Not for rent.</span></div>
+  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas: rent max + utilities allowance (Korea, Europe, Japan…).</span></div>
+  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs OCONUS. Not for rent — shown in the rundown.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized.</span></div>
   <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges — verify before you sign.</span></div>
 </div>

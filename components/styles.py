@@ -257,6 +257,15 @@ CUSTOM_CSS = """
         line-height: 1.25;
     }
 
+    .pcs-face-mini {
+        margin-top: 0.35rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #9CA3AF;
+    }
+
     /* Hide Step labels — HTML demo has none */
     #pcs-inputs-panel .pcs-panel-label,
     .pcs-face-section-inputs .pcs-panel-label {
@@ -673,6 +682,28 @@ CUSTOM_CSS = """
     .pcs-partner-arrow-loc,
     .pcs-results-kicker {
         display: none;
+    }
+
+    .pcs-system-chip {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #D4AF37;
+        margin: 0 0 0.55rem 0;
+    }
+
+    .pcs-partner-breakdown-title {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #9CA3AF;
+        margin: 0.65rem 0 0.4rem 0;
+    }
+
+    .pcs-partner-breakdown-title:first-child {
+        margin-top: 0.25rem;
     }
 
     .pcs-partner-delta-row {
