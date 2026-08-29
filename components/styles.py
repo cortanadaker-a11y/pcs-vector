@@ -7,33 +7,34 @@ CUSTOM_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap');
 
     :root {
-        /* Lighter army greens + brighter text for readability */
+        /* One dark card + high-contrast light controls */
         --pcs-ink: #FFFFFF;
-        --pcs-navy: #314B3C;
-        --pcs-navy-light: #3D5A48;
-        --pcs-slate: #E8F0EB;
-        --pcs-muted: #D2DDD6;
-        --pcs-bg: #1B2A22;
-        --pcs-surface: #314B3C;
-        --pcs-accent: #F0D060;
-        --pcs-accent-soft: #F7E08A;
-        --pcs-accent-hover: #D4B445;
-        --pcs-gold: #F0D060;
-        --pcs-border: rgba(255, 255, 255, 0.28);
+        --pcs-navy: #2F4638;
+        --pcs-navy-light: #3A5545;
+        --pcs-slate: #EEF4F0;
+        --pcs-muted: #D8E3DC;
+        --pcs-bg: #18241E;
+        --pcs-surface: #2F4638;
+        --pcs-accent: #E8C84A;
+        --pcs-accent-soft: #F3DC7A;
+        --pcs-accent-hover: #C9A83A;
+        --pcs-gold: #E8C84A;
+        --pcs-border: rgba(255, 255, 255, 0.22);
         --pcs-success: #6EE7B7;
-        --pcs-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-        --pcs-radius: 1.15rem;
-        --pcs-hero-dark: #1B2A22;
-        --pcs-army-deep: #1B2A22;
-        --pcs-army-card: #314B3C;
-        --pcs-army-gold: #F0D060;
+        --pcs-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+        --pcs-radius: 1.2rem;
+        --pcs-hero-dark: #18241E;
+        --pcs-army-deep: #18241E;
+        --pcs-army-card: #2F4638;
+        --pcs-army-gold: #E8C84A;
         --pcs-orange: #FB923C;
         --pcs-orange-hover: #F97316;
-        --pcs-panel: #3A5747;
-        --pcs-panel-deep: #274033;
+        --pcs-panel: transparent;
+        --pcs-panel-deep: rgba(0, 0, 0, 0.28);
         --pcs-text: #FFFFFF;
-        --pcs-text-dim: #E2EBE5;
-        --pcs-control: #1E3228;
+        --pcs-text-dim: #E4EEE8;
+        --pcs-control: #F3F1EC;
+        --pcs-control-text: #152019;
     }
 
     .stApp {
@@ -133,24 +134,50 @@ CUSTOM_CSS = """
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
         background: var(--pcs-army-card) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 1.35rem !important;
-        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5) !important;
-        padding: 0.7rem 0.75rem 0.9rem 0.75rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.24) !important;
+        border-radius: 1.25rem !important;
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.45) !important;
+        padding: 1rem 1rem 1.05rem 1rem !important;
     }
 
-    /* First block in the face is the inputs panel — no floating header above it */
+    /* Flatten nested panels → one continuous calculator face */
+    .pcs-face-section,
+    #pcs-inputs-panel,
+    #pcs-match-panel,
+    .pcs-partner-panel {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 0 0.15rem 0 !important;
+    }
+
+    .pcs-face-section-results,
+    .pcs-partner-results {
+        background: rgba(0, 0, 0, 0.28) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        border-radius: 0.85rem !important;
+        padding: 0.85rem 0.85rem !important;
+        margin: 0.55rem 0 0.75rem 0 !important;
+    }
+
+    .pcs-face-section-match {
+        margin-top: 0.35rem !important;
+        padding-top: 0.75rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+    }
+
     .pcs-calc-face > div > [data-testid="stVerticalBlock"] > div:first-child {
         margin-top: 0 !important;
     }
 
-    /* Tighter vertical rhythm inside the face */
     .pcs-calc-face [data-testid="stVerticalBlock"] > div {
-        gap: 0.28rem !important;
+        gap: 0.22rem !important;
     }
 
     .pcs-calc-face [data-testid="stHorizontalBlock"] {
-        gap: 0.45rem !important;
+        gap: 0.5rem !important;
     }
 
     /* Unified calculator top: brand + Step 1 inside one panel */
@@ -183,12 +210,8 @@ CUSTOM_CSS = """
         line-height: 1.25;
     }
 
-    #pcs-inputs-panel.pcs-partner-panel {
-        padding-top: 0.95rem;
-    }
-
     #pcs-inputs-panel .pcs-calc-top .pcs-panel-label {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.55rem;
     }
 
     .pcs-calc-face [data-testid="stAlert"],
@@ -266,12 +289,12 @@ CUSTOM_CSS = """
     }
 
     .pcs-panel-label {
-        font-size: 0.7rem;
+        font-size: 0.74rem;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #F2D56A;
-        margin: 0 0 0.45rem 0;
+        color: #F3DC7A;
+        margin: 0 0 0.5rem 0;
     }
 
     /* Partner HTML calculator panels */
@@ -283,18 +306,10 @@ CUSTOM_CSS = """
         overflow: hidden;
     }
 
-    #pcs-inputs-panel.pcs-partner-panel,
-    #pcs-match-panel.pcs-partner-panel,
-    .pcs-partner-panel {
-        background: var(--pcs-panel);
-        border: 1px solid rgba(255, 255, 255, 0.26);
-        border-radius: 0.95rem;
-        padding: 0.85rem 0.9rem;
-        margin: 0 0 0.55rem 0;
-    }
-
     #pcs-match-start,
-    #pcs-match-end {
+    #pcs-match-end,
+    #pcs-inputs-start,
+    #pcs-inputs-end {
         height: 0;
         margin: 0;
         padding: 0;
@@ -302,14 +317,14 @@ CUSTOM_CSS = """
     }
 
     .pcs-match-top {
-        margin: 0 0 0.45rem 0;
+        margin: 0 0 0.5rem 0;
     }
 
     .pcs-match-body {
-        margin: 0 0 0.45rem 0;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        color: #F2F7F4;
+        margin: 0 0 0.5rem 0;
+        font-size: 0.92rem;
+        line-height: 1.45;
+        color: #F4F8F5;
         font-weight: 500;
     }
 
@@ -317,16 +332,8 @@ CUSTOM_CSS = """
         color: #FFFFFF;
         font-weight: 800;
         text-decoration: underline;
-        text-decoration-color: rgba(240, 208, 96, 0.8);
+        text-decoration-color: rgba(232, 200, 74, 0.85);
         text-underline-offset: 0.12em;
-    }
-
-    .pcs-partner-results {
-        background: var(--pcs-panel-deep) !important;
-        border: 1px solid rgba(255, 255, 255, 0.26) !important;
-        margin-top: 0.1rem;
-        margin-bottom: 0.55rem;
-        padding: 0.95rem 0.9rem !important;
     }
 
     .pcs-partner-arrow {
@@ -515,51 +522,73 @@ CUSTOM_CSS = """
         text-transform: uppercase;
     }
 
+    /* Light controls on dark card — max readability */
     .pcs-calc-face div[data-baseweb="select"] > div {
         background-color: var(--pcs-control) !important;
-        border-color: rgba(240, 208, 96, 0.75) !important;
-        color: #FFFFFF !important;
+        border: 1.5px solid #C9B056 !important;
+        color: var(--pcs-control-text) !important;
         font-weight: 700 !important;
-        min-height: 2.6rem !important;
+        min-height: 2.7rem !important;
+        border-radius: 0.7rem !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] span,
     .pcs-calc-face div[data-baseweb="select"] div {
-        color: #FFFFFF !important;
+        color: var(--pcs-control-text) !important;
     }
 
     .pcs-calc-face div[data-baseweb="select"] svg {
-        fill: #F7E08A !important;
-        color: #F7E08A !important;
+        fill: #6B5A20 !important;
+        color: #6B5A20 !important;
+    }
+
+    .pcs-calc-face label,
+    .pcs-calc-face [data-testid="stWidgetLabel"] p {
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        font-size: 0.74rem !important;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
     }
 
     .pcs-calc-face [data-testid="stCheckbox"] label span,
     .pcs-calc-face [data-testid="stRadio"] label p,
     .pcs-calc-face [data-testid="stCaption"] {
         color: #E8F0EB !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        font-size: 0.86rem !important;
+        font-weight: 600 !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input {
         background: var(--pcs-control) !important;
-        color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        color: var(--pcs-control-text) !important;
+        border: 1.5px solid #C9B056 !important;
         font-weight: 600 !important;
+        border-radius: 0.7rem !important;
+        min-height: 2.7rem !important;
     }
 
     .pcs-calc-face [data-testid="stTextInput"] input::placeholder {
-        color: #9AABA2 !important;
+        color: #7A857E !important;
     }
 
-    /* Baseweb dropdown menu readability */
+    /* Dropdown menus */
     div[data-baseweb="popover"] ul,
     div[data-baseweb="menu"] {
-        background: #24362C !important;
-        color: #FFFFFF !important;
+        background: #F3F1EC !important;
+        color: #152019 !important;
     }
 
     div[data-baseweb="popover"] li,
     div[data-baseweb="menu"] li {
-        color: #FFFFFF !important;
+        color: #152019 !important;
+    }
+
+    div[data-baseweb="popover"] li:hover,
+    div[data-baseweb="menu"] li:hover {
+        background: #E5E1D8 !important;
     }
 
     .pcs-calc-face .pcs-bah-section-label,

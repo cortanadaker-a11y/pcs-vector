@@ -121,7 +121,7 @@ def _wrap_inputs_panel() -> None:
         start_id="pcs-inputs-start",
         end_id="pcs-inputs-end",
         panel_id="pcs-inputs-panel",
-        panel_class="pcs-partner-panel pcs-partner-inputs",
+        panel_class="pcs-face-section pcs-face-section-inputs",
     )
 
 
@@ -548,7 +548,7 @@ def render_bah_calculator() -> None:
 
     _render_html(
         f"""
-        <div class="pcs-partner-panel pcs-partner-results">
+        <div class="pcs-face-section pcs-face-section-results pcs-partner-results">
             {arrow_html}
             {rollup_html}
             <div class="pcs-partner-breakdown">

@@ -150,7 +150,7 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         gap: 0.65rem;
         padding: 0.6rem 0.75rem 0.6rem 0.85rem;
         border-radius: 14px;
-        background: #314B3C;
+        background: #2F4638;
         color: #FFFFFF;
         box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.28);
@@ -383,14 +383,6 @@ def _render_referral_hook() -> None:
             disabled=not ready,
         )
 
-    st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
-    wrap_dom_panel(
-        start_id="pcs-match-start",
-        end_id="pcs-match-end",
-        panel_id="pcs-match-panel",
-        panel_class="pcs-partner-panel pcs-partner-match",
-    )
-
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
         last_name = str(st.session_state.get("referral_last_name") or last_name or "")
@@ -434,10 +426,6 @@ def _render_referral_hook() -> None:
                 "Opening a pre-filled form… tap **Submit** on the next page to finish."
             )
 
-    _render_sticky_referral_cta(calc)
-
-
-def _render_faq() -> None:
     with st.expander("What do these numbers mean?", expanded=False):
         st.markdown(
             """
@@ -453,13 +441,22 @@ def _render_faq() -> None:
             unsafe_allow_html=True,
         )
 
+    st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
+    wrap_dom_panel(
+        start_id="pcs-match-start",
+        end_id="pcs-match-end",
+        panel_id="pcs-match-panel",
+        panel_class="pcs-face-section pcs-face-section-match",
+    )
+
+    _render_sticky_referral_cta(calc)
+
 
 def render_home() -> None:
     with st.container(border=True):
         _tag_page_face()
         render_bah_calculator()
         _render_referral_hook()
-        _render_faq()
         st.markdown(
             """
             <div class="pcs-footer">
