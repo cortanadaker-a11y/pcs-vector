@@ -407,11 +407,16 @@ def render_bah_calculator() -> None:
         else:
             delta_cls, delta_txt = "pcs-delta-flat", "$0/mo"
         arrow_html = f"""
-        <div class="pcs-system-chip">{safe_html(system_chip)} · {safe_html(gaining)}</div>
         <div class="pcs-partner-arrow">
-            <span class="pcs-partner-arrow-amt muted">{_money_html(cur_face)}</span>
+            <div class="pcs-partner-arrow-col">
+                <div class="pcs-partner-arrow-loc">Current</div>
+                <span class="pcs-partner-arrow-amt muted">{_money_html(cur_face)}</span>
+            </div>
             <span class="pcs-partner-arrow-glyph">➔</span>
-            <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
+            <div class="pcs-partner-arrow-col pcs-partner-arrow-col-new">
+                <div class="pcs-partner-arrow-loc">{safe_html(system_chip)}</div>
+                <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
+            </div>
         </div>
         <div class="pcs-partner-delta-row">
             <span>{delta_label}</span>
@@ -441,12 +446,14 @@ def render_bah_calculator() -> None:
         left_cola = _money_html(cur_cola) if cur_cola else "—"
     else:
         arrow_html = f"""
-        <div class="pcs-system-chip">{safe_html(system_chip)} · {safe_html(gaining)}</div>
-        <div class="pcs-partner-arrow">
-            <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
+        <div class="pcs-partner-arrow pcs-partner-arrow-solo">
+            <div class="pcs-partner-arrow-col pcs-partner-arrow-col-new">
+                <div class="pcs-partner-arrow-loc">{safe_html(system_chip)}</div>
+                <span class="pcs-partner-arrow-amt">{_money_html(new_face)}</span>
+            </div>
         </div>
         <div class="pcs-partner-delta-row">
-            <span>{safe_html(new_face_k)}</span>
+            <span>{safe_html(gaining)}</span>
             <span class="pcs-bah-delta-badge pcs-delta-flat">{_money_html(total)}/mo total</span>
         </div>
         """

@@ -691,18 +691,44 @@ CUSTOM_CSS = """
         font-weight: 900;
     }
 
-    .pcs-partner-arrow-loc,
     .pcs-results-kicker {
         display: none;
     }
 
-    .pcs-system-chip {
-        font-size: 0.68rem;
+    .pcs-partner-arrow-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pcs-partner-arrow-col-new {
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    .pcs-partner-arrow-loc {
+        display: block;
+        font-size: 0.65rem;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+        color: #9CA3AF;
+        margin-bottom: 0.25rem;
+        line-height: 1.2;
+    }
+
+    .pcs-partner-arrow-col-new .pcs-partner-arrow-loc {
         color: #D4AF37;
-        margin: 0 0 0.55rem 0;
+        text-align: right;
+    }
+
+    .pcs-partner-arrow-solo {
+        justify-content: flex-end;
+    }
+
+    .pcs-partner-arrow-solo .pcs-partner-arrow-col-new {
+        flex: 0 1 auto;
     }
 
     .pcs-partner-breakdown-title {
