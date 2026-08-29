@@ -147,27 +147,28 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.65rem 0;
-        padding-bottom: 0.55rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-    }
-
-    .pcs-face-brand-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.4rem 0.65rem;
-        margin-bottom: 0;
+        margin: 0 0 0.15rem 0;
+        padding: 0 0 0.55rem 0;
+        border-bottom: none;
     }
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1.45rem;
+        font-size: 1.55rem;
         font-weight: 900;
         letter-spacing: -0.03em;
-        color: var(--pcs-text);
-        margin: 0;
+        color: #FFFFFF;
+        margin: 0 0 0.2rem 0;
         line-height: 1.1;
+    }
+
+    .pcs-face-tagline {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #F2D56A;
+        margin: 0;
+        line-height: 1.25;
     }
 
     .pcs-calc-face [data-testid="stAlert"],
@@ -177,73 +178,28 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
     }
 
-    .pcs-face-brand .pcs-hero-tag {
-        margin: 0;
-        font-size: 0.64rem;
-        padding: 0.22rem 0.55rem;
-        background: rgba(224, 188, 74, 0.2);
-        border: 1px solid rgba(224, 188, 74, 0.55);
-        color: #F2D56A;
-        font-weight: 800;
-    }
-
-    .pcs-face-brand .pcs-hero-lead {
-        display: none;
-    }
-
-    .pcs-face-sub {
-        margin: 0.4rem 0 0.5rem 0;
-        font-size: 0.82rem;
-        line-height: 1.4;
-        color: #D5DDD8;
-        font-weight: 500;
-    }
-
-    .pcs-steps {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.35rem 0.45rem;
-        margin-top: 0.15rem;
-    }
-
-    .pcs-step {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-size: 0.68rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #AEB8B2;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
-        padding: 0.22rem 0.55rem;
-    }
-
-    .pcs-step b {
-        color: #F2D56A;
-        font-weight: 900;
-    }
-
-    .pcs-step-on {
-        color: #F4F7F5;
-        background: rgba(224, 188, 74, 0.16);
-        border-color: rgba(224, 188, 74, 0.45);
-    }
-
-    .pcs-step-sep {
-        color: #F2D56A;
-        font-weight: 900;
-        font-size: 0.85rem;
-    }
-
     .pcs-face-divider {
         height: 1px;
         margin: 0.75rem 0 0.65rem 0;
         background: rgba(255, 255, 255, 0.16);
         border: 0;
+    }
+
+    /* Brand sits flush on top of Step 1 inputs panel */
+    .pcs-calc-face .pcs-face-brand + div,
+    .pcs-calc-face #pcs-inputs-panel {
+        margin-top: 0;
+    }
+
+    #pcs-inputs-panel.pcs-partner-panel {
+        margin-top: 0;
+        border-top-left-radius: 0.85rem;
+        border-top-right-radius: 0.85rem;
+    }
+
+    #pcs-inputs-panel .pcs-panel-label {
+        margin-top: 0;
+        padding-top: 0;
     }
 
     .pcs-results-kicker {
@@ -297,12 +253,12 @@ CUSTOM_CSS = """
     }
 
     .pcs-panel-label {
-        font-size: 0.64rem;
+        font-size: 0.7rem;
         font-weight: 800;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--pcs-text-dim);
-        margin: 0.1rem 0 0.35rem 0;
+        color: #F2D56A;
+        margin: 0 0 0.45rem 0;
     }
 
     /* Partner HTML calculator panels */

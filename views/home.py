@@ -9,7 +9,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from components.bah_calculator import get_calculator_snapshot, render_bah_calculator
-from components.content import TRUST_SIGNALS
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
@@ -37,20 +36,10 @@ def _is_valid_email(raw: str | None) -> bool:
 
 def _render_header() -> None:
     st.markdown(
-        f"""
+        """
         <div class="pcs-face-brand">
-            <div class="pcs-face-brand-row">
-                <div class="pcs-brand-title">PCS Vector</div>
-                <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
-            </div>
-            <p class="pcs-face-sub">
-                Quick PCS money estimate — BAH / OHA / COLA / DLA — then free housing help at your new post.
-            </p>
-            <div class="pcs-steps" aria-hidden="true">
-                <span class="pcs-step pcs-step-on"><b>1</b> Estimate</span>
-                <span class="pcs-step-sep">→</span>
-                <span class="pcs-step"><b>2</b> Get matched</span>
-            </div>
+            <div class="pcs-brand-title">PCS Vector</div>
+            <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
         </div>
         """,
         unsafe_allow_html=True,

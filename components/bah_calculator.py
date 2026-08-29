@@ -256,7 +256,7 @@ def render_bah_calculator() -> None:
 
     st.markdown(
         '<div id="pcs-inputs-start"></div>'
-        '<div class="pcs-panel-label">Step 1 · Your profile &amp; posts</div>',
+        '<div class="pcs-panel-label">Step 1 · Rank, family &amp; posts</div>',
         unsafe_allow_html=True,
     )
 
