@@ -38,9 +38,11 @@ def _is_valid_email(raw: str | None) -> bool:
 def _render_header() -> None:
     st.markdown(
         f"""
-        <div class="pcs-hero pcs-hero-compact">
-            <div class="pcs-brand-title">PCS Vector</div>
-            <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
+        <div class="pcs-face-brand">
+            <div class="pcs-face-brand-row">
+                <div class="pcs-brand-title">PCS Vector</div>
+                <div class="pcs-hero-tag">{safe_html(TRUST_SIGNALS["banner"])}</div>
+            </div>
             <p class="pcs-hero-lead">
                 See your BAH, OHA, COLA, and move-in cash for your next post —
                 then get matched with a housing pro who knows the area.
@@ -53,6 +55,34 @@ def _render_header() -> None:
         </div>
         """,
         unsafe_allow_html=True,
+    )
+
+
+def _tag_page_face() -> None:
+    """Mark the singular calculator face container for dark CSS."""
+    st.markdown('<div id="pcs-face-marker" aria-hidden="true"></div>', unsafe_allow_html=True)
+    components.html(
+        """
+<script>
+(function () {
+  var doc = window.parent.document;
+  function tag() {
+    var marker = doc.getElementById("pcs-face-marker");
+    if (!marker) return;
+    var wrap = marker.closest('[data-testid="stVerticalBlockBorderWrapper"]');
+    if (wrap) {
+      wrap.classList.add("pcs-calc-face");
+      wrap.classList.add("pcs-calc-dark");
+    }
+    doc.documentElement.classList.add("pcs-dark-app");
+    doc.body.classList.add("pcs-dark-app");
+  }
+  tag();
+  [40, 160, 400].forEach(function (ms) { setTimeout(tag, ms); });
+})();
+</script>
+        """,
+        height=0,
     )
 
 
@@ -177,17 +207,17 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         appearance: none;
         border: none;
         cursor: pointer;
-        background: #fff;
-        color: #1a2e28;
-        font-weight: 800;
+        background: #ea580c;
+        color: #fff;
+        font-weight: 900;
         font-size: 0.82rem;
         letter-spacing: -0.01em;
         padding: 0.55rem 0.9rem;
         border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-btn:hover {{
-        background: #f4f2ee;
+        background: #c2410c;
       }}
       @media (max-width: 560px) {{
         #pcs-sticky-ref-bar {{
@@ -325,98 +355,97 @@ def _render_referral_hook() -> None:
         )
         summary_html = ""
 
-    with st.container(border=True):
-        st.markdown(
-            f"""
-            <div id="pcs-referral" class="pcs-ref-head">
-                <div class="pcs-ref-kicker">Free match · military housing pros</div>
-                <div class="pcs-ref-title">Your next home is one step away</div>
-                <p class="pcs-ref-body">{body_html}</p>
-                {summary_html}
-            </div>
-            <p class="pcs-bah-section-label">Tell us how to reach you</p>
-            """,
-            unsafe_allow_html=True,
+    st.markdown(
+        f"""
+        <div id="pcs-referral" class="pcs-ref-head">
+            <div class="pcs-ref-kicker">Free match · military housing pros</div>
+            <div class="pcs-ref-title">Your next home is one step away</div>
+            <p class="pcs-ref-body">{body_html}</p>
+            {summary_html}
+        </div>
+        <p class="pcs-bah-section-label">Tell us how to reach you</p>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.form("referral_form", clear_on_submit=False):
+        n1, n2 = st.columns(2)
+        with n1:
+            first_name = st.text_input(
+                "First name",
+                key="referral_first_name",
+                placeholder="First",
+            )
+        with n2:
+            last_name = st.text_input(
+                "Last name",
+                key="referral_last_name",
+                placeholder="Last",
+            )
+
+        email_address = st.text_input(
+            "Email",
+            key="referral_email_address",
+            placeholder="you@email.com",
         )
 
-        with st.form("referral_form", clear_on_submit=False):
-            n1, n2 = st.columns(2)
-            with n1:
-                first_name = st.text_input(
-                    "First name",
-                    key="referral_first_name",
-                    placeholder="First",
-                )
-            with n2:
-                last_name = st.text_input(
-                    "Last name",
-                    key="referral_last_name",
-                    placeholder="Last",
-                )
+        rent_buy_not_sure = st.radio(
+            "Looking to…",
+            options=list(INTEREST_OPTIONS),
+            horizontal=True,
+            key="referral_rent_buy_not_sure",
+        )
 
-            email_address = st.text_input(
-                "Email",
-                key="referral_email_address",
-                placeholder="you@email.com",
+        st.caption("Learn how to adjust housing at your new post · Veteran-led · Free")
+        submitted = st.form_submit_button(
+            "Connect with a housing pro →",
+            type="primary",
+            use_container_width=True,
+            disabled=not ready,
+        )
+
+    if submitted:
+        first_name = str(st.session_state.get("referral_first_name") or first_name or "")
+        last_name = str(st.session_state.get("referral_last_name") or last_name or "")
+        email_address = _clean_email(
+            st.session_state.get("referral_email_address") or email_address
+        )
+        rent_buy_not_sure = str(
+            st.session_state.get("referral_rent_buy_not_sure") or rent_buy_not_sure or ""
+        )
+
+        live = get_calculator_snapshot() or snap
+        live_calc = _calc_fields_from_snap(live)
+
+        live_deps_n = int(live.get("num_dependents") or 0)
+        row = build_referral_row(
+            destination=live_calc["destination"],
+            first_name=first_name,
+            last_name=last_name,
+            rank=live_calc["rank"],
+            rent_buy_not_sure=rent_buy_not_sure,
+            num_dependents=live_deps_n,
+            email_address=email_address,
+        )
+
+        if not live_calc["destination"]:
+            st.error("Set New post in the calculator above first.")
+        elif not row["First Name"].strip() or not row["Last Name"].strip():
+            st.error("Enter your first and last name.")
+        elif not _is_valid_email(row["Email address"]):
+            st.error("Enter a valid email address (example: name@email.com).")
+        else:
+            st.session_state.referral_lead = {**row, "calculator": live}
+
+            submit_referral_via_apps_script(row)
+
+            st.html(
+                build_redirect_to_form_html(row),
+                unsafe_allow_javascript=True,
             )
-
-            rent_buy_not_sure = st.radio(
-                "Looking to…",
-                options=list(INTEREST_OPTIONS),
-                horizontal=True,
-                key="referral_rent_buy_not_sure",
+            st.info(
+                "Opening a pre-filled form… tap **Submit** on the next page to finish."
             )
-
-            st.caption("No spam · free match · Built For Soldiers; By Soldiers")
-            submitted = st.form_submit_button(
-                "Connect me with a housing pro →",
-                type="primary",
-                use_container_width=True,
-                disabled=not ready,
-            )
-
-        if submitted:
-            first_name = str(st.session_state.get("referral_first_name") or first_name or "")
-            last_name = str(st.session_state.get("referral_last_name") or last_name or "")
-            email_address = _clean_email(
-                st.session_state.get("referral_email_address") or email_address
-            )
-            rent_buy_not_sure = str(
-                st.session_state.get("referral_rent_buy_not_sure") or rent_buy_not_sure or ""
-            )
-
-            live = get_calculator_snapshot() or snap
-            live_calc = _calc_fields_from_snap(live)
-
-            live_deps_n = int(live.get("num_dependents") or 0)
-            row = build_referral_row(
-                destination=live_calc["destination"],
-                first_name=first_name,
-                last_name=last_name,
-                rank=live_calc["rank"],
-                rent_buy_not_sure=rent_buy_not_sure,
-                num_dependents=live_deps_n,
-                email_address=email_address,
-            )
-
-            if not live_calc["destination"]:
-                st.error("Set New post in the calculator above first.")
-            elif not row["First Name"].strip() or not row["Last Name"].strip():
-                st.error("Enter your first and last name.")
-            elif not _is_valid_email(row["Email address"]):
-                st.error("Enter a valid email address (example: name@email.com).")
-            else:
-                st.session_state.referral_lead = {**row, "calculator": live}
-
-                submit_referral_via_apps_script(row)
-
-                st.html(
-                    build_redirect_to_form_html(row),
-                    unsafe_allow_javascript=True,
-                )
-                st.info(
-                    "Opening a pre-filled form… tap **Submit** on the next page to finish."
-                )
 
     _render_sticky_referral_cta(calc)
 
@@ -444,20 +473,22 @@ def _render_faq() -> None:
 
 
 def render_home() -> None:
-    _render_header()
-    render_bah_calculator()
-    st.markdown(
-        '<p class="pcs-section-bridge">Numbers checked? Next — get help finding a place.</p>',
-        unsafe_allow_html=True,
-    )
-    _render_referral_hook()
-    _render_faq()
-    st.markdown(
-        """
-        <div class="pcs-footer">
-            <strong>PCS Vector</strong> · Built For Soldiers; By Soldiers
-            <span>· Planning figures only — verify with finance before you spend.</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container(border=True):
+        _tag_page_face()
+        _render_header()
+        render_bah_calculator()
+        st.markdown(
+            '<div class="pcs-face-divider" aria-hidden="true"></div>',
+            unsafe_allow_html=True,
+        )
+        _render_referral_hook()
+        _render_faq()
+        st.markdown(
+            """
+            <div class="pcs-footer">
+                <strong>PCS Vector</strong> · Built For Soldiers; By Soldiers
+                <span>· Planning figures only — verify with finance before you spend.</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
