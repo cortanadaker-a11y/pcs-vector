@@ -19,7 +19,7 @@ from services.installation_data import (
 from services.utility_costs import get_utility_costs_for_installation
 
 YOS_OPTIONS = list(range(0, 41))
-_NONE_CURRENT = "— Skip compare —"
+_NONE_CURRENT = "— Skip —"
 CALC_SNAPSHOT_KEY = "bah_calc_snapshot"
 
 

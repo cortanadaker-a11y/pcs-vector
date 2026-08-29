@@ -72,9 +72,11 @@ CUSTOM_CSS = """
     }
 
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 2.75rem !important;
-        max-width: 40rem; /* slightly larger outer frame */
+        padding-top: 0.85rem !important;
+        padding-bottom: 5.5rem !important; /* room for sticky match bar */
+        max-width: 36rem;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 
     /* Primary CTAs — partner orange */
@@ -2914,32 +2916,187 @@ CUSTOM_CSS = """
         display: inline;
     }
 
+    /* Larger primary CTA for thumb reach */
+    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+        min-height: 3.15rem !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.01em !important;
+        margin-top: 0.35rem !important;
+    }
+
+    /* Professional density — select/input touch targets */
+    .pcs-calc-face div[data-baseweb="select"] > div,
+    .pcs-calc-face [data-testid="stTextInput"] input {
+        min-height: 2.85rem !important;
+    }
+
+    .pcs-face-brand {
+        margin-bottom: 0.65rem !important;
+        padding-bottom: 0.55rem !important;
+    }
+
+    .pcs-calc-face [data-testid="stExpander"] {
+        margin-top: 0.55rem !important;
+        border-radius: 0.75rem !important;
+    }
+
+    .pcs-faq-item {
+        padding: 0.5rem 0.65rem !important;
+    }
+
+    .pcs-footer {
+        text-align: center;
+        font-size: 0.7rem !important;
+        color: #9CA3AF !important;
+        margin-top: 0.75rem !important;
+    }
+
+    /* ── Mobile-first polish (35-loop pass) ── */
     @media (max-width: 640px) {
+        .block-container {
+            padding-top: 0.55rem !important;
+            padding-left: 0.7rem !important;
+            padding-right: 0.7rem !important;
+            padding-bottom: 5.75rem !important;
+        }
+
+        [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
+        [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
+            padding: 0.85rem 0.8rem 1rem 0.8rem !important;
+            border-radius: 1.25rem !important;
+            outline-offset: 5px !important;
+            margin-top: 0.45rem !important;
+            margin-bottom: 0.45rem !important;
+        }
+
+        #pcs-inputs-panel,
+        .pcs-face-section-inputs,
+        .pcs-face-section-results,
+        .pcs-partner-results,
+        #pcs-match-panel,
+        .pcs-face-section-match {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+
         .pcs-face-brand .pcs-brand-title {
-            font-size: 1.28rem;
+            font-size: 1.22rem !important;
         }
-        .pcs-face-sub {
-            font-size: 0.76rem;
+
+        .pcs-face-tagline {
+            font-size: 0.66rem !important;
         }
+
+        .pcs-face-mini {
+            font-size: 0.6rem !important;
+            margin-top: 0.28rem !important;
+        }
+
         .pcs-partner-arrow-amt {
-            font-size: 1.45rem;
+            font-size: 1.4rem !important;
         }
+
+        .pcs-partner-arrow-glyph {
+            font-size: 1.15rem !important;
+            padding: 0 0.15rem !important;
+        }
+
+        .pcs-partner-arrow-loc {
+            font-size: 0.58rem !important;
+        }
+
+        .pcs-partner-delta-row {
+            font-size: 0.62rem !important;
+            gap: 0.35rem !important;
+        }
+
+        .pcs-bah-delta-badge {
+            font-size: 0.72rem !important;
+            padding: 0.22rem 0.45rem !important;
+        }
+
+        .pcs-partner-rollup {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.3rem !important;
+            padding: 0.5rem 0.6rem !important;
+        }
+
+        .pcs-partner-rollup-mids {
+            text-align: left !important;
+            font-size: 0.75rem !important;
+        }
+
+        .pcs-est-heads-live {
+            font-size: 0.58rem !important;
+        }
+
+        .pcs-calc-face .pcs-est-row {
+            padding: 0.5rem 0.55rem !important;
+            margin-bottom: 0.3rem !important;
+            gap: 0.25rem !important;
+        }
+
         .pcs-calc-face .pcs-est-label {
-            font-size: 0.58rem;
+            font-size: 0.58rem !important;
+            line-height: 1.25 !important;
         }
+
         .pcs-calc-face .pcs-est-side {
-            font-size: 0.76rem;
+            font-size: 0.74rem !important;
         }
+
+        .pcs-partner-breakdown-title {
+            font-size: 0.62rem !important;
+            margin: 0.55rem 0 0.3rem 0 !important;
+        }
+
+        .pcs-partner-foot {
+            font-size: 0.62rem !important;
+        }
+
+        .pcs-calc-face label,
+        .pcs-calc-face [data-testid="stWidgetLabel"] p {
+            font-size: 0.66rem !important;
+        }
+
+        .pcs-calc-face div[data-baseweb="select"] > div,
+        .pcs-calc-face [data-testid="stTextInput"] input {
+            min-height: 2.75rem !important;
+            font-size: 0.875rem !important;
+        }
+
+        .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+            min-height: 3.25rem !important;
+            font-size: 0.9rem !important;
+        }
+
+        .pcs-faq-item strong {
+            font-size: 0.82rem !important;
+        }
+
+        .pcs-faq-item span {
+            font-size: 0.8rem !important;
+        }
+
         .pcs-footer span {
             display: block;
-            margin-top: 0.2rem;
+            margin-top: 0.15rem;
+        }
+
+        /* Hide Streamlit header chrome noise on phones */
+        header[data-testid="stHeader"] {
+            background: transparent !important;
         }
     }
 
-    /* Larger primary CTA for thumb reach */
-    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
-        min-height: 3rem !important;
-        font-size: 1rem !important;
+    @media (max-width: 380px) {
+        .pcs-partner-arrow-amt {
+            font-size: 1.22rem !important;
+        }
+        .pcs-calc-face .pcs-est-side {
+            font-size: 0.68rem !important;
+        }
     }
 
     .pcs-bottom-line {

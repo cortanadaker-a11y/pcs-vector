@@ -141,21 +141,22 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
-        bottom: 0.85rem;
+        bottom: max(0.65rem, env(safe-area-inset-bottom));
         z-index: 99999;
-        width: min(540px, calc(100vw - 1.25rem));
+        width: min(560px, calc(100vw - 1.25rem));
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.65rem;
-        padding: 0.6rem 0.75rem 0.6rem 0.85rem;
+        gap: 0.55rem;
+        padding: 0.65rem 0.75rem;
         border-radius: 14px;
-        background: #2F4638;
+        background: #1C2D22;
         color: #FFFFFF;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
         transition: opacity 0.2s ease, transform 0.2s ease;
+        backdrop-filter: blur(8px);
       }}
       #pcs-sticky-ref-bar.pcs-sticky-ref-hidden {{
         opacity: 0;
@@ -370,7 +371,7 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Free · CONUS & OCONUS · tap the button when ready — no browser popups")
+        st.caption("Free housing match · CONUS & OCONUS")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -411,21 +412,19 @@ def _render_referral_hook() -> None:
                 build_redirect_to_form_html(row),
                 unsafe_allow_javascript=True,
             )
-            st.info(
-                "Opening a pre-filled form… tap **Submit** on the next page to finish."
-            )
+            st.success("Opening your pre-filled form — tap **Submit** on the next page.")
 
-    with st.expander("What do these numbers mean?", expanded=False):
+    with st.expander("FAQ — what these numbers mean", expanded=False):
         st.markdown(
             """
 <div class="pcs-faq-grid">
   <div class="pcs-faq-item"><strong>Free?</strong><span>Yes — calculator and housing match.</span></div>
   <div class="pcs-faq-item"><strong>BAH</strong><span>U.S. housing pay. Keep leftover if rent is lower.</span></div>
-  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas: rent max + utilities allowance (Korea, Europe, Japan…).</span></div>
-  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra for high daily costs OCONUS. Not for rent — shown in the rundown.</span></div>
+  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas rent max + utilities allowance.</span></div>
+  <div class="pcs-faq-item"><strong>COLA</strong><span>OCONUS daily-cost extra. Not for rent.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized.</span></div>
-  <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges — verify before you sign.</span></div>
-  <div class="pcs-faq-item"><strong>Rent % badge</strong><span>Change in estimated typical rent mid between posts — not an official COL index.</span></div>
+  <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges.</span></div>
+  <div class="pcs-faq-item"><strong>Rent % badge</strong><span>Typical rent mid change — not official COL.</span></div>
 </div>
             """,
             unsafe_allow_html=True,
@@ -451,7 +450,7 @@ def render_home() -> None:
             """
             <div class="pcs-footer">
                 <strong>PCS Vector</strong> · For Soldiers; By Soldiers
-                <span>· Verify with finance before you spend.</span>
+                <span>Verify LES / finance before you sign.</span>
             </div>
             """,
             unsafe_allow_html=True,
