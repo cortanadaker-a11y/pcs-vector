@@ -220,12 +220,9 @@ CUSTOM_CSS = """
         margin: 0 0 0.3rem 0 !important;
     }
 
-    /*
-     * Inputs vertical rhythm — brand → rank row → posts → barracks
-     * Professional breathing room (was 0.25–0.35rem and looked cramped)
-     */
+    /* Inputs vertical rhythm — tighter so wells sit closer to the card edge */
     #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
-        gap: 0.85rem !important;
+        gap: 0.55rem !important;
     }
 
     #pcs-inputs-panel [data-testid="stHorizontalBlock"] {
