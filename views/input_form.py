@@ -560,8 +560,10 @@ def render_input_form() -> None:
     step_titles = [t for t, _ in FORM_STEPS]
     st.markdown("## Build your PCS plan")
     st.markdown(
-        f"**Step {step + 1} of {len(FORM_STEPS)}** — {step_titles[step]}. "
-        f"Answer straight — no essays. After checkout (**{price}**), your plan + PDF land in your inbox."
+        f'<p class="pcs-section-desc"><strong>Step {step + 1} of {len(FORM_STEPS)}</strong> — '
+        f"{step_titles[step]}. Answer straight — no essays. After checkout "
+        f"(<strong>{price}</strong>), your plan + PDF land in your inbox.</p>",
+        unsafe_allow_html=True,
     )
 
     carryover = st.session_state.pop("calculator_carryover_banner", None)

@@ -188,7 +188,6 @@ def render_bah_calculator() -> None:
             <div class="pcs-face-brand">
                 <div class="pcs-brand-title">PCS Vector</div>
                 <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
-                <div class="pcs-face-mini">2026 BAH · OHA · COLA · DLA</div>
             </div>
         </div>
         """,
@@ -410,11 +409,11 @@ def render_bah_calculator() -> None:
         if cur_mid and cur_mid > 0:
             rent_pct = int(round(((market_mid - cur_mid) / cur_mid) * 100))
             if rent_pct < 0:
-                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% lower"
+                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% cheaper"
             elif rent_pct > 0:
-                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% higher"
+                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% more"
             else:
-                roll_cls, roll_txt = "pcs-roll-flat", "about the same"
+                roll_cls, roll_txt = "pcs-roll-flat", "similar"
             rollup_html = f"""
             <div class="pcs-partner-rollup">
                 <span>Typical {bed_label} rent (est.)</span>
@@ -445,6 +444,50 @@ def render_bah_calculator() -> None:
 
     right_rent = f"{_money_html(market_low)} – {_money_html(market_high)}"
     right_util = f"{_money_html(util_n)}/mo" if util_n else "—"
+
+    # Engagement: housing pay vs typical rent (planning estimate only)
+    housing_vs_rent = None
+    if system == "OHA" and oha_rent is not None:
+        housing_vs_rent = int(oha_rent) - int(market_mid)
+        surplus_basis = "OHA rent max"
+    elif system != "OHA" and housing:
+        housing_vs_rent = int(housing) - int(market_mid)
+        surplus_basis = "BAH"
+    else:
+        surplus_basis = "housing pay"
+
+    # Keep the wow on the badge; one short honest cue (Loop 8 distill)
+    if housing_vs_rent is None:
+        surplus_html = ""
+        cue_html = ""
+    elif housing_vs_rent > 40:
+        surplus_html = f"""
+        <div class="pcs-surplus-row">
+            <span>{safe_html(surplus_basis)} vs typical {bed_label} rent</span>
+            <span class="pcs-surplus-badge pcs-surplus-pos">~{_money_html(housing_vs_rent)} left /mo</span>
+        </div>
+        """
+        cue_html = '<p class="pcs-cue-line">Planning estimate · verify before you sign.</p>'
+    elif housing_vs_rent < -40:
+        short = abs(housing_vs_rent)
+        surplus_html = f"""
+        <div class="pcs-surplus-row">
+            <span>{safe_html(surplus_basis)} vs typical {bed_label} rent</span>
+            <span class="pcs-surplus-badge pcs-surplus-neg">~{_money_html(short)} over /mo</span>
+        </div>
+        """
+        cue_html = (
+            '<p class="pcs-cue-line">Typical rent runs high — shop low end or on-post '
+            "(estimate).</p>"
+        )
+    else:
+        surplus_html = f"""
+        <div class="pcs-surplus-row">
+            <span>{safe_html(surplus_basis)} vs typical {bed_label} rent</span>
+            <span class="pcs-surplus-badge pcs-surplus-flat">About even</span>
+        </div>
+        """
+        cue_html = '<p class="pcs-cue-line">Planning estimate · verify utilities.</p>'
 
     # Allowance rows: show each line only if it applies to Current and/or Target
     allowance_rows = ""
@@ -514,6 +557,8 @@ def render_bah_calculator() -> None:
         f"""
         <div class="pcs-face-section pcs-face-section-results pcs-partner-results">
             {arrow_html}
+            {surplus_html}
+            {cue_html}
             {rollup_html}
             <div class="pcs-partner-breakdown">
                 <div class="pcs-est-heads-live"><span>Current</span><span></span><span>Target</span></div>
@@ -536,7 +581,7 @@ def render_bah_calculator() -> None:
                     <span class="pcs-est-side pcs-est-side-new">{_dla_html(dla_amt)}</span>
                 </div>
             </div>
-            <div class="pcs-partner-foot">Planning figures · verify LES / finance / DTMO before you sign</div>
+            <div class="pcs-partner-foot">Planning estimates · verify LES / finance / DTMO before you sign</div>
         </div>
         """
     )
