@@ -113,7 +113,7 @@ CUSTOM_CSS = """
     /* Calculator card must win over the generic BorderWrapper padding above */
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        padding: 0.2rem !important;
+        padding: 12px !important;
         background: #314A3C !important;
     }
 
@@ -180,7 +180,7 @@ CUSTOM_CSS = """
         border-radius: 1.5rem !important;
         outline: none !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-        padding: 6px !important;
+        padding: 12px !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -190,7 +190,7 @@ CUSTOM_CSS = """
 
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        padding: 0.2rem !important;
+        padding: 12px !important;
         background: #314A3C !important;
     }
 
@@ -3175,7 +3175,7 @@ CUSTOM_CSS = """
 
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-            padding: 0.15rem !important;
+            padding: 10px !important;
             background: #314A3C !important;
             border-radius: 1.25rem !important;
             outline: none !important;
@@ -4099,7 +4099,7 @@ div.st-key-pcs_calc_card[data-testid="stVerticalBlockBorderWrapper"],
 [class*="st-key-pcs_calc_card"][data-testid="stVerticalBlockBorderWrapper"] {
   background-color: #314A3C !important;
   background: #314A3C !important;
-  padding: 6px !important;
+  padding: 12px !important;
   gap: 0 !important;
   row-gap: 0 !important;
   border-color: rgba(255, 255, 255, 0.16) !important;

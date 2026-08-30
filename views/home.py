@@ -48,8 +48,8 @@ def _tag_page_face() -> None:
   var doc = window.parent.document;
   var CARD = "#314A3C";
   var FIELD = "#0B1210";  /* same dark chip as BAH/utilities rows */
-  var PAD = "6px";
-  var GAP = "6px";
+  var PAD = "12px";  /* light-green frame around dark wells */
+  var GAP = "8px";
 
   function force(el, prop, val) {
     if (el) el.style.setProperty(prop, val, "important");
