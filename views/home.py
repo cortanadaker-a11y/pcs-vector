@@ -56,12 +56,15 @@ def _tag_page_face() -> None:
   }
 
   function darkenFields(root) {
-    /* Rank / Dependents / YOS / posts — force dark like est-row chips */
+    /* Rank/posts + Wayfinder Looking-to / text inputs — dark like BAH chips */
     var nodes = root.querySelectorAll(
       '#pcs-inputs-panel [data-baseweb="select"] > div, ' +
       '#pcs-inputs-panel [data-baseweb="select"] > div > div, ' +
       '#pcs-inputs-panel [data-testid="stSelectbox"] > div > div, ' +
       '#pcs-match-panel [data-baseweb="select"] > div, ' +
+      '#pcs-match-panel [data-baseweb="select"] > div > div, ' +
+      '#pcs-match-panel [data-testid="stSelectbox"] > div, ' +
+      '#pcs-match-panel [data-testid="stSelectbox"] > div > div, ' +
       '#pcs-match-panel [data-testid="stTextInput"] input, ' +
       '.pcs-calc-face [data-testid="stTextInput"] input'
     );

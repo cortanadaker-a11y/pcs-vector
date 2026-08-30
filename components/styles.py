@@ -388,6 +388,21 @@ CUSTOM_CSS = """
         text-align: center;
     }
 
+    /* Looking to… (rent/buy) — same dark chip as name/email / BAH rows */
+    #pcs-match-panel [data-testid="stSelectbox"] > div,
+    #pcs-match-panel [data-baseweb="select"],
+    #pcs-match-panel [data-baseweb="select"] > div,
+    #pcs-match-panel [data-baseweb="select"] > div > div,
+    .st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div,
+    .st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div > div {
+        background: #0B1210 !important;
+        background-color: #0B1210 !important;
+        background-image: none !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        color: #FFFFFF !important;
+        box-shadow: none !important;
+    }
+
     #pcs-match-panel div[data-testid="stForm"] button[kind="primary"],
     .st-key-pcs_calc_card div[data-testid="stForm"] button[kind="primary"],
     .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
@@ -400,9 +415,17 @@ CUSTOM_CSS = """
         font-size: 1.08rem !important;
         font-weight: 900 !important;
         letter-spacing: -0.01em !important;
-        margin-top: 0.25rem !important;
+        margin-top: 0.85rem !important;
         width: 100% !important;
         box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35) !important;
+    }
+
+    /* Space between field row and Connect button */
+    #pcs-match-panel [data-testid="stForm"] [data-testid="stButton"],
+    #pcs-match-panel div[data-testid="stFormSubmitButton"],
+    .st-key-pcs_calc_card #pcs-match-panel [data-testid="stFormSubmitButton"] {
+        margin-top: 0.85rem !important;
+        padding-top: 0.25rem !important;
     }
 
     #pcs-match-panel div[data-testid="stForm"] button[kind="primary"]:hover,
@@ -4114,13 +4137,24 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match
 .st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div,
 .st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div > div,
 .st-key-pcs_calc_card #pcs-inputs-panel [data-testid="stSelectbox"] > div,
+.st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div,
+.st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div > div,
+.st-key-pcs_calc_card #pcs-match-panel [data-testid="stSelectbox"] > div,
 div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel [data-baseweb="select"] > div,
-div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel [data-baseweb="select"] > div > div {
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel [data-baseweb="select"] > div > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel [data-baseweb="select"] > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel [data-baseweb="select"] > div > div {
   background: #0B1210 !important;
   background-color: #0B1210 !important;
   background-image: none !important;
   color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.st-key-pcs_calc_card #pcs-match-panel [data-testid="stFormSubmitButton"],
+.st-key-pcs_calc_card #pcs-match-panel [data-testid="stForm"] button[kind="primary"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel [data-testid="stFormSubmitButton"] {
+  margin-top: 0.85rem !important;
 }
 
 .st-key-pcs_calc_card #pcs-match-panel,
