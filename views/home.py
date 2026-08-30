@@ -53,12 +53,20 @@ def _tag_page_face() -> None:
     if (wrap) {
       wrap.classList.add("pcs-calc-face");
       wrap.classList.add("pcs-calc-dark");
+      // Force tight padding — Streamlit border wrappers keep re-adding space
+      wrap.style.setProperty("padding", "0.4rem", "important");
+      var inner = wrap.firstElementChild;
+      if (inner) {
+        inner.style.setProperty("padding", "0", "important");
+        inner.style.setProperty("margin", "0", "important");
+        inner.style.setProperty("gap", "0", "important");
+      }
     }
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
   }
   tag();
-  [40, 160, 400].forEach(function (ms) { setTimeout(tag, ms); });
+  [40, 160, 400, 900].forEach(function (ms) { setTimeout(tag, ms); });
 })();
 </script>
         """,

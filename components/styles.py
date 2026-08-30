@@ -110,6 +110,12 @@ CUSTOM_CSS = """
         padding-bottom: 0.55rem !important;
     }
 
+    /* Calculator card must win over the generic BorderWrapper padding above */
+    div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
+    div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
+        padding: 0.4rem !important;
+    }
+
     .pcs-hero-pills {
         display: flex;
         flex-wrap: wrap;
@@ -173,7 +179,7 @@ CUSTOM_CSS = """
         border-radius: 1.5rem !important;
         outline: none !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-        padding: 0.65rem 0.65rem 0.7rem 0.65rem !important;
+        padding: 0.4rem !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -184,6 +190,24 @@ CUSTOM_CSS = """
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face > div,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark > div {
         border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        gap: 0 !important;
+    }
+
+    /* Kill Streamlit element chrome padding inside the card */
+    .pcs-calc-face [data-testid="stVerticalBlock"],
+    .pcs-calc-face [data-testid="stVerticalBlockBorderWrapper"],
+    .pcs-calc-face [data-testid="element-container"],
+    .pcs-calc-face [data-testid="stElementContainer"],
+    .pcs-calc-dark [data-testid="stElementContainer"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .pcs-calc-face [data-testid="stElementContainer"],
+    .pcs-calc-face [data-testid="element-container"] {
+        margin-bottom: 0 !important;
     }
 
     /* Inset wells inside the one card — same radius/border language, with gap */
@@ -191,9 +215,9 @@ CUSTOM_CSS = """
     .pcs-face-section-inputs {
         background: rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 0.9rem !important;
-        padding: 0.75rem 0.8rem !important;
-        margin: 0 0 0.45rem 0 !important;
+        border-radius: 0.85rem !important;
+        padding: 0.65rem 0.7rem !important;
+        margin: 0 0 0.3rem 0 !important;
     }
 
     /*
@@ -238,17 +262,17 @@ CUSTOM_CSS = """
     .pcs-partner-results {
         background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 0.9rem !important;
-        padding: 0.75rem 0.8rem !important;
-        margin: 0 0 0.45rem 0 !important;
+        border-radius: 0.85rem !important;
+        padding: 0.65rem 0.7rem !important;
+        margin: 0 0 0.3rem 0 !important;
     }
 
     #pcs-match-panel,
     .pcs-face-section-match {
         background: rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 0.9rem !important;
-        padding: 0.75rem 0.8rem !important;
+        border-radius: 0.85rem !important;
+        padding: 0.65rem 0.7rem !important;
         margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -3002,7 +3026,7 @@ CUSTOM_CSS = """
 
     /* Keep input-row rhythm on later polish passes */
     #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
-        gap: 0.85rem !important;
+        gap: 0.55rem !important;
     }
 
     .pcs-calc-face [data-testid="stExpander"] {
@@ -3032,8 +3056,8 @@ CUSTOM_CSS = """
 
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-            padding: 0.55rem 0.55rem 0.6rem 0.55rem !important;
-            border-radius: 1.35rem !important;
+            padding: 0.35rem !important;
+            border-radius: 1.25rem !important;
             outline: none !important;
             margin-top: 0 !important;
             margin-bottom: 0.75rem !important;
@@ -3058,8 +3082,8 @@ CUSTOM_CSS = """
         .pcs-partner-results,
         #pcs-match-panel,
         .pcs-face-section-match {
-            padding: 0.65rem 0.7rem !important;
-            margin-bottom: 0.4rem !important;
+            padding: 0.55rem 0.6rem !important;
+            margin-bottom: 0.28rem !important;
         }
 
         #pcs-match-panel,
