@@ -234,25 +234,26 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.75rem 0;
-        padding: 0 0 0.65rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 0 0 0.85rem 0;
+        padding: 0.15rem 0 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1.35rem;
+        font-size: 2.05rem;
         font-weight: 900;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.045em;
         color: #FFFFFF;
-        margin: 0 0 0.15rem 0;
-        line-height: 1.1;
+        margin: 0 0 0.3rem 0;
+        line-height: 1.05;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     }
 
     .pcs-face-tagline {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         color: #D4AF37;
         margin: 0;
@@ -260,9 +261,9 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-mini {
-        margin-top: 0.35rem;
-        font-size: 0.65rem;
-        font-weight: 700;
+        margin-top: 0.3rem;
+        font-size: 0.62rem;
+        font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: #9CA3AF;
@@ -2980,16 +2981,17 @@ CUSTOM_CSS = """
         }
 
         .pcs-face-brand .pcs-brand-title {
-            font-size: 1.22rem !important;
+            font-size: 1.75rem !important;
+            letter-spacing: -0.04em !important;
         }
 
         .pcs-face-tagline {
-            font-size: 0.66rem !important;
+            font-size: 0.65rem !important;
         }
 
         .pcs-face-mini {
-            font-size: 0.6rem !important;
-            margin-top: 0.28rem !important;
+            font-size: 0.58rem !important;
+            margin-top: 0.25rem !important;
         }
 
         .pcs-partner-arrow-amt {
