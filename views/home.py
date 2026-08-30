@@ -563,7 +563,7 @@ def _render_faq() -> None:
   <div class="pcs-faq-item"><strong>COLA</strong><span>OCONUS daily-cost extra. Not for rent.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time move money when authorized.</span></div>
   <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent/utilities are planning ranges.</span></div>
-  <div class="pcs-faq-item"><strong>Rent % badge</strong><span>Typical rent mid change — not official COL.</span></div>
+  <div class="pcs-faq-item"><strong>Cost of Living Index</strong><span>Typical rent mid change current → target — planning cue, not official COL.</span></div>
 </div>
             """,
             unsafe_allow_html=True,

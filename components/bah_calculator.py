@@ -402,9 +402,10 @@ def render_bah_calculator() -> None:
                 roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% higher"
             else:
                 roll_cls, roll_txt = "pcs-roll-flat", "about the same"
+            # Shown under DLA — COL cue from typical rent mid (planning estimate)
             rollup_html = f"""
             <div class="pcs-partner-rollup">
-                <span>Typical {bed_label} rent (est.)</span>
+                <span>New Cost of Living Index</span>
                 <span class="pcs-partner-rollup-mids">{_money_html(cur_mid)} → {_money_html(market_mid)}</span>
                 <span class="pcs-partner-rollup-badge {roll_cls}">{roll_txt}</span>
             </div>
@@ -501,7 +502,6 @@ def render_bah_calculator() -> None:
         f"""
         <div class="pcs-face-section pcs-face-section-results pcs-partner-results">
             {arrow_html}
-            {rollup_html}
             <div class="pcs-partner-breakdown">
                 <div class="pcs-est-heads-live"><span>Current</span><span></span><span>Target</span></div>
                 <div class="pcs-partner-breakdown-title">Allowances (official tables)</div>
@@ -522,6 +522,7 @@ def render_bah_calculator() -> None:
                     <span class="pcs-est-label">DLA (one-time)</span>
                     <span class="pcs-est-side pcs-est-side-new">{_dla_html(dla_amt)}</span>
                 </div>
+                {rollup_html}
             </div>
             <div class="pcs-partner-foot">Planning figures · verify LES / finance / DTMO before you sign</div>
         </div>
