@@ -403,9 +403,10 @@ CUSTOM_CSS = """
         box-shadow: none !important;
     }
 
-    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"],
-    .st-key-pcs_calc_card div[data-testid="stForm"] button[kind="primary"],
-    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+    #pcs-match-panel div[data-testid="stButton"] > button[kind="primary"],
+    #pcs-match-panel button[kind="primary"],
+    .st-key-pcs_calc_card #pcs-match-panel button[kind="primary"],
+    .pcs-calc-face #pcs-match-panel button[kind="primary"] {
         background: #EA580C !important;
         background-color: #EA580C !important;
         background-image: none !important;
@@ -421,16 +422,15 @@ CUSTOM_CSS = """
     }
 
     /* Space between field row and Connect button */
-    #pcs-match-panel [data-testid="stForm"] [data-testid="stButton"],
-    #pcs-match-panel div[data-testid="stFormSubmitButton"],
-    .st-key-pcs_calc_card #pcs-match-panel [data-testid="stFormSubmitButton"] {
+    #pcs-match-panel [data-testid="stButton"],
+    .st-key-pcs_calc_card #pcs-match-panel [data-testid="stButton"] {
         margin-top: 0.85rem !important;
         padding-top: 0.25rem !important;
     }
 
-    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"]:hover,
-    .st-key-pcs_calc_card div[data-testid="stForm"] button[kind="primary"]:hover,
-    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"]:hover {
+    #pcs-match-panel div[data-testid="stButton"] > button[kind="primary"]:hover,
+    #pcs-match-panel button[kind="primary"]:hover,
+    .st-key-pcs_calc_card #pcs-match-panel button[kind="primary"]:hover {
         background: #C2410C !important;
         background-color: #C2410C !important;
         background-image: none !important;
