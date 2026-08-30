@@ -339,6 +339,7 @@ def _render_referral_hook() -> None:
     )
 
     with st.form("referral_form", clear_on_submit=False):
+        # Compact 2×2 grid — same full-width well as inputs/results above
         n1, n2 = st.columns(2)
         with n1:
             first_name = st.text_input(
@@ -353,17 +354,19 @@ def _render_referral_hook() -> None:
                 placeholder="Last",
             )
 
-        email_address = st.text_input(
-            "Email",
-            key="referral_email_address",
-            placeholder="you@email.com",
-        )
-
-        rent_buy_not_sure = st.selectbox(
-            "Looking to…",
-            options=list(INTEREST_OPTIONS),
-            key="referral_rent_buy_not_sure",
-        )
+        e1, e2 = st.columns(2)
+        with e1:
+            email_address = st.text_input(
+                "Email",
+                key="referral_email_address",
+                placeholder="you@email.com",
+            )
+        with e2:
+            rent_buy_not_sure = st.selectbox(
+                "Looking to…",
+                options=list(INTEREST_OPTIONS),
+                key="referral_rent_buy_not_sure",
+            )
 
         submitted = st.form_submit_button(
             "Connect With A PCS Wayfinder ➔",
@@ -371,7 +374,7 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Free housing match · CONUS & OCONUS")
+        st.caption("Free · CONUS & OCONUS")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -414,6 +417,15 @@ def _render_referral_hook() -> None:
             )
             st.success("Opening your pre-filled form — tap **Submit** on the next page.")
 
+    # End match well before FAQ so the connect box stays compact + full-bleed
+    st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
+    wrap_dom_panel(
+        start_id="pcs-match-start",
+        end_id="pcs-match-end",
+        panel_id="pcs-match-panel",
+        panel_class="pcs-face-section pcs-face-section-match",
+    )
+
     with st.expander("FAQ — what these numbers mean", expanded=False):
         st.markdown(
             """
@@ -429,14 +441,6 @@ def _render_referral_hook() -> None:
             """,
             unsafe_allow_html=True,
         )
-
-    st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
-    wrap_dom_panel(
-        start_id="pcs-match-start",
-        end_id="pcs-match-end",
-        panel_id="pcs-match-panel",
-        panel_class="pcs-face-section pcs-face-section-match",
-    )
 
     _render_sticky_referral_cta(calc)
 

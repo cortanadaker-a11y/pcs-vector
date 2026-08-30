@@ -231,8 +231,53 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-top: none !important;
         border-radius: 0 0 1rem 1rem !important;
-        padding: 0.9rem 1rem 1rem 1rem !important;
+        padding: 0.75rem 1rem 0.85rem 1rem !important;
         margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        display: block !important;
+    }
+
+    /* Form fills the match well edge-to-edge (no nested Streamlit card) */
+    #pcs-match-panel [data-testid="stForm"],
+    .pcs-face-section-match [data-testid="stForm"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #pcs-match-panel [data-testid="stForm"] > div,
+    .pcs-face-section-match [data-testid="stForm"] > div {
+        width: 100% !important;
+        gap: 0.4rem !important;
+    }
+
+    #pcs-match-panel [data-testid="stHorizontalBlock"] {
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+
+    #pcs-match-panel [data-testid="column"] {
+        min-width: 0 !important;
+    }
+
+    #pcs-match-panel [data-testid="stWidgetLabel"] {
+        margin-bottom: 0.2rem !important;
+    }
+
+    #pcs-match-panel [data-testid="stCaptionContainer"] {
+        margin-top: 0.15rem !important;
+        text-align: center;
+    }
+
+    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"] {
+        min-height: 2.85rem !important;
+        margin-top: 0.2rem !important;
+        width: 100% !important;
     }
 
     /* Nuke theme-blue labels (was #1e3a5f from config.toml) */
@@ -255,10 +300,10 @@ CUSTOM_CSS = """
         gap: 0 !important; /* no gaps between connected stack sections */
     }
 
-    /* Keep small gaps only inside form/column rows (match panel; inputs set above) */
+    /* Match panel form — denser than inputs; still readable */
     .pcs-calc-face [data-testid="stForm"] [data-testid="stVerticalBlock"] > div,
     #pcs-match-panel [data-testid="stVerticalBlock"] > div {
-        gap: 0.55rem !important;
+        gap: 0.4rem !important;
     }
 
     .pcs-calc-face [data-testid="stHorizontalBlock"] {
@@ -871,8 +916,8 @@ CUSTOM_CSS = """
     .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
         background: #EA580C !important;
         border: none !important;
-        min-height: 3.25rem !important;
-        font-size: 0.95rem !important;
+        min-height: 2.85rem !important;
+        font-size: 0.9rem !important;
         font-weight: 900 !important;
         border-radius: 0.75rem !important;
         box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35) !important;
@@ -2950,12 +2995,12 @@ CUSTOM_CSS = """
         display: inline;
     }
 
-    /* Larger primary CTA for thumb reach */
+    /* Primary CTA — compact in match well, still thumb-friendly */
     .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
-        min-height: 3.15rem !important;
-        font-size: 0.95rem !important;
+        min-height: 2.85rem !important;
+        font-size: 0.9rem !important;
         letter-spacing: 0.01em !important;
-        margin-top: 0.35rem !important;
+        margin-top: 0.2rem !important;
     }
 
     /* Professional density — select/input touch targets */
@@ -3108,8 +3153,8 @@ CUSTOM_CSS = """
         }
 
         .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
-            min-height: 3.25rem !important;
-            font-size: 0.9rem !important;
+            min-height: 2.85rem !important;
+            font-size: 0.88rem !important;
         }
 
         .pcs-faq-item strong {
