@@ -234,9 +234,9 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.85rem 0;
-        padding: 0.15rem 0 0.75rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        margin: 0 0 0.55rem 0;
+        padding: 0.15rem 0 0.35rem 0;
+        border-bottom: none;
     }
 
     .pcs-face-brand .pcs-brand-title {
@@ -2932,8 +2932,9 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin-bottom: 0.65rem !important;
-        padding-bottom: 0.55rem !important;
+        margin-bottom: 0.45rem !important;
+        padding-bottom: 0.25rem !important;
+        border-bottom: none !important;
     }
 
     .pcs-calc-face [data-testid="stExpander"] {

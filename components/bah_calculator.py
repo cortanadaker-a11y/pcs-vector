@@ -234,11 +234,10 @@ def render_bah_calculator() -> None:
         with_dependents = num_deps > 0
     with r3:
         yos = st.selectbox(
-            "YOS",
+            "Years of service",
             options=YOS_OPTIONS,
             index=4,
             key="bah_calc_yos",
-            help="Years of service — used for COLA.",
         )
 
     d1, d2 = st.columns(2)
