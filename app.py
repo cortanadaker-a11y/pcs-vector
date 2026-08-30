@@ -38,6 +38,8 @@ st.set_page_config(
 
 apply_styles()
 render_dropdown_scroll_fix()
+# Force top early (before layout jumps) and again after content.
+render_boot_at_top()
 
 st.session_state.page = "home"
 render_sidebar()

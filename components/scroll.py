@@ -13,58 +13,93 @@ def request_scroll_to_top() -> None:
     st.session_state[SCROLL_TO_TOP_FLAG] = True
 
 
-def _scroll_top_script(*, clear_hash: bool) -> str:
+def _scroll_top_script(*, clear_hash: bool, aggressive: bool = False) -> str:
     clear = "true" if clear_hash else "false"
+    aggressive_js = "true" if aggressive else "false"
     return f"""
 <script>
 (function () {{
-  const doc = window.parent.document;
-  const clearHash = {clear};
+  var doc = window.parent.document;
+  var win = window.parent;
+  var clearHash = {clear};
+  var aggressive = {aggressive_js};
 
   function scrollAllToTop() {{
+    try {{
+      if (win.history && "scrollRestoration" in win.history) {{
+        win.history.scrollRestoration = "manual";
+      }}
+    }} catch (err) {{}}
+
     if (clearHash) {{
       try {{
-        const url = window.parent.location;
+        var url = win.location;
         if (url.hash) {{
-          window.parent.history.replaceState(
-            null,
-            "",
-            url.pathname + url.search
-          );
+          win.history.replaceState(null, "", url.pathname + url.search);
         }}
       }} catch (err) {{}}
     }}
 
     try {{
-      window.parent.scrollTo({{ top: 0, left: 0, behavior: "auto" }});
+      win.scrollTo({{ top: 0, left: 0, behavior: "instant" }});
     }} catch (err) {{
-      try {{ window.parent.scrollTo(0, 0); }} catch (e2) {{}}
+      try {{ win.scrollTo(0, 0); }} catch (e2) {{}}
     }}
+    try {{
+      if (doc.documentElement) doc.documentElement.scrollTop = 0;
+      if (doc.body) doc.body.scrollTop = 0;
+    }} catch (err) {{}}
 
-    const selectors = [
+    var selectors = [
       '[data-testid="stAppViewContainer"]',
       '[data-testid="stMain"]',
+      '[data-testid="stMainBlockContainer"]',
       "section.main",
       ".main",
       ".block-container",
+      '[data-testid="stAppViewBlockContainer"]',
     ];
-
     selectors.forEach(function (selector) {{
       doc.querySelectorAll(selector).forEach(function (el) {{
-        el.scrollTop = 0;
+        try {{ el.scrollTop = 0; }} catch (e) {{}}
       }});
     }});
 
-    const anchor = doc.getElementById("pcs-page-top");
+    var anchor = doc.getElementById("pcs-page-top");
     if (anchor && anchor.scrollIntoView) {{
-      anchor.scrollIntoView({{ block: "start", behavior: "auto" }});
+      try {{
+        anchor.scrollIntoView({{ block: "start", behavior: "instant" }});
+      }} catch (err) {{
+        try {{ anchor.scrollIntoView(true); }} catch (e2) {{}}
+      }}
+    }}
+
+    // Stop Streamlit/widget autofocus from jumping mid-page on load
+    if (aggressive) {{
+      try {{
+        var ae = doc.activeElement;
+        if (ae && ae !== doc.body && typeof ae.blur === "function") {{
+          var tag = (ae.tagName || "").toLowerCase();
+          if (tag === "input" || tag === "select" || tag === "textarea" || ae.getAttribute("role") === "combobox") {{
+            ae.blur();
+          }}
+        }}
+      }} catch (err) {{}}
     }}
   }}
 
   scrollAllToTop();
-  [50, 150, 350, 600, 1200].forEach(function (delay) {{
+  [0, 50, 100, 200, 400, 700, 1200, 2000].forEach(function (delay) {{
     setTimeout(scrollAllToTop, delay);
   }});
+
+  if (aggressive) {{
+    try {{
+      win.addEventListener("pageshow", function () {{ scrollAllToTop(); }});
+      win.addEventListener("load", function () {{ scrollAllToTop(); }});
+      doc.addEventListener("DOMContentLoaded", function () {{ scrollAllToTop(); }});
+    }} catch (err) {{}}
+  }}
 }})();
 </script>
 """
@@ -83,17 +118,23 @@ def render_scroll_to_top() -> None:
 
 
 def render_boot_at_top() -> None:
-    """On home load: strip deep-link hashes (#ready-to-find-a-place) and stay at top.
+    """On home load: strip hashes, disable scroll restoration, force top.
 
-    Streamlit heading anchors and height-0 component iframes otherwise drop users
-    at the referral section.
+    Mobile Safari restores mid-page scroll; Streamlit widgets/iframes can also
+    jump the viewport away from the title. Call at start AND end of the page.
     """
-    components.html(_scroll_top_script(clear_hash=True), height=0)
+    components.html(
+        _scroll_top_script(clear_hash=True, aggressive=True),
+        height=0,
+    )
 
 
 def render_page_top_anchor() -> None:
     """Invisible anchor at the top of main content for scroll targeting."""
-    st.markdown('<div id="pcs-page-top"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div id="pcs-page-top" style="height:0;margin:0;padding:0;overflow:hidden;"></div>',
+        unsafe_allow_html=True,
+    )
 
 
 def render_dropdown_scroll_fix() -> None:
