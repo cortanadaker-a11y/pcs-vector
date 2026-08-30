@@ -274,13 +274,26 @@ CUSTOM_CSS = """
         margin: 0 0 0.15rem 0 !important;
     }
 
-    /* Keep Rank / Dependents / posts fields dark on the raised card */
-    #pcs-inputs-panel div[data-baseweb="select"] > div,
-    .pcs-face-section-inputs div[data-baseweb="select"] > div {
-        background-color: #0B1210 !important;
+    /*
+     * Rank / Dependents / YOS / posts — same dark chip as BAH/utilities rows.
+     * Theme secondary (#314A3C) paints BaseWeb selects light green unless we
+     * override every nested control layer.
+     */
+    #pcs-inputs-panel [data-testid="stSelectbox"] > div,
+    #pcs-inputs-panel [data-baseweb="select"],
+    #pcs-inputs-panel [data-baseweb="select"] > div,
+    #pcs-inputs-panel [data-baseweb="select"] > div > div,
+    #pcs-inputs-panel div[data-baseweb="select"] div[class*="valueContainer"],
+    .pcs-face-section-inputs [data-baseweb="select"] > div,
+    .pcs-face-section-inputs [data-baseweb="select"] > div > div,
+    .st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div,
+    .st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div > div {
         background: #0B1210 !important;
-        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        background-color: #0B1210 !important;
+        background-image: none !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
         color: #FFFFFF !important;
+        box-shadow: none !important;
     }
 
     /* Inputs vertical rhythm — tighter so wells sit closer to the card edge */
@@ -4098,10 +4111,16 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match
   background: rgba(0, 0, 0, 0.55) !important;
 }
 
-.st-key-pcs_calc_card #pcs-inputs-panel div[data-baseweb="select"] > div,
-div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel div[data-baseweb="select"] > div {
+.st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div,
+.st-key-pcs_calc_card #pcs-inputs-panel [data-baseweb="select"] > div > div,
+.st-key-pcs_calc_card #pcs-inputs-panel [data-testid="stSelectbox"] > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel [data-baseweb="select"] > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel [data-baseweb="select"] > div > div {
   background: #0B1210 !important;
   background-color: #0B1210 !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
 .st-key-pcs_calc_card #pcs-match-panel,

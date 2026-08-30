@@ -47,11 +47,31 @@ def _tag_page_face() -> None:
 (function () {
   var doc = window.parent.document;
   var CARD = "#314A3C";
+  var FIELD = "#0B1210";  /* same dark chip as BAH/utilities rows */
   var PAD = "6px";
   var GAP = "6px";
 
   function force(el, prop, val) {
     if (el) el.style.setProperty(prop, val, "important");
+  }
+
+  function darkenFields(root) {
+    /* Rank / Dependents / YOS / posts — force dark like est-row chips */
+    var nodes = root.querySelectorAll(
+      '#pcs-inputs-panel [data-baseweb="select"] > div, ' +
+      '#pcs-inputs-panel [data-baseweb="select"] > div > div, ' +
+      '#pcs-inputs-panel [data-testid="stSelectbox"] > div > div, ' +
+      '#pcs-match-panel [data-baseweb="select"] > div, ' +
+      '#pcs-match-panel [data-testid="stTextInput"] input, ' +
+      '.pcs-calc-face [data-testid="stTextInput"] input'
+    );
+    nodes.forEach(function (el) {
+      force(el, "background", FIELD);
+      force(el, "background-color", FIELD);
+      force(el, "background-image", "none");
+      force(el, "color", "#FFFFFF");
+      force(el, "border-color", "rgba(255,255,255,0.18)");
+    });
   }
 
   function collapseIframes(root) {
@@ -118,6 +138,7 @@ def _tag_page_face() -> None:
 
     collapseIframes(wrap);
     tightenWells(wrap);
+    darkenFields(wrap);
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
   }
