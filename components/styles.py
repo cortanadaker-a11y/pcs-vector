@@ -323,12 +323,12 @@ CUSTOM_CSS = """
 
     .pcs-face-brand .pcs-brand-title {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 2.05rem;
+        font-size: 2.65rem;
         font-weight: 900;
-        letter-spacing: -0.045em;
+        letter-spacing: -0.05em;
         color: #FFFFFF;
         margin: 0 0 0.4rem 0;
-        line-height: 1.12;
+        line-height: 1.08;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     }
 
@@ -3065,8 +3065,8 @@ CUSTOM_CSS = """
         }
 
         .pcs-face-brand .pcs-brand-title {
-            font-size: 1.75rem !important;
-            letter-spacing: -0.04em !important;
+            font-size: 2.35rem !important;
+            letter-spacing: -0.045em !important;
         }
 
         .pcs-face-tagline {
