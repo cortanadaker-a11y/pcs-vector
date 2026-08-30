@@ -113,7 +113,8 @@ CUSTOM_CSS = """
     /* Calculator card must win over the generic BorderWrapper padding above */
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        padding: 0.4rem !important;
+        padding: 0.2rem !important;
+        background: #314A3C !important;
     }
 
     .pcs-hero-pills {
@@ -169,22 +170,27 @@ CUSTOM_CSS = """
 
     /*
      * ONE calculator card (Anees-style):
-     * page #121E16 → single #1C2D22 shell → inset wells inside
-     * No double outline / no stacked Streamlit panel look
+     * page #121E16 → raised lighter green shell → inset wells inside
      */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        background: #1C2D22 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        background: #314A3C !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
         border-radius: 1.5rem !important;
         outline: none !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-        padding: 0.4rem !important;
+        padding: 0.2rem !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
         margin-top: 0 !important;
         margin-bottom: 0.85rem !important;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
+    div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
+        padding: 0.2rem !important;
+        background: #314A3C !important;
     }
 
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face > div,
@@ -193,9 +199,16 @@ CUSTOM_CSS = """
         padding: 0 !important;
         margin: 0 !important;
         gap: 0 !important;
+        row-gap: 0 !important;
     }
 
-    /* Kill Streamlit element chrome padding inside the card */
+    /* Kill Streamlit element chrome padding / gaps inside the card */
+    .pcs-calc-face [data-testid="stVerticalBlock"],
+    .pcs-calc-dark [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+        row-gap: 0 !important;
+    }
+
     .pcs-calc-face [data-testid="stVerticalBlock"],
     .pcs-calc-face [data-testid="stVerticalBlockBorderWrapper"],
     .pcs-calc-face [data-testid="element-container"],
@@ -203,21 +216,61 @@ CUSTOM_CSS = """
     .pcs-calc-dark [data-testid="stElementContainer"] {
         padding-left: 0 !important;
         padding-right: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     .pcs-calc-face [data-testid="stElementContainer"],
     .pcs-calc-face [data-testid="element-container"] {
+        margin: 0 !important;
         margin-bottom: 0 !important;
     }
 
-    /* Inset wells inside the one card — same radius/border language, with gap */
+    /* Zero-height script/marker hosts that were creating fake top/bottom gaps */
+    .pcs-calc-face iframe {
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        display: block !important;
+        overflow: hidden !important;
+        visibility: hidden !important;
+    }
+
+    .pcs-calc-face [data-testid="stElementContainer"]:has(iframe),
+    .pcs-calc-face [data-testid="element-container"]:has(iframe) {
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #pcs-face-marker,
+    #pcs-calc-marker,
+    #pcs-inputs-start,
+    #pcs-inputs-end,
+    #pcs-match-start,
+    #pcs-match-end,
+    #pcs-referral {
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        line-height: 0 !important;
+    }
+
+    /* Inset wells — tight to each other and to the card edge */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
-        background: rgba(0, 0, 0, 0.4) !important;
+        background: rgba(0, 0, 0, 0.38) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
-        padding: 0.65rem 0.7rem !important;
-        margin: 0 0 0.3rem 0 !important;
+        padding: 0.6rem 0.65rem !important;
+        margin: 0 0 0.15rem 0 !important;
     }
 
     /* Inputs vertical rhythm — tighter so wells sit closer to the card edge */
@@ -257,19 +310,19 @@ CUSTOM_CSS = """
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.55) !important;
+        background: rgba(0, 0, 0, 0.48) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
-        padding: 0.65rem 0.7rem !important;
-        margin: 0 0 0.3rem 0 !important;
+        padding: 0.6rem 0.65rem !important;
+        margin: 0 0 0.15rem 0 !important;
     }
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: rgba(0, 0, 0, 0.4) !important;
+        background: rgba(0, 0, 0, 0.38) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
-        padding: 0.65rem 0.7rem !important;
+        padding: 0.6rem 0.65rem !important;
         margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -3053,7 +3106,8 @@ CUSTOM_CSS = """
 
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-            padding: 0.35rem !important;
+            padding: 0.15rem !important;
+            background: #314A3C !important;
             border-radius: 1.25rem !important;
             outline: none !important;
             margin-top: 0 !important;
@@ -3080,7 +3134,7 @@ CUSTOM_CSS = """
         #pcs-match-panel,
         .pcs-face-section-match {
             padding: 0.55rem 0.6rem !important;
-            margin-bottom: 0.28rem !important;
+            margin-bottom: 0.12rem !important;
         }
 
         #pcs-match-panel,

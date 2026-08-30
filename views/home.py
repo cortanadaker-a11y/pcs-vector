@@ -53,14 +53,31 @@ def _tag_page_face() -> None:
     if (wrap) {
       wrap.classList.add("pcs-calc-face");
       wrap.classList.add("pcs-calc-dark");
-      // Force tight padding — Streamlit border wrappers keep re-adding space
-      wrap.style.setProperty("padding", "0.4rem", "important");
+      // Force raised green + tight padding (Streamlit keeps re-adding space)
+      wrap.style.setProperty("background", "#314A3C", "important");
+      wrap.style.setProperty("padding", "0.2rem", "important");
       var inner = wrap.firstElementChild;
       if (inner) {
         inner.style.setProperty("padding", "0", "important");
         inner.style.setProperty("margin", "0", "important");
         inner.style.setProperty("gap", "0", "important");
+        inner.style.setProperty("row-gap", "0", "important");
       }
+      // Collapse zero-height iframe hosts that create fake vertical gaps
+      wrap.querySelectorAll('iframe').forEach(function (frame) {
+        frame.style.setProperty("height", "0", "important");
+        frame.style.setProperty("min-height", "0", "important");
+        frame.style.setProperty("margin", "0", "important");
+        var host = frame.closest('[data-testid="stElementContainer"]') ||
+                   frame.closest('[data-testid="element-container"]');
+        if (host) {
+          host.style.setProperty("height", "0", "important");
+          host.style.setProperty("min-height", "0", "important");
+          host.style.setProperty("margin", "0", "important");
+          host.style.setProperty("padding", "0", "important");
+          host.style.setProperty("overflow", "hidden", "important");
+        }
+      });
     }
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
