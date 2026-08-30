@@ -7,48 +7,38 @@ import streamlit.components.v1 as components
 
 SCROLL_TO_TOP_FLAG = "_scroll_to_top"
 
-
-def request_scroll_to_top() -> None:
-    """Request a scroll-to-top on the next rerun."""
-    st.session_state[SCROLL_TO_TOP_FLAG] = True
-
-
-def _scroll_top_script(*, clear_hash: bool, aggressive: bool = False) -> str:
-    clear = "true" if clear_hash else "false"
-    aggressive_js = "true" if aggressive else "false"
-    return f"""
+# Injected into the MAIN document via st.html (no iframe → no scroll-to-iframe jump).
+_BOOT_TOP_JS = """
 <script>
-(function () {{
-  var doc = window.parent.document;
-  var win = window.parent;
-  var clearHash = {clear};
-  var aggressive = {aggressive_js};
+(function () {
+  if (window.__pcsBootTopInstalled) {
+    // Still re-run a scroll pass on every Streamlit rerender
+  } else {
+    window.__pcsBootTopInstalled = true;
+  }
 
-  function scrollAllToTop() {{
-    try {{
-      if (win.history && "scrollRestoration" in win.history) {{
-        win.history.scrollRestoration = "manual";
-      }}
-    }} catch (err) {{}}
+  function scrollAllToTop() {
+    try {
+      if (history && "scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+    } catch (err) {}
 
-    if (clearHash) {{
-      try {{
-        var url = win.location;
-        if (url.hash) {{
-          win.history.replaceState(null, "", url.pathname + url.search);
-        }}
-      }} catch (err) {{}}
-    }}
+    try {
+      if (location.hash) {
+        history.replaceState(null, "", location.pathname + location.search);
+      }
+    } catch (err) {}
 
-    try {{
-      win.scrollTo({{ top: 0, left: 0, behavior: "instant" }});
-    }} catch (err) {{
-      try {{ win.scrollTo(0, 0); }} catch (e2) {{}}
-    }}
-    try {{
-      if (doc.documentElement) doc.documentElement.scrollTop = 0;
-      if (doc.body) doc.body.scrollTop = 0;
-    }} catch (err) {{}}
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    } catch (err) {
+      try { window.scrollTo(0, 0); } catch (e2) {}
+    }
+    try {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    } catch (err) {}
 
     var selectors = [
       '[data-testid="stAppViewContainer"]',
@@ -59,86 +49,125 @@ def _scroll_top_script(*, clear_hash: bool, aggressive: bool = False) -> str:
       ".block-container",
       '[data-testid="stAppViewBlockContainer"]',
     ];
-    selectors.forEach(function (selector) {{
-      doc.querySelectorAll(selector).forEach(function (el) {{
-        try {{ el.scrollTop = 0; }} catch (e) {{}}
-      }});
-    }});
+    selectors.forEach(function (selector) {
+      document.querySelectorAll(selector).forEach(function (el) {
+        try { el.scrollTop = 0; } catch (e) {}
+      });
+    });
 
-    var anchor = doc.getElementById("pcs-page-top");
-    if (anchor && anchor.scrollIntoView) {{
-      try {{
-        anchor.scrollIntoView({{ block: "start", behavior: "instant" }});
-      }} catch (err) {{
-        try {{ anchor.scrollIntoView(true); }} catch (e2) {{}}
-      }}
-    }}
+    var anchor = document.getElementById("pcs-page-top");
+    if (anchor && anchor.scrollIntoView) {
+      try {
+        anchor.scrollIntoView({ block: "start", behavior: "instant" });
+      } catch (err) {
+        try { anchor.scrollIntoView(true); } catch (e2) {}
+      }
+    }
 
-    // Stop Streamlit/widget autofocus from jumping mid-page on load
-    if (aggressive) {{
-      try {{
-        var ae = doc.activeElement;
-        if (ae && ae !== doc.body && typeof ae.blur === "function") {{
-          var tag = (ae.tagName || "").toLowerCase();
-          if (tag === "input" || tag === "select" || tag === "textarea" || ae.getAttribute("role") === "combobox") {{
-            ae.blur();
-          }}
-        }}
-      }} catch (err) {{}}
-    }}
-  }}
+    // Blur autofocused fields that pull the viewport mid-page
+    try {
+      var ae = document.activeElement;
+      if (ae && ae !== document.body && typeof ae.blur === "function") {
+        var tag = (ae.tagName || "").toLowerCase();
+        if (
+          tag === "input" ||
+          tag === "select" ||
+          tag === "textarea" ||
+          tag === "button" ||
+          ae.getAttribute("role") === "combobox" ||
+          ae.getAttribute("role") === "listbox"
+        ) {
+          ae.blur();
+        }
+      }
+    } catch (err) {}
+
+    // Park zero-height component iframes off-screen so they can't steal scroll
+    try {
+      document.querySelectorAll("iframe").forEach(function (frame) {
+        var h = frame.getAttribute("height");
+        if (h === "0" || frame.clientHeight < 4) {
+          frame.setAttribute("tabindex", "-1");
+          frame.style.setProperty("position", "fixed", "important");
+          frame.style.setProperty("left", "-9999px", "important");
+          frame.style.setProperty("top", "0", "important");
+          frame.style.setProperty("width", "0", "important");
+          frame.style.setProperty("height", "0", "important");
+          frame.style.setProperty("opacity", "0", "important");
+          frame.style.setProperty("pointer-events", "none", "important");
+          var host =
+            frame.closest('[data-testid="stElementContainer"]') ||
+            frame.closest('[data-testid="element-container"]');
+          if (host) {
+            host.style.setProperty("height", "0", "important");
+            host.style.setProperty("min-height", "0", "important");
+            host.style.setProperty("margin", "0", "important");
+            host.style.setProperty("padding", "0", "important");
+            host.style.setProperty("overflow", "hidden", "important");
+          }
+        }
+      });
+    } catch (err) {}
+  }
 
   scrollAllToTop();
-  [0, 50, 100, 200, 400, 700, 1200, 2000].forEach(function (delay) {{
+  [0, 50, 100, 200, 400, 800, 1500, 2500, 4000].forEach(function (delay) {
     setTimeout(scrollAllToTop, delay);
-  }});
+  });
 
-  if (aggressive) {{
-    try {{
-      win.addEventListener("pageshow", function () {{ scrollAllToTop(); }});
-      win.addEventListener("load", function () {{ scrollAllToTop(); }});
-      doc.addEventListener("DOMContentLoaded", function () {{ scrollAllToTop(); }});
-    }} catch (err) {{}}
-  }}
-}})();
+  if (!window.__pcsBootTopListeners) {
+    window.__pcsBootTopListeners = true;
+    window.addEventListener("pageshow", function () { scrollAllToTop(); });
+    window.addEventListener("load", function () { scrollAllToTop(); });
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") scrollAllToTop();
+    });
+  }
+})();
 </script>
 """
 
 
-def render_scroll_to_top() -> None:
-    """Scroll the main view to the top when requested.
+def request_scroll_to_top() -> None:
+    """Request a scroll-to-top on the next rerun."""
+    st.session_state[SCROLL_TO_TOP_FLAG] = True
 
-    Call this AFTER page content renders so the DOM is ready.
-    Uses instant scroll first, then retries for Streamlit's async layout.
-    """
+
+def _inject_main_doc_script(script_html: str) -> None:
+    """Run JS in the main Streamlit document (avoids iframe scroll jumps)."""
+    try:
+        st.html(script_html)
+    except Exception:
+        st.markdown(script_html, unsafe_allow_html=True)
+
+
+def render_scroll_to_top() -> None:
+    """Scroll the main view to the top when requested."""
     if not st.session_state.pop(SCROLL_TO_TOP_FLAG, False):
         return
-
-    components.html(_scroll_top_script(clear_hash=False), height=0)
+    _inject_main_doc_script(_BOOT_TOP_JS)
 
 
 def render_boot_at_top() -> None:
-    """On home load: strip hashes, disable scroll restoration, force top.
+    """Force the page to open at the top on load / phone reload.
 
-    Mobile Safari restores mid-page scroll; Streamlit widgets/iframes can also
-    jump the viewport away from the title. Call at start AND end of the page.
+    Uses st.html in the main document — NOT components.html iframes.
+    Mid/bottom iframes are a common cause of “opens halfway down the page.”
     """
-    components.html(
-        _scroll_top_script(clear_hash=True, aggressive=True),
-        height=0,
-    )
+    _inject_main_doc_script(_BOOT_TOP_JS)
 
 
 def render_page_top_anchor() -> None:
     """Invisible anchor at the top of main content for scroll targeting."""
     st.markdown(
-        '<div id="pcs-page-top" style="height:0;margin:0;padding:0;overflow:hidden;"></div>',
+        '<div id="pcs-page-top" style="height:0;margin:0;padding:0;overflow:hidden;" aria-hidden="true"></div>',
         unsafe_allow_html=True,
     )
 
 
 def render_dropdown_scroll_fix() -> None:
     """Prevent page jump when select/multiselect popovers open; reset list scroll."""
+    # Keep this as components.html (needs early parent hook); boot script parks iframes off-screen.
     components.html(
         """<script>
             (function () {

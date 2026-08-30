@@ -37,13 +37,15 @@ st.set_page_config(
 )
 
 apply_styles()
-render_dropdown_scroll_fix()
-# Force top early (before layout jumps) and again after content.
+# Main-document scroll (st.html) — do NOT use bottom components.html iframes;
+# those are what yank the phone viewport halfway down the page.
 render_boot_at_top()
+render_dropdown_scroll_fix()
 
 st.session_state.page = "home"
 render_sidebar()
 render_page_top_anchor()
 render_home()
 render_scroll_to_top()
+# Final pass after content/widgets mount (still st.html, no iframe).
 render_boot_at_top()

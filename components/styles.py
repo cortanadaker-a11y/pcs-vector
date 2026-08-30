@@ -71,6 +71,22 @@ CUSTOM_CSS = """
         color: var(--pcs-text-dim) !important;
     }
 
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    /* Zero-height Streamlit component iframes must not pull scroll on load */
+    iframe[height="0"] {
+        position: fixed !important;
+        left: -9999px !important;
+        top: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        border: 0 !important;
+    }
+
     .block-container {
         padding-top: 1.25rem !important;
         padding-bottom: 5.5rem !important; /* room for sticky match bar */
