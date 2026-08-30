@@ -173,7 +173,7 @@ CUSTOM_CSS = """
         border-radius: 1.5rem !important;
         outline: none !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-        padding: 1rem 1rem 1.1rem 1rem !important;
+        padding: 0.65rem 0.65rem 0.7rem 0.65rem !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -191,9 +191,9 @@ CUSTOM_CSS = """
     .pcs-face-section-inputs {
         background: rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 1rem !important;
-        padding: 0.9rem 0.95rem !important;
-        margin: 0 0 0.75rem 0 !important;
+        border-radius: 0.9rem !important;
+        padding: 0.75rem 0.8rem !important;
+        margin: 0 0 0.45rem 0 !important;
     }
 
     /*
@@ -238,17 +238,17 @@ CUSTOM_CSS = """
     .pcs-partner-results {
         background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 1rem !important;
-        padding: 0.9rem 0.95rem !important;
-        margin: 0 0 0.75rem 0 !important;
+        border-radius: 0.9rem !important;
+        padding: 0.75rem 0.8rem !important;
+        margin: 0 0 0.45rem 0 !important;
     }
 
     #pcs-match-panel,
     .pcs-face-section-match {
         background: rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 1rem !important;
-        padding: 0.9rem 0.95rem !important;
+        border-radius: 0.9rem !important;
+        padding: 0.75rem 0.8rem !important;
         margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -3032,7 +3032,7 @@ CUSTOM_CSS = """
 
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-            padding: 0.85rem 0.8rem 0.95rem 0.8rem !important;
+            padding: 0.55rem 0.55rem 0.6rem 0.55rem !important;
             border-radius: 1.35rem !important;
             outline: none !important;
             margin-top: 0 !important;
@@ -3055,10 +3055,16 @@ CUSTOM_CSS = """
         #pcs-inputs-panel,
         .pcs-face-section-inputs,
         .pcs-face-section-results,
-        .pcs-partner-results {
-            padding-left: 0.8rem !important;
-            padding-right: 0.8rem !important;
-            margin-bottom: 0.65rem !important;
+        .pcs-partner-results,
+        #pcs-match-panel,
+        .pcs-face-section-match {
+            padding: 0.65rem 0.7rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        #pcs-match-panel,
+        .pcs-face-section-match {
+            margin-bottom: 0 !important;
         }
 
         .pcs-partner-arrow-amt {
