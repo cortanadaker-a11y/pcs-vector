@@ -245,10 +245,10 @@ CUSTOM_CSS = """
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0.15rem 0 0 0 !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-radius: 1rem !important;
+        padding: 0.9rem 0.95rem !important;
         margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
