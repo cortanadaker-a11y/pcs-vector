@@ -394,19 +394,21 @@ def render_bah_calculator() -> None:
             <span class="pcs-bah-delta-badge {delta_cls}">{delta_txt}</span>
         </div>
         """
-        if cur_mid and cur_mid > 0:
-            rent_pct = int(round(((market_mid - cur_mid) / cur_mid) * 100))
-            if rent_pct < 0:
-                roll_cls, roll_txt = "pcs-roll-down", f"{abs(rent_pct)}% lower"
-            elif rent_pct > 0:
-                roll_cls, roll_txt = "pcs-roll-up", f"{rent_pct}% higher"
+        # COL index = typical rent mid + utilities (same figures as the rows above)
+        cur_col = int(cur_mid or 0) + int(cur_util_n or 0)
+        tgt_col = int(market_mid or 0) + int(util_n or 0)
+        if cur_col > 0:
+            col_pct = int(round(((tgt_col - cur_col) / cur_col) * 100))
+            if col_pct < 0:
+                roll_cls, roll_txt = "pcs-roll-down", f"{abs(col_pct)}% lower"
+            elif col_pct > 0:
+                roll_cls, roll_txt = "pcs-roll-up", f"{col_pct}% higher"
             else:
                 roll_cls, roll_txt = "pcs-roll-flat", "about the same"
-            # Shown under DLA — COL cue from typical rent mid (planning estimate)
             rollup_html = f"""
             <div class="pcs-partner-rollup">
                 <span>New Cost of Living Index</span>
-                <span class="pcs-partner-rollup-mids">{_money_html(cur_mid)} → {_money_html(market_mid)}</span>
+                <span class="pcs-partner-rollup-mids">{_money_html(cur_col)} → {_money_html(tgt_col)}</span>
                 <span class="pcs-partner-rollup-badge {roll_cls}">{roll_txt}</span>
             </div>
             """

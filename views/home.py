@@ -563,7 +563,7 @@ def _render_faq() -> None:
   <div class="pcs-faq-item"><strong>COLA</strong><span>Extra pay overseas for higher everyday costs. It is not for rent.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time cash when you move (if your orders authorize it).</span></div>
   <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent and utilities are ballpark numbers for planning — confirm before you sign.</span></div>
-  <div class="pcs-faq-item"><strong>Cost of Living Index</strong><span>Shows if typical rent at your new post is higher or lower than where you are now.</span></div>
+  <div class="pcs-faq-item"><strong>Cost of Living Index</strong><span>Typical rent plus utilities now vs your new post — higher or lower.</span></div>
 </div>
             """,
             unsafe_allow_html=True,
