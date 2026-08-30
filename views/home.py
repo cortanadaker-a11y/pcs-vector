@@ -39,57 +39,13 @@ def _is_valid_email(raw: str | None) -> bool:
 
 
 def _tag_page_face() -> None:
-    """Mark calculator face, inject double-border CSS+DOM, kill blue labels."""
+    """Mark the singular calculator face container for dark CSS."""
     st.markdown('<div id="pcs-face-marker" aria-hidden="true"></div>', unsafe_allow_html=True)
     components.html(
         """
 <script>
 (function () {
   var doc = window.parent.document;
-
-  // Inject double-border CSS into parent (guaranteed to apply)
-  var styleId = "pcs-dbl-frame-style";
-  if (!doc.getElementById(styleId)) {
-    var css = doc.createElement("style");
-    css.id = styleId;
-    css.textContent = `
-      .pcs-dbl-shell {
-        background: #1C2D22 !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
-        border-radius: 18px !important;
-        padding: 10px !important;
-        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48) !important;
-        max-width: 36rem;
-        margin: 0.35rem auto !important;
-      }
-      .pcs-dbl-pad {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-      }
-      .pcs-dbl-inner {
-        display: block;
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-      }
-      .pcs-calc-face [data-testid="stWidgetLabel"] p,
-      .pcs-calc-face label p {
-        color: #A3ADB6 !important;
-      }
-      .pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p {
-        color: #D4AF37 !important;
-      }
-      /* Kill Streamlit light fills inside the instrument */
-      .pcs-calc-face [data-baseweb="select"] > div,
-      .pcs-calc-face input {
-        background-color: rgba(0, 0, 0, 0.48) !important;
-        color: #FFFFFF !important;
-      }
-    `;
-    doc.head.appendChild(css);
-  }
-
   function tag() {
     var marker = doc.getElementById("pcs-face-marker");
     if (!marker) return;
@@ -97,62 +53,12 @@ def _tag_page_face() -> None:
     if (wrap) {
       wrap.classList.add("pcs-calc-face");
       wrap.classList.add("pcs-calc-dark");
-      // Make wrapper transparent so dbl-shell is the visible frame
-      wrap.style.setProperty("background", "transparent", "important");
-      wrap.style.setProperty("border", "none", "important");
-      wrap.style.setProperty("padding", "0", "important");
-      wrap.style.setProperty("box-shadow", "none", "important");
-      wrap.style.setProperty("outline", "none", "important");
-
-      var shell = wrap.querySelector(".pcs-dbl-shell");
-      if (!shell) {
-        shell = doc.createElement("div");
-        shell.className = "pcs-dbl-shell";
-        var pad = doc.createElement("div");
-        pad.className = "pcs-dbl-pad";
-        var inner = doc.createElement("div");
-        inner.className = "pcs-dbl-inner";
-        while (wrap.firstChild) {
-          inner.appendChild(wrap.firstChild);
-        }
-        pad.appendChild(inner);
-        shell.appendChild(pad);
-        wrap.appendChild(shell);
-      } else {
-        // Scoop late-arriving Streamlit siblings into the frame
-        var inner = shell.querySelector(".pcs-dbl-inner");
-        if (inner) {
-          Array.from(wrap.children).forEach(function (child) {
-            if (child !== shell) inner.appendChild(child);
-          });
-        }
-      }
     }
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
-    // Force labels off Streamlit blue (#1e3a5f)
-    doc.querySelectorAll(
-      '.pcs-calc-face [data-testid="stWidgetLabel"] p, .pcs-calc-face label p, .pcs-calc-face label span'
-    ).forEach(function (el) {
-      if (el.closest('[data-testid="stCheckbox"]') || el.closest('[data-testid="stRadio"]')) {
-        el.style.setProperty("color", "#C8D0D8", "important");
-      } else {
-        el.style.setProperty("color", "#A3ADB6", "important");
-      }
-    });
-    doc.querySelectorAll(
-      '.pcs-calc-face [data-testid="stHorizontalBlock"] > div:first-child [data-testid="stWidgetLabel"] p'
-    ).forEach(function (el) {
-      el.style.setProperty("color", "#D4AF37", "important");
-    });
-    // Force app chrome off cream / light defaults
-    doc.documentElement.style.background = "#121E16";
-    if (doc.body) doc.body.style.background = "#121E16";
-    var app = doc.querySelector(".stApp");
-    if (app) app.style.setProperty("background", "#121E16", "important");
   }
   tag();
-  [40, 160, 400, 800, 1500].forEach(function (ms) { setTimeout(tag, ms); });
+  [40, 160, 400].forEach(function (ms) { setTimeout(tag, ms); });
 })();
 </script>
         """,
@@ -229,29 +135,25 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
     css.id = styleId;
     css.textContent = `
       html.pcs-has-sticky-ref [data-testid="stAppViewContainer"] {{
-        padding-bottom: 6.5rem !important;
-      }}
-      html.pcs-has-sticky-ref .block-container {{
-        padding-bottom: 8rem !important;
+        padding-bottom: 4.75rem !important;
       }}
       #pcs-sticky-ref-bar {{
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
-        bottom: max(0.5rem, env(safe-area-inset-bottom));
+        bottom: max(0.65rem, env(safe-area-inset-bottom));
         z-index: 99999;
-        width: min(560px, calc(100vw - 1rem));
+        width: min(560px, calc(100vw - 1.25rem));
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.5rem;
-        padding: 0.55rem 0.65rem;
-        min-height: 52px;
+        gap: 0.55rem;
+        padding: 0.65rem 0.75rem;
         border-radius: 14px;
         background: #1C2D22;
         color: #FFFFFF;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
         transition: opacity 0.2s ease, transform 0.2s ease;
         backdrop-filter: blur(8px);
@@ -266,15 +168,15 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         flex: 1;
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-kicker {{
-        font-size: 0.6rem;
+        font-size: 0.64rem;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #D4AF37;
-        margin-bottom: 0.1rem;
+        color: #F0D060;
+        margin-bottom: 0.12rem;
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-line {{
-        font-size: 0.76rem;
+        font-size: 0.8rem;
         font-weight: 700;
         color: #FFFFFF;
         white-space: nowrap;
@@ -286,32 +188,30 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
         appearance: none;
         border: none;
         cursor: pointer;
-        background: #EA580C;
+        background: #FB923C;
         color: #fff;
         font-weight: 900;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         letter-spacing: -0.01em;
-        min-height: 44px;
         padding: 0.55rem 0.85rem;
         border-radius: 10px;
-        box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+        box-shadow: 0 4px 14px rgba(251, 146, 60, 0.45);
       }}
       #pcs-sticky-ref-bar .pcs-sticky-ref-btn:hover {{
-        background: #C2410C;
+        background: #F97316;
       }}
-      @media (max-width: 430px) {{
+      @media (max-width: 560px) {{
         #pcs-sticky-ref-bar {{
-          bottom: max(0.4rem, env(safe-area-inset-bottom));
-          padding: 0.5rem 0.55rem;
-          gap: 0.4rem;
+          bottom: 0.55rem;
+          padding: 0.55rem 0.65rem;
+          gap: 0.5rem;
         }}
         #pcs-sticky-ref-bar .pcs-sticky-ref-line {{
-          font-size: 0.7rem;
+          font-size: 0.74rem;
         }}
         #pcs-sticky-ref-bar .pcs-sticky-ref-btn {{
-          font-size: 0.72rem;
-          padding: 0.5rem 0.65rem;
-          min-height: 44px;
+          font-size: 0.75rem;
+          padding: 0.5rem 0.7rem;
         }}
       }}
     `;
@@ -329,14 +229,14 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
 
   bar.innerHTML =
     '<div class="pcs-sticky-ref-meta">' +
-      '<div class="pcs-sticky-ref-kicker">Free housing match</div>' +
+      '<div class="pcs-sticky-ref-kicker">Step 2 · Free housing help</div>' +
       '<div class="pcs-sticky-ref-line" title="' +
         String(data.destFull).replace(/"/g, "&quot;") +
       '">' +
         String(data.dest) + " · " + String(data.rank) + " · " + String(data.deps) +
       "</div>" +
     "</div>" +
-    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Get matched</button>';
+    '<button type="button" class="pcs-sticky-ref-btn" id="pcs-sticky-ref-go">Get free help →</button>';
 
   root.classList.add("pcs-has-sticky-ref");
 
@@ -466,12 +366,12 @@ def _render_referral_hook() -> None:
         )
 
         submitted = st.form_submit_button(
-            "Get matched ➔",
+            "Connect With A PCS Wayfinder ➔",
             type="primary",
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Free housing help · CONUS & OCONUS")
+        st.caption("Free housing match · CONUS & OCONUS")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
