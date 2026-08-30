@@ -72,7 +72,7 @@ CUSTOM_CSS = """
     }
 
     .block-container {
-        padding-top: 0.85rem !important;
+        padding-top: 1.25rem !important;
         padding-bottom: 5.5rem !important; /* room for sticky match bar */
         max-width: 36rem;
         padding-left: 1rem !important;
@@ -144,8 +144,9 @@ CUSTOM_CSS = """
     .pcs-page-brand {
         text-align: center;
         max-width: 36rem;
-        margin: 0.15rem auto 0.85rem auto;
-        padding: 0 0.25rem;
+        margin: 0.35rem auto 0.85rem auto;
+        padding: 0.35rem 0.25rem 0 0.25rem;
+        overflow: visible;
     }
 
     .pcs-page-brand .pcs-brand-title {
@@ -155,7 +156,9 @@ CUSTOM_CSS = """
         letter-spacing: -0.05em;
         color: #FFFFFF;
         margin: 0 0 0.35rem 0;
-        line-height: 1.08;
+        padding-top: 0.15rem;
+        line-height: 1.2;
+        overflow: visible;
     }
 
     .pcs-page-brand .pcs-face-tagline {
@@ -3167,7 +3170,7 @@ CUSTOM_CSS = """
     /* ── Mobile-first polish (35-loop pass) ── */
     @media (max-width: 640px) {
         .block-container {
-            padding-top: 0.55rem !important;
+            padding-top: 1.1rem !important;
             padding-left: 0.7rem !important;
             padding-right: 0.7rem !important;
             padding-bottom: 5.75rem !important;
@@ -3184,12 +3187,16 @@ CUSTOM_CSS = """
         }
 
         .pcs-page-brand {
+            margin-top: 0.25rem !important;
             margin-bottom: 0.7rem !important;
+            padding-top: 0.25rem !important;
         }
 
         .pcs-page-brand .pcs-brand-title {
             font-size: 2.35rem !important;
             letter-spacing: -0.045em !important;
+            line-height: 1.2 !important;
+            padding-top: 0.1rem !important;
         }
 
         .pcs-page-brand .pcs-face-tagline {
