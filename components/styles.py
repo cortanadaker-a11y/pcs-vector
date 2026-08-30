@@ -4151,9 +4151,9 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match
   border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
-.st-key-pcs_calc_card #pcs-match-panel [data-testid="stFormSubmitButton"],
-.st-key-pcs_calc_card #pcs-match-panel [data-testid="stForm"] button[kind="primary"],
-div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel [data-testid="stFormSubmitButton"] {
+.st-key-pcs_calc_card #pcs-match-panel [data-testid="stButton"],
+.st-key-pcs_calc_card #pcs-match-panel button[kind="primary"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel [data-testid="stButton"] {
   margin-top: 0.85rem !important;
 }
 
@@ -4185,9 +4185,9 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-test
 }
 
 /* Connect CTA — big type, true orange (not theme gold/yellow) */
-.st-key-pcs_calc_card [data-testid="stForm"] button[kind="primary"],
+.st-key-pcs_calc_card #pcs-match-panel button[kind="primary"],
 #pcs-match-panel button[kind="primary"],
-div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-testid="stForm"] button[kind="primary"] {
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel button[kind="primary"] {
   background: #EA580C !important;
   background-color: #EA580C !important;
   background-image: none !important;

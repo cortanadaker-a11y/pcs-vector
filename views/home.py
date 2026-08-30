@@ -410,95 +410,46 @@ def _render_referral_hook() -> None:
     dest = calc["destination"]
     ready = bool(dest)
 
-    # Compact contact strip → orange CTA (PVector.html bottom pattern)
+    # Compact contact strip → orange CTA (not st.form — forms inject
+    # "Press Enter to submit form" tooltips on every text field)
     st.markdown('<div id="pcs-match-start"></div><div id="pcs-referral"></div>', unsafe_allow_html=True)
-    # Kill Streamlit/browser "Press Enter to submit form" tooltips on name/email
-    components.html(
-        """
-<script>
-(function () {
-  var doc = window.parent.document;
-  function disarm() {
-    var root =
-      doc.getElementById("pcs-match-panel") ||
-      doc.querySelector(".st-key-pcs_calc_card") ||
-      doc;
-    root.querySelectorAll("form").forEach(function (f) {
-      f.setAttribute("novalidate", "novalidate");
-    });
-    root.querySelectorAll("input").forEach(function (inp) {
-      inp.removeAttribute("required");
-      inp.removeAttribute("title");
-      inp.removeAttribute("aria-required");
-      inp.setAttribute("aria-required", "false");
-      // Streamlit re-adds title="Press Enter to submit form" on form inputs
-      if (inp.getAttribute("title") && /enter to submit/i.test(inp.getAttribute("title") || "")) {
-        inp.removeAttribute("title");
-      }
-      if (!inp._pcsNoTip) {
-        inp._pcsNoTip = true;
-        var killTitle = function () {
-          inp.removeAttribute("title");
-        };
-        inp.addEventListener("mouseenter", killTitle);
-        inp.addEventListener("focus", killTitle);
-        inp.addEventListener("pointerdown", killTitle);
-      }
-    });
-  }
-  disarm();
-  [40, 120, 300, 600, 1200, 2000].forEach(function (ms) { setTimeout(disarm, ms); });
-  try {
-    var t = null;
-    var obs = new MutationObserver(function () {
-      if (t) clearTimeout(t);
-      t = setTimeout(disarm, 30);
-    });
-    obs.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["title", "required"] });
-  } catch (e) {}
-})();
-</script>
-        """,
-        height=0,
-    )
 
-    with st.form("referral_form", clear_on_submit=False):
-        # Compact 2×2 grid — same full-width well as inputs/results above
-        n1, n2 = st.columns(2)
-        with n1:
-            first_name = st.text_input(
-                "First name",
-                key="referral_first_name",
-                placeholder="First",
-            )
-        with n2:
-            last_name = st.text_input(
-                "Last name",
-                key="referral_last_name",
-                placeholder="Last",
-            )
-
-        e1, e2 = st.columns(2)
-        with e1:
-            email_address = st.text_input(
-                "Email",
-                key="referral_email_address",
-                placeholder="you@email.com",
-            )
-        with e2:
-            rent_buy_not_sure = st.selectbox(
-                "Looking to…",
-                options=list(INTEREST_OPTIONS),
-                key="referral_rent_buy_not_sure",
-            )
-
-        submitted = st.form_submit_button(
-            "Connect With A PCS Wayfinder ➔",
-            type="primary",
-            use_container_width=True,
-            disabled=not ready,
+    n1, n2 = st.columns(2)
+    with n1:
+        first_name = st.text_input(
+            "First name",
+            key="referral_first_name",
+            placeholder="First",
         )
-        st.caption("PCS Wayfinders are our military-approved local agents — Free")
+    with n2:
+        last_name = st.text_input(
+            "Last name",
+            key="referral_last_name",
+            placeholder="Last",
+        )
+
+    e1, e2 = st.columns(2)
+    with e1:
+        email_address = st.text_input(
+            "Email",
+            key="referral_email_address",
+            placeholder="you@email.com",
+        )
+    with e2:
+        rent_buy_not_sure = st.selectbox(
+            "Looking to…",
+            options=list(INTEREST_OPTIONS),
+            key="referral_rent_buy_not_sure",
+        )
+
+    submitted = st.button(
+        "Connect With A PCS Wayfinder ➔",
+        type="primary",
+        use_container_width=True,
+        disabled=not ready,
+        key="referral_submit_btn",
+    )
+    st.caption("PCS Wayfinders are our military-approved local agents — Free")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
