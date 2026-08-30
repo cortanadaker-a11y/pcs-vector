@@ -267,11 +267,20 @@ CUSTOM_CSS = """
     /* Inset wells — tight to each other and to the card edge */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
-        background: rgba(0, 0, 0, 0.38) !important;
+        background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
         padding: 0.6rem 0.65rem !important;
         margin: 0 0 0.15rem 0 !important;
+    }
+
+    /* Keep Rank / Dependents / posts fields dark on the raised card */
+    #pcs-inputs-panel div[data-baseweb="select"] > div,
+    .pcs-face-section-inputs div[data-baseweb="select"] > div {
+        background-color: #0B1210 !important;
+        background: #0B1210 !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #FFFFFF !important;
     }
 
     /* Inputs vertical rhythm — tighter so wells sit closer to the card edge */
@@ -311,7 +320,7 @@ CUSTOM_CSS = """
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.48) !important;
+        background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
         padding: 0.6rem 0.65rem !important;
@@ -320,7 +329,7 @@ CUSTOM_CSS = """
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: rgba(0, 0, 0, 0.38) !important;
+        background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.10) !important;
         border-radius: 0.85rem !important;
         padding: 0.6rem 0.65rem !important;
@@ -4086,6 +4095,13 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) .pcs-partn
 div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel {
   margin-top: 0 !important;
   margin-bottom: 6px !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+}
+
+.st-key-pcs_calc_card #pcs-inputs-panel div[data-baseweb="select"] > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel div[data-baseweb="select"] > div {
+  background: #0B1210 !important;
+  background-color: #0B1210 !important;
 }
 
 .st-key-pcs_calc_card #pcs-match-panel,
