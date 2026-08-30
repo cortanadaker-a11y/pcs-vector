@@ -171,8 +171,46 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-bottom: none !important;
         border-radius: 1rem 1rem 0 0 !important;
-        padding: 0.95rem 1rem 0.85rem 1rem !important;
+        padding: 1.05rem 1.05rem 1rem 1.05rem !important;
         margin: 0 !important;
+    }
+
+    /*
+     * Inputs vertical rhythm — brand → rank row → posts → barracks
+     * Professional breathing room (was 0.25–0.35rem and looked cramped)
+     */
+    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
+        gap: 0.85rem !important;
+    }
+
+    #pcs-inputs-panel [data-testid="stHorizontalBlock"] {
+        gap: 0.65rem !important;
+        margin-bottom: 0.15rem !important;
+    }
+
+    #pcs-inputs-panel [data-testid="stWidgetLabel"] {
+        margin-bottom: 0.35rem !important;
+    }
+
+    #pcs-inputs-panel [data-testid="stWidgetLabel"] p {
+        line-height: 1.35 !important;
+        margin-bottom: 0 !important;
+    }
+
+    #pcs-inputs-panel [data-testid="stSelectbox"],
+    #pcs-inputs-panel [data-testid="column"] {
+        margin-bottom: 0 !important;
+    }
+
+    #pcs-inputs-panel [data-testid="stCheckbox"] {
+        margin-top: 0.35rem !important;
+        padding-top: 0.55rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    #pcs-inputs-panel [data-testid="stCheckbox"] label {
+        line-height: 1.4 !important;
+        gap: 0.45rem !important;
     }
 
     .pcs-face-section-results,
@@ -217,25 +255,24 @@ CUSTOM_CSS = """
         gap: 0 !important; /* no gaps between connected stack sections */
     }
 
-    /* Keep small gaps only inside form/column rows */
+    /* Keep small gaps only inside form/column rows (match panel; inputs set above) */
     .pcs-calc-face [data-testid="stForm"] [data-testid="stVerticalBlock"] > div,
-    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div,
     #pcs-match-panel [data-testid="stVerticalBlock"] > div {
-        gap: 0.35rem !important;
+        gap: 0.55rem !important;
     }
 
     .pcs-calc-face [data-testid="stHorizontalBlock"] {
-        gap: 0.5rem !important;
+        gap: 0.65rem !important;
     }
 
     /* Unified calculator top: brand + Step 1 inside one panel */
     .pcs-calc-top {
-        margin: 0 0 0.35rem 0;
+        margin: 0 0 0.75rem 0;
     }
 
     .pcs-face-brand {
-        margin: 0 0 0.55rem 0;
-        padding: 0.15rem 0 0.35rem 0;
+        margin: 0 0 0.15rem 0;
+        padding: 0.2rem 0 0.15rem 0;
         border-bottom: none;
     }
 
@@ -245,8 +282,8 @@ CUSTOM_CSS = """
         font-weight: 900;
         letter-spacing: -0.045em;
         color: #FFFFFF;
-        margin: 0 0 0.3rem 0;
-        line-height: 1.05;
+        margin: 0 0 0.4rem 0;
+        line-height: 1.12;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     }
 
@@ -257,16 +294,17 @@ CUSTOM_CSS = """
         text-transform: uppercase;
         color: #D4AF37;
         margin: 0;
-        line-height: 1.25;
+        line-height: 1.4;
     }
 
     .pcs-face-mini {
-        margin-top: 0.3rem;
+        margin-top: 0.4rem;
         font-size: 0.62rem;
         font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: #9CA3AF;
+        line-height: 1.35;
     }
 
     /* Hide Step labels — HTML demo has none */
@@ -287,11 +325,6 @@ CUSTOM_CSS = """
         margin: 0.75rem 0 0.65rem 0;
         background: rgba(255, 255, 255, 0.16);
         border: 0;
-    }
-
-    /* Kill Streamlit gaps that split brand from Step 1 widgets */
-    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
-        gap: 0.25rem !important;
     }
 
     #pcs-inputs-panel > div:first-child {
@@ -2932,9 +2965,14 @@ CUSTOM_CSS = """
     }
 
     .pcs-face-brand {
-        margin-bottom: 0.45rem !important;
-        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.15rem !important;
+        padding-bottom: 0.15rem !important;
         border-bottom: none !important;
+    }
+
+    /* Keep input-row rhythm on later polish passes */
+    #pcs-inputs-panel [data-testid="stVerticalBlock"] > div {
+        gap: 0.85rem !important;
     }
 
     .pcs-calc-face [data-testid="stExpander"] {
