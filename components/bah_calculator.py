@@ -514,7 +514,7 @@ def render_bah_calculator() -> None:
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">{left_util}</span>
-                    <span class="pcs-est-label">Utilities (est.)</span>
+                    <span class="pcs-est-label">Utilities</span>
                     <span class="pcs-est-side pcs-est-side-new">{right_util}</span>
                 </div>
                 <div class="pcs-est-row">
