@@ -113,7 +113,7 @@ CUSTOM_CSS = """
     /* Calculator card must win over the generic BorderWrapper padding above */
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     div[data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-        padding: 12px !important;
+        padding: 18px !important;
         background: #314A3C !important;
     }
 
