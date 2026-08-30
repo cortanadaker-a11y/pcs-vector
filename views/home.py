@@ -39,51 +39,100 @@ def _is_valid_email(raw: str | None) -> bool:
 
 
 def _tag_page_face() -> None:
-    """Mark the singular calculator face container for dark CSS."""
+    """Mark the singular calculator face and force card color/padding in the live DOM."""
     st.markdown('<div id="pcs-face-marker" aria-hidden="true"></div>', unsafe_allow_html=True)
     components.html(
         """
 <script>
 (function () {
   var doc = window.parent.document;
+  var CARD = "#314A3C";
+  var PAD = "6px";
+  var GAP = "6px";
+
+  function force(el, prop, val) {
+    if (el) el.style.setProperty(prop, val, "important");
+  }
+
+  function collapseIframes(root) {
+    root.querySelectorAll("iframe").forEach(function (frame) {
+      force(frame, "height", "0");
+      force(frame, "min-height", "0");
+      force(frame, "margin", "0");
+      force(frame, "padding", "0");
+      force(frame, "border", "0");
+      force(frame, "position", "absolute");
+      force(frame, "opacity", "0");
+      var host = frame.closest('[data-testid="stElementContainer"]') ||
+                 frame.closest('[data-testid="element-container"]');
+      if (host) {
+        force(host, "height", "0");
+        force(host, "min-height", "0");
+        force(host, "margin", "0");
+        force(host, "padding", "0");
+        force(host, "overflow", "hidden");
+      }
+    });
+  }
+
+  function tightenWells(root) {
+    var wells = root.querySelectorAll(
+      "#pcs-inputs-panel, .pcs-face-section-inputs, .pcs-partner-results, .pcs-face-section-results, #pcs-match-panel, .pcs-face-section-match"
+    );
+    wells.forEach(function (well, i) {
+      force(well, "margin-top", "0");
+      force(well, "margin-bottom", i === wells.length - 1 ? "0" : GAP);
+    });
+  }
+
   function tag() {
     var marker = doc.getElementById("pcs-face-marker");
     if (!marker) return;
-    var wrap = marker.closest('[data-testid="stVerticalBlockBorderWrapper"]');
-    if (wrap) {
-      wrap.classList.add("pcs-calc-face");
-      wrap.classList.add("pcs-calc-dark");
-      // Force raised green + tight padding (Streamlit keeps re-adding space)
-      wrap.style.setProperty("background", "#314A3C", "important");
-      wrap.style.setProperty("padding", "0.2rem", "important");
-      var inner = wrap.firstElementChild;
-      if (inner) {
-        inner.style.setProperty("padding", "0", "important");
-        inner.style.setProperty("margin", "0", "important");
-        inner.style.setProperty("gap", "0", "important");
-        inner.style.setProperty("row-gap", "0", "important");
-      }
-      // Collapse zero-height iframe hosts that create fake vertical gaps
-      wrap.querySelectorAll('iframe').forEach(function (frame) {
-        frame.style.setProperty("height", "0", "important");
-        frame.style.setProperty("min-height", "0", "important");
-        frame.style.setProperty("margin", "0", "important");
-        var host = frame.closest('[data-testid="stElementContainer"]') ||
-                   frame.closest('[data-testid="element-container"]');
-        if (host) {
-          host.style.setProperty("height", "0", "important");
-          host.style.setProperty("min-height", "0", "important");
-          host.style.setProperty("margin", "0", "important");
-          host.style.setProperty("padding", "0", "important");
-          host.style.setProperty("overflow", "hidden", "important");
-        }
-      });
+    var wrap =
+      marker.closest('[data-testid="stVerticalBlockBorderWrapper"]') ||
+      doc.querySelector(".st-key-pcs_calc_card") ||
+      doc.querySelector('[class*="st-key-pcs_calc_card"]');
+    if (!wrap) return;
+
+    wrap.classList.add("pcs-calc-face");
+    wrap.classList.add("pcs-calc-dark");
+    force(wrap, "background", CARD);
+    force(wrap, "background-color", CARD);
+    force(wrap, "padding", PAD);
+    force(wrap, "gap", "0");
+    force(wrap, "row-gap", "0");
+
+    var inner = wrap.firstElementChild;
+    if (inner) {
+      force(inner, "padding", "0");
+      force(inner, "margin", "0");
+      force(inner, "gap", "0");
+      force(inner, "row-gap", "0");
+      force(inner, "background", "transparent");
     }
+
+    wrap.querySelectorAll('[data-testid="stVerticalBlock"]').forEach(function (vb) {
+      force(vb, "gap", "0");
+      force(vb, "row-gap", "0");
+    });
+
+    collapseIframes(wrap);
+    tightenWells(wrap);
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
   }
+
+  var t = null;
+  function schedule() {
+    if (t) clearTimeout(t);
+    t = setTimeout(tag, 40);
+  }
   tag();
-  [40, 160, 400, 900].forEach(function (ms) { setTimeout(tag, ms); });
+  [50, 150, 350, 700, 1400, 2500].forEach(function (ms) { setTimeout(tag, ms); });
+  try {
+    var obs = new MutationObserver(schedule);
+    obs.observe(doc.body, { childList: true, subtree: true });
+  } catch (e) {}
 })();
 </script>
         """,
@@ -483,7 +532,7 @@ def render_home() -> None:
         unsafe_allow_html=True,
     )
 
-    with st.container(border=True):
+    with st.container(border=True, key="pcs_calc_card"):
         _tag_page_face()
         render_bah_calculator()
         _render_referral_hook()

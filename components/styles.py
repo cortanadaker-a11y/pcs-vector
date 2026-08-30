@@ -175,11 +175,12 @@ CUSTOM_CSS = """
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
         background: #314A3C !important;
+        background-color: #314A3C !important;
         border: 1px solid rgba(255, 255, 255, 0.16) !important;
         border-radius: 1.5rem !important;
         outline: none !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-        padding: 0.2rem !important;
+        padding: 6px !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -4015,6 +4016,86 @@ CUSTOM_CSS = """
 """
 
 
+# Extra force rules — keyed container + :has() beat Streamlit emotion theme
+_FORCE_CARD_CSS = """
+<style>
+/* Theme paints bordered containers with secondaryBackgroundColor; reinforce. */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-inputs-panel),
+.st-key-pcs_calc_card,
+.st-key-pcs_calc_card > div,
+div.st-key-pcs_calc_card[data-testid="stVerticalBlockBorderWrapper"],
+[class*="st-key-pcs_calc_card"][data-testid="stVerticalBlockBorderWrapper"] {
+  background-color: #314A3C !important;
+  background: #314A3C !important;
+  padding: 6px !important;
+  gap: 0 !important;
+  row-gap: 0 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.st-key-pcs_calc_card > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) > div {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+.st-key-pcs_calc_card [data-testid="stVerticalBlock"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-testid="stVerticalBlock"] {
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+.st-key-pcs_calc_card #pcs-inputs-panel,
+.st-key-pcs_calc_card .pcs-face-section-inputs,
+.st-key-pcs_calc_card .pcs-partner-results,
+.st-key-pcs_calc_card .pcs-face-section-results,
+.st-key-pcs_calc_card #pcs-match-panel,
+.st-key-pcs_calc_card .pcs-face-section-match,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-inputs-panel,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) .pcs-partner-results,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+}
+
+.st-key-pcs_calc_card #pcs-match-panel,
+.st-key-pcs_calc_card .pcs-face-section-match,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel {
+  margin-bottom: 0 !important;
+}
+
+/* Collapse Streamlit hosts for zero-height markers / scripts */
+.st-key-pcs_calc_card iframe,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) iframe {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.st-key-pcs_calc_card [data-testid="stElementContainer"]:has(iframe),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-testid="stElementContainer"]:has(iframe) {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+</style>
+"""
+
+
 def apply_styles() -> None:
     """Inject global CSS into the Streamlit app."""
-    st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+    # st.html avoids markdown whitespace and applies more reliably on Cloud
+    try:
+        st.html(CUSTOM_CSS + _FORCE_CARD_CSS)
+    except Exception:
+        st.markdown(CUSTOM_CSS + _FORCE_CARD_CSS, unsafe_allow_html=True)
