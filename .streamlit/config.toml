@@ -1,7 +1,7 @@
 # PCS Vector — Streamlit configuration (local + Streamlit Community Cloud)
 
 [theme]
-primaryColor = "#D4AF37"
+primaryColor = "#EA580C"
 backgroundColor = "#121E16"
 secondaryBackgroundColor = "#314A3C"
 textColor = "#FFFFFF"

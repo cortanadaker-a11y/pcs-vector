@@ -366,10 +366,29 @@ CUSTOM_CSS = """
         text-align: center;
     }
 
-    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"] {
-        min-height: 2.85rem !important;
-        margin-top: 0.2rem !important;
+    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"],
+    .st-key-pcs_calc_card div[data-testid="stForm"] button[kind="primary"],
+    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
+        background: #EA580C !important;
+        background-color: #EA580C !important;
+        background-image: none !important;
+        border: 1px solid #C2410C !important;
+        color: #FFFFFF !important;
+        min-height: 3.35rem !important;
+        font-size: 1.08rem !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.01em !important;
+        margin-top: 0.25rem !important;
         width: 100% !important;
+        box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35) !important;
+    }
+
+    #pcs-match-panel div[data-testid="stForm"] button[kind="primary"]:hover,
+    .st-key-pcs_calc_card div[data-testid="stForm"] button[kind="primary"]:hover,
+    .pcs-calc-face div[data-testid="stForm"] button[kind="primary"]:hover {
+        background: #C2410C !important;
+        background-color: #C2410C !important;
+        background-image: none !important;
     }
 
     /* Nuke theme-blue labels (was #1e3a5f from config.toml) */
@@ -975,9 +994,11 @@ CUSTOM_CSS = """
 
     .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
         background: #EA580C !important;
-        border: none !important;
-        min-height: 2.85rem !important;
-        font-size: 0.9rem !important;
+        background-color: #EA580C !important;
+        background-image: none !important;
+        border: 1px solid #C2410C !important;
+        min-height: 3.35rem !important;
+        font-size: 1.08rem !important;
         font-weight: 900 !important;
         border-radius: 0.75rem !important;
         box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35) !important;
@@ -3055,12 +3076,14 @@ CUSTOM_CSS = """
         display: inline;
     }
 
-    /* Primary CTA — compact in match well, still thumb-friendly */
+    /* Primary CTA — larger type, true orange (not theme gold) */
     .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
-        min-height: 2.85rem !important;
-        font-size: 0.9rem !important;
-        letter-spacing: 0.01em !important;
-        margin-top: 0.2rem !important;
+        min-height: 3.35rem !important;
+        font-size: 1.08rem !important;
+        letter-spacing: -0.01em !important;
+        margin-top: 0.25rem !important;
+        background: #EA580C !important;
+        background-image: none !important;
     }
 
     /* Professional density — select/input touch targets */
@@ -3218,8 +3241,10 @@ CUSTOM_CSS = """
         }
 
         .pcs-calc-face div[data-testid="stForm"] button[kind="primary"] {
-            min-height: 2.85rem !important;
-            font-size: 0.88rem !important;
+            min-height: 3.25rem !important;
+            font-size: 1.02rem !important;
+            background: #EA580C !important;
+            background-image: none !important;
         }
 
         .pcs-faq-item strong {
@@ -3984,22 +4009,23 @@ CUSTOM_CSS = """
         line-height: 1.55;
     }
 
-    /* ── Streamlit widgets ── */
-    div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, var(--pcs-accent-soft) 0%, var(--pcs-accent) 100%);
-        border: none;
-        font-weight: 700;
+    /* ── Streamlit widgets — orange CTA, never gold gradient ── */
+    div[data-testid="stButton"] > button[kind="primary"],
+    div[data-testid="stForm"] button[kind="primary"] {
+        background: #EA580C !important;
+        background-image: none !important;
+        border: 1px solid #C2410C !important;
+        font-weight: 900 !important;
         border-radius: 10px;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        box-shadow: 0 4px 14px rgba(74, 124, 100, 0.3);
+        box-shadow: 0 8px 22px rgba(234, 88, 12, 0.32) !important;
         color: #ffffff !important;
     }
 
-    div[data-testid="stButton"] > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, var(--pcs-accent) 0%, var(--pcs-accent-hover) 100%);
-        border: none;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(61, 102, 82, 0.35);
+    div[data-testid="stButton"] > button[kind="primary"]:hover,
+    div[data-testid="stForm"] button[kind="primary"]:hover {
+        background: #C2410C !important;
+        background-image: none !important;
+        border: 1px solid #C2410C !important;
     }
 
     h1, h2, h3 {
@@ -4087,6 +4113,21 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-test
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
+}
+
+/* Connect CTA — big type, true orange (not theme gold/yellow) */
+.st-key-pcs_calc_card [data-testid="stForm"] button[kind="primary"],
+#pcs-match-panel button[kind="primary"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) [data-testid="stForm"] button[kind="primary"] {
+  background: #EA580C !important;
+  background-color: #EA580C !important;
+  background-image: none !important;
+  border: 1px solid #C2410C !important;
+  color: #FFFFFF !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+  min-height: 3.4rem !important;
+  line-height: 1.2 !important;
 }
 </style>
 """
