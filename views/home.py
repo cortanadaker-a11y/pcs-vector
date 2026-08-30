@@ -409,24 +409,50 @@ def _render_referral_hook() -> None:
 
     # Compact contact strip → orange CTA (PVector.html bottom pattern)
     st.markdown('<div id="pcs-match-start"></div><div id="pcs-referral"></div>', unsafe_allow_html=True)
-    # Disable browser "Please fill out this field" / enter-to-submit tooltips
+    # Kill Streamlit/browser "Press Enter to submit form" tooltips on name/email
     components.html(
         """
 <script>
 (function () {
   var doc = window.parent.document;
   function disarm() {
-    doc.querySelectorAll('form').forEach(function (f) {
-      f.setAttribute('novalidate', 'novalidate');
-      f.setAttribute('autocomplete', 'on');
+    var root =
+      doc.getElementById("pcs-match-panel") ||
+      doc.querySelector(".st-key-pcs_calc_card") ||
+      doc;
+    root.querySelectorAll("form").forEach(function (f) {
+      f.setAttribute("novalidate", "novalidate");
     });
-    doc.querySelectorAll('input').forEach(function (inp) {
-      inp.removeAttribute('required');
-      inp.setAttribute('aria-required', 'false');
+    root.querySelectorAll("input").forEach(function (inp) {
+      inp.removeAttribute("required");
+      inp.removeAttribute("title");
+      inp.removeAttribute("aria-required");
+      inp.setAttribute("aria-required", "false");
+      // Streamlit re-adds title="Press Enter to submit form" on form inputs
+      if (inp.getAttribute("title") && /enter to submit/i.test(inp.getAttribute("title") || "")) {
+        inp.removeAttribute("title");
+      }
+      if (!inp._pcsNoTip) {
+        inp._pcsNoTip = true;
+        var killTitle = function () {
+          inp.removeAttribute("title");
+        };
+        inp.addEventListener("mouseenter", killTitle);
+        inp.addEventListener("focus", killTitle);
+        inp.addEventListener("pointerdown", killTitle);
+      }
     });
   }
   disarm();
-  [50, 200, 500].forEach(function (ms) { setTimeout(disarm, ms); });
+  [40, 120, 300, 600, 1200, 2000].forEach(function (ms) { setTimeout(disarm, ms); });
+  try {
+    var t = null;
+    var obs = new MutationObserver(function () {
+      if (t) clearTimeout(t);
+      t = setTimeout(disarm, 30);
+    });
+    obs.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["title", "required"] });
+  } catch (e) {}
 })();
 </script>
         """,
