@@ -133,46 +133,67 @@ CUSTOM_CSS = """
         overflow: hidden;
     }
 
+    /* Brand above the calculator card — loud, not competing with money */
+    .pcs-page-brand {
+        text-align: center;
+        max-width: 36rem;
+        margin: 0.15rem auto 0.85rem auto;
+        padding: 0 0.25rem;
+    }
+
+    .pcs-page-brand .pcs-brand-title {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 2.65rem;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        color: #FFFFFF;
+        margin: 0 0 0.35rem 0;
+        line-height: 1.08;
+    }
+
+    .pcs-page-brand .pcs-face-tagline {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #D4AF37;
+        margin: 0;
+        line-height: 1.35;
+    }
+
     /*
-     * TRUE DOUBLE BORDER (always visible):
-     *  outer ring = outline on the page
-     *  inner ring = border on the card
-     * Matches PVector.html: page #121E16 → card edge → inset well
+     * ONE calculator card (Anees-style):
+     * page #121E16 → single #1C2D22 shell → inset wells inside
+     * No double outline / no stacked Streamlit panel look
      */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
         background: #1C2D22 !important;
-        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 1.5rem !important;
-        outline: 1px solid rgba(255, 255, 255, 0.14) !important;
-        outline-offset: 7px !important;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55) !important;
-        padding: 1.2rem 1.2rem 1.3rem 1.2rem !important;
+        outline: none !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+        padding: 1rem 1rem 1.1rem 1rem !important;
         max-width: 36rem;
         margin-left: auto !important;
         margin-right: auto !important;
-        margin-top: 0.75rem !important;
-        margin-bottom: 0.75rem !important;
+        margin-top: 0 !important;
+        margin-bottom: 0.85rem !important;
     }
 
-    /* Kill Streamlit’s own thin border so ours is the only card edge */
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face > div,
     [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark > div {
         border: none !important;
     }
 
-    /*
-     * Connected inner well — third visual edge inside the card
-     * (inputs → results → match as one unit)
-     */
+    /* Inset wells inside the one card — same radius/border language, with gap */
     #pcs-inputs-panel,
     .pcs-face-section-inputs {
         background: rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-bottom: none !important;
-        border-radius: 1rem 1rem 0 0 !important;
-        padding: 1.05rem 1.05rem 1rem 1.05rem !important;
-        margin: 0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-radius: 1rem !important;
+        padding: 0.9rem 0.95rem !important;
+        margin: 0 0 0.75rem 0 !important;
     }
 
     /*
@@ -215,23 +236,19 @@ CUSTOM_CSS = """
 
     .pcs-face-section-results,
     .pcs-partner-results {
-        background: rgba(0, 0, 0, 0.6) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-        border-radius: 0 !important;
-        padding: 0.95rem 1rem !important;
-        margin: 0 !important;
+        background: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-radius: 1rem !important;
+        padding: 0.9rem 0.95rem !important;
+        margin: 0 0 0.75rem 0 !important;
     }
 
     #pcs-match-panel,
     .pcs-face-section-match {
-        background: rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-top: none !important;
-        border-radius: 0 0 1rem 1rem !important;
-        padding: 0.75rem 1rem 0.85rem 1rem !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0.15rem 0 0 0 !important;
         margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -297,7 +314,13 @@ CUSTOM_CSS = """
     }
 
     .pcs-calc-face [data-testid="stVerticalBlock"] > div {
-        gap: 0 !important; /* no gaps between connected stack sections */
+        gap: 0 !important; /* section margins handle rhythm inside the one card */
+    }
+
+    /* Hide leftover in-card brand if any remnant HTML appears */
+    .pcs-calc-face .pcs-face-brand,
+    .pcs-calc-face .pcs-calc-top {
+        display: none !important;
     }
 
     /* Match panel form — denser than inputs; still readable */
@@ -310,47 +333,9 @@ CUSTOM_CSS = """
         gap: 0.65rem !important;
     }
 
-    /* Unified calculator top: brand + Step 1 inside one panel */
-    .pcs-calc-top {
-        margin: 0 0 0.75rem 0;
-    }
-
-    .pcs-face-brand {
-        margin: 0 0 0.15rem 0;
-        padding: 0.2rem 0 0.15rem 0;
-        border-bottom: none;
-    }
-
-    .pcs-face-brand .pcs-brand-title {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 2.65rem;
-        font-weight: 900;
-        letter-spacing: -0.05em;
-        color: #FFFFFF;
-        margin: 0 0 0.4rem 0;
-        line-height: 1.08;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    }
-
-    .pcs-face-tagline {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #D4AF37;
-        margin: 0;
-        line-height: 1.4;
-    }
-
-    .pcs-face-mini {
-        margin-top: 0.4rem;
-        font-size: 0.62rem;
-        font-weight: 600;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #9CA3AF;
-        line-height: 1.35;
-    }
+    .pcs-calc-top { display: none !important; }
+    .pcs-face-brand { display: none !important; }
+    .pcs-face-mini { display: none !important; }
 
     /* Hide Step labels — HTML demo has none */
     #pcs-inputs-panel .pcs-panel-label,
@@ -3047,35 +3032,33 @@ CUSTOM_CSS = """
 
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-face,
         [data-testid="stVerticalBlockBorderWrapper"].pcs-calc-dark {
-            padding: 0.85rem 0.8rem 1rem 0.8rem !important;
-            border-radius: 1.25rem !important;
-            outline-offset: 5px !important;
-            margin-top: 0.45rem !important;
-            margin-bottom: 0.45rem !important;
+            padding: 0.85rem 0.8rem 0.95rem 0.8rem !important;
+            border-radius: 1.35rem !important;
+            outline: none !important;
+            margin-top: 0 !important;
+            margin-bottom: 0.75rem !important;
+        }
+
+        .pcs-page-brand {
+            margin-bottom: 0.7rem !important;
+        }
+
+        .pcs-page-brand .pcs-brand-title {
+            font-size: 2.35rem !important;
+            letter-spacing: -0.045em !important;
+        }
+
+        .pcs-page-brand .pcs-face-tagline {
+            font-size: 0.7rem !important;
         }
 
         #pcs-inputs-panel,
         .pcs-face-section-inputs,
         .pcs-face-section-results,
-        .pcs-partner-results,
-        #pcs-match-panel,
-        .pcs-face-section-match {
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-
-        .pcs-face-brand .pcs-brand-title {
-            font-size: 2.35rem !important;
-            letter-spacing: -0.045em !important;
-        }
-
-        .pcs-face-tagline {
-            font-size: 0.65rem !important;
-        }
-
-        .pcs-face-mini {
-            font-size: 0.58rem !important;
-            margin-top: 0.25rem !important;
+        .pcs-partner-results {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+            margin-bottom: 0.65rem !important;
         }
 
         .pcs-partner-arrow-amt {

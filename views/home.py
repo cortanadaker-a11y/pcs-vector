@@ -417,7 +417,6 @@ def _render_referral_hook() -> None:
             )
             st.success("Opening your pre-filled form — tap **Submit** on the next page.")
 
-    # End match well before FAQ so the connect box stays compact + full-bleed
     st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
     wrap_dom_panel(
         start_id="pcs-match-start",
@@ -426,6 +425,10 @@ def _render_referral_hook() -> None:
         panel_class="pcs-face-section pcs-face-section-match",
     )
 
+    _render_sticky_referral_cta(calc)
+
+
+def _render_faq() -> None:
     with st.expander("FAQ — what these numbers mean", expanded=False):
         st.markdown(
             """
@@ -442,20 +445,30 @@ def _render_referral_hook() -> None:
             unsafe_allow_html=True,
         )
 
-    _render_sticky_referral_cta(calc)
-
 
 def render_home() -> None:
+    # Loud brand ABOVE the calculator — card itself is pure instrument
+    st.markdown(
+        """
+        <div class="pcs-page-brand">
+            <div class="pcs-brand-title">PCS Vector</div>
+            <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     with st.container(border=True):
         _tag_page_face()
         render_bah_calculator()
         _render_referral_hook()
-        st.markdown(
-            """
-            <div class="pcs-footer">
-                <strong>PCS Vector</strong> · For Soldiers; By Soldiers
-                <span>Verify LES / finance before you sign.</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+
+    _render_faq()
+    st.markdown(
+        """
+        <div class="pcs-footer">
+            <span>Verify LES / finance before you sign.</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )

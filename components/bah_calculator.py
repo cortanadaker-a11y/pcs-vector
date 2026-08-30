@@ -180,20 +180,8 @@ def render_bah_calculator() -> None:
 
     grades = [g for g in RANK_PAY_GRADES if g != "Other"]
 
-    # Brand + Step 1 share one panel (wrapped together) so the top isn’t disjointed
-    st.markdown(
-        """
-        <div id="pcs-inputs-start"></div>
-        <div class="pcs-calc-top">
-            <div class="pcs-face-brand">
-                <div class="pcs-brand-title">PCS Vector</div>
-                <div class="pcs-face-tagline">For Soldiers; By Soldiers</div>
-                <div class="pcs-face-mini">2026 BAH · OHA · COLA · DLA</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Inputs well starts here — brand lives above the calculator card on home
+    st.markdown('<div id="pcs-inputs-start"></div>', unsafe_allow_html=True)
 
     if "bah_calc_gaining" not in st.session_state:
         st.session_state.bah_calc_gaining = (
