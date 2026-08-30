@@ -978,7 +978,7 @@ CUSTOM_CSS = """
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 0.35rem 0.65rem;
+        gap: 0.35rem 0.5rem;
         background: rgba(0, 0, 0, 0.5);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0.75rem;
@@ -991,14 +991,26 @@ CUSTOM_CSS = """
         text-transform: uppercase;
     }
 
+    .pcs-partner-rollup > span:first-child {
+        flex: 0 0 100%;
+        width: 100%;
+    }
+
     .pcs-partner-rollup-mids {
         color: #D1D5DB;
         font-weight: 700;
         letter-spacing: 0;
         text-transform: none;
         font-size: 0.8rem;
-        flex: 1;
-        text-align: center;
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: left;
+    }
+
+    .pcs-partner-rollup-badge {
+        flex: 0 0 auto;
+        margin-left: auto;
+        white-space: nowrap;
     }
 
     .pcs-calc-face .pcs-est-row {
@@ -3258,15 +3270,32 @@ CUSTOM_CSS = """
         }
 
         .pcs-partner-rollup {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 0.3rem !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.3rem 0.45rem !important;
             padding: 0.5rem 0.6rem !important;
         }
 
+        .pcs-partner-rollup > span:first-child {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+        }
+
         .pcs-partner-rollup-mids {
+            flex: 1 1 auto !important;
             text-align: left !important;
             font-size: 0.75rem !important;
+            min-width: 0 !important;
+        }
+
+        .pcs-partner-rollup-badge {
+            flex: 0 0 auto !important;
+            margin-left: auto !important;
+            white-space: nowrap !important;
+            font-size: 0.68rem !important;
+            padding: 0.2rem 0.45rem !important;
         }
 
         .pcs-est-heads-live {
