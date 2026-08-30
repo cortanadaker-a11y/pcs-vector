@@ -448,7 +448,7 @@ def _render_referral_hook() -> None:
             use_container_width=True,
             disabled=not ready,
         )
-        st.caption("Free · CONUS & OCONUS")
+        st.caption("PCS Wayfinders are our military-approved local agents")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
