@@ -16,7 +16,6 @@ from components.bah_calculator import (
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
-    INTEREST_OPTIONS,
     build_redirect_to_form_html,
     build_referral_row,
     format_dependents_label,
@@ -56,7 +55,7 @@ def _tag_page_face() -> None:
   }
 
   function darkenFields(root) {
-    /* Rank/posts + Wayfinder Looking-to / text inputs — dark like BAH chips */
+    /* Rank/posts + Wayfinder name/email — dark like BAH chips */
     var nodes = root.querySelectorAll(
       '#pcs-inputs-panel [data-baseweb="select"] > div, ' +
       '#pcs-inputs-panel [data-baseweb="select"] > div > div, ' +
@@ -422,24 +421,10 @@ def _render_referral_hook() -> None:
             placeholder="First",
         )
     with n2:
-        last_name = st.text_input(
-            "Last name",
-            key="referral_last_name",
-            placeholder="Last",
-        )
-
-    e1, e2 = st.columns(2)
-    with e1:
         email_address = st.text_input(
             "Email",
             key="referral_email_address",
             placeholder="you@email.com",
-        )
-    with e2:
-        rent_buy_not_sure = st.selectbox(
-            "Looking to…",
-            options=list(INTEREST_OPTIONS),
-            key="referral_rent_buy_not_sure",
         )
 
     submitted = st.button(
@@ -453,12 +438,8 @@ def _render_referral_hook() -> None:
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
-        last_name = str(st.session_state.get("referral_last_name") or last_name or "")
         email_address = _clean_email(
             st.session_state.get("referral_email_address") or email_address
-        )
-        rent_buy_not_sure = str(
-            st.session_state.get("referral_rent_buy_not_sure") or rent_buy_not_sure or ""
         )
 
         live = get_calculator_snapshot() or snap
@@ -468,17 +449,15 @@ def _render_referral_hook() -> None:
         row = build_referral_row(
             destination=live_calc["destination"],
             first_name=first_name,
-            last_name=last_name,
             rank=live_calc["rank"],
-            rent_buy_not_sure=rent_buy_not_sure,
             num_dependents=live_deps_n,
             email_address=email_address,
         )
 
         if not live_calc["destination"]:
             st.error("Set New post in the calculator above first.")
-        elif not row["First Name"].strip() or not row["Last Name"].strip():
-            st.error("Enter your first and last name.")
+        elif not row["First Name"].strip():
+            st.error("Enter your first name.")
         elif not _is_valid_email(row["Email address"]):
             st.error("Enter a valid email address (example: name@email.com).")
         else:

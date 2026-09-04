@@ -407,21 +407,6 @@ CUSTOM_CSS = """
         text-align: center;
     }
 
-    /* Looking to… (rent/buy) — same dark chip as name/email / BAH rows */
-    #pcs-match-panel [data-testid="stSelectbox"] > div,
-    #pcs-match-panel [data-baseweb="select"],
-    #pcs-match-panel [data-baseweb="select"] > div,
-    #pcs-match-panel [data-baseweb="select"] > div > div,
-    .st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div,
-    .st-key-pcs_calc_card #pcs-match-panel [data-baseweb="select"] > div > div {
-        background: #0B1210 !important;
-        background-color: #0B1210 !important;
-        background-image: none !important;
-        border-color: rgba(255, 255, 255, 0.18) !important;
-        color: #FFFFFF !important;
-        box-shadow: none !important;
-    }
-
     #pcs-match-panel div[data-testid="stButton"] > button[kind="primary"],
     #pcs-match-panel button[kind="primary"],
     .st-key-pcs_calc_card #pcs-match-panel button[kind="primary"],

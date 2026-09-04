@@ -58,9 +58,9 @@ def build_referral_row(
     *,
     destination: str,
     first_name: str,
-    last_name: str,
     rank: str,
-    rent_buy_not_sure: str,
+    last_name: str = "",
+    rent_buy_not_sure: str = "",
     num_dependents: int = 0,
     email_address: str = "",
 ) -> dict[str, str]:
