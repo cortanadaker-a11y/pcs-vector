@@ -1760,7 +1760,13 @@ def _build_profile(canonical_name: str) -> InstallationProfile:
     short_name = canonical_name.rsplit(", ", 1)[0]
     state = data["state"].split("/")[0]  # KY/TN → KY for profile state field
     priority: Priority = data["priority"]
-    rent = rich.get("avg_3br_rent_range", _RENT_BY_PRIORITY[priority])
+    from services.local_costs import get_rent_3br
+
+    rent = (
+        get_rent_3br(canonical_name)
+        or rich.get("avg_3br_rent_range")
+        or _RENT_BY_PRIORITY[priority]
+    )
 
     major_areas = data["major_areas"]
     off_post = rich.get(
@@ -2045,7 +2051,10 @@ def get_family_market_rent(
     low = int(round(base_low * scale))
     high = int(round(base_high * scale))
     mid = int(round((low + high) / 2))
-    rich = bool(_RICH_PROFILE_EXTENSIONS.get(profile.display_name))
+    from services.local_costs import get_rent_3br
+
+    local = get_rent_3br(profile.display_name)
+    rich = bool(local or _RICH_PROFILE_EXTENSIONS.get(profile.display_name))
     return {
         "installation": profile.display_name,
         "bedrooms": br,

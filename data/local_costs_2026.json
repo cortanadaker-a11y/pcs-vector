@@ -1,0 +1,728 @@
+{
+  "as_of": "2026-09",
+  "note": "Typical 3BR off-post rent (low–high) and monthly utilities for a 3BR. Planning estimates from local rental markets; not BAH/OHA.",
+  "installations": {
+    "Aberdeen Proving Ground, MD": {
+      "rent_3br": [1850, 2550],
+      "utility": {
+        "as_of": "2026 planning (Harford County / BGE)",
+        "areas": [
+          {
+            "name": "Aberdeen / Bel Air (21001 / 21014)",
+            "zips": ["21001", "21014", "21009"],
+            "electric": [115, 210],
+            "gas_or_heat": [55, 150],
+            "water_trash": [55, 105],
+            "internet": [65, 105],
+            "season_note": "Winter gas heat is the swing; milder AC than the South."
+          }
+        ]
+      }
+    },
+    "Hunter Army Airfield, GA": {
+      "rent_3br": [1750, 2300],
+      "utility": {
+        "as_of": "2026 planning (Savannah / Pooler / Richmond Hill)",
+        "areas": [
+          {
+            "name": "Pooler / Richmond Hill (31322 / 31324)",
+            "zips": ["31322", "31324", "31419"],
+            "electric": [145, 275],
+            "gas_or_heat": [20, 55],
+            "water_trash": [60, 100],
+            "internet": [60, 95],
+            "season_note": "Coastal humidity drives AC. Savannah market is pricier than Hinesville/Stewart."
+          }
+        ]
+      }
+    },
+    "Anniston Army Depot, AL": {
+      "rent_3br": [1050, 1450],
+      "utility": {
+        "as_of": "2026 planning (Anniston / Oxford AL)",
+        "areas": [
+          {
+            "name": "Oxford / Anniston (36203)",
+            "zips": ["36203", "36201"],
+            "electric": [125, 240],
+            "gas_or_heat": [25, 70],
+            "water_trash": [45, 85],
+            "internet": [50, 85],
+            "season_note": "Hot summers; electric is the big variable."
+          }
+        ]
+      }
+    },
+    "Camp Atterbury, IN": {
+      "rent_3br": [1150, 1600],
+      "utility": {
+        "as_of": "2026 planning (Edinburgh / Franklin IN)",
+        "areas": [
+          {
+            "name": "Franklin / Edinburgh (46131)",
+            "zips": ["46124", "46131"],
+            "electric": [100, 180],
+            "gas_or_heat": [60, 160],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Cold winters — gas heat spikes Dec–Feb."
+          }
+        ]
+      }
+    },
+    "Camp Casey, South Korea": {
+      "rent_3br": [800, 1300]
+    },
+    "Camp Humphreys, South Korea": {
+      "rent_3br": [1400, 2100]
+    },
+    "Camp Zama, Japan": {
+      "rent_3br": [1500, 2300]
+    },
+    "Carlisle Barracks, PA": {
+      "rent_3br": [1450, 2000],
+      "utility": {
+        "as_of": "2026 planning (Carlisle / west shore)",
+        "areas": [
+          {
+            "name": "Carlisle / Mechanicsburg (17013)",
+            "zips": ["17013", "17050"],
+            "electric": [105, 185],
+            "gas_or_heat": [65, 170],
+            "water_trash": [50, 95],
+            "internet": [55, 95],
+            "season_note": "PA winters: heating oil/gas is the swing."
+          }
+        ]
+      }
+    },
+    "Detroit Arsenal, MI": {
+      "rent_3br": [1350, 1850],
+      "utility": {
+        "as_of": "2026 planning (Warren / Sterling Heights)",
+        "areas": [
+          {
+            "name": "Warren / Sterling Heights (48092)",
+            "zips": ["48092", "48310"],
+            "electric": [95, 170],
+            "gas_or_heat": [80, 200],
+            "water_trash": [55, 100],
+            "internet": [55, 95],
+            "season_note": "DTE/Consumers winter heat is the expensive month."
+          }
+        ]
+      }
+    },
+    "Dugway Proving Ground, UT": {
+      "rent_3br": [1000, 1500],
+      "utility": {
+        "as_of": "2026 planning (Tooele / Grantsville)",
+        "areas": [
+          {
+            "name": "Tooele (84074)",
+            "zips": ["84074"],
+            "electric": [90, 170],
+            "gas_or_heat": [50, 140],
+            "water_trash": [45, 85],
+            "internet": [55, 95],
+            "season_note": "Long commute from Tooele; winter heat + summer AC both matter."
+          }
+        ]
+      }
+    },
+    "Fort Barfoot, VA": {
+      "rent_3br": [1100, 1550],
+      "utility": {
+        "as_of": "2026 planning (Blackstone / Crewe VA)",
+        "areas": [
+          {
+            "name": "Blackstone (23824)",
+            "zips": ["23824"],
+            "electric": [110, 200],
+            "gas_or_heat": [45, 130],
+            "water_trash": [45, 85],
+            "internet": [50, 90],
+            "season_note": "Rural inventory; ask for prior-year bills."
+          }
+        ]
+      }
+    },
+    "Fort Belvoir, VA": {
+      "rent_3br": [2400, 3200]
+    },
+    "Fort Benning, GA": {
+      "rent_3br": [1300, 1750]
+    },
+    "Fort Bliss, TX": {
+      "rent_3br": [1200, 1650]
+    },
+    "Fort Bragg, NC": {
+      "rent_3br": [1450, 1850]
+    },
+    "Fort Buchanan, PR": {
+      "rent_3br": [1100, 1700]
+    },
+    "Fort Campbell, KY": {
+      "rent_3br": [1350, 1750]
+    },
+    "Fort Carson, CO": {
+      "rent_3br": [1750, 2400]
+    },
+    "Fort Detrick, MD": {
+      "rent_3br": [1800, 2500],
+      "utility": {
+        "as_of": "2026 planning (Frederick MD)",
+        "areas": [
+          {
+            "name": "Frederick (21702)",
+            "zips": ["21701", "21702"],
+            "electric": [110, 200],
+            "gas_or_heat": [55, 150],
+            "water_trash": [55, 105],
+            "internet": [65, 105],
+            "season_note": "Frederick is a tighter, higher-cost market than rural MD."
+          }
+        ]
+      }
+    },
+    "Fort Drum, NY": {
+      "rent_3br": [1300, 1700]
+    },
+    "Fort Gillem, GA": {
+      "rent_3br": [1650, 2300],
+      "utility": {
+        "as_of": "2026 planning (Forest Park / south Atlanta)",
+        "areas": [
+          {
+            "name": "Forest Park / Morrow (30297)",
+            "zips": ["30297", "30260"],
+            "electric": [130, 250],
+            "gas_or_heat": [25, 70],
+            "water_trash": [55, 100],
+            "internet": [60, 95],
+            "season_note": "Atlanta-metro electric and water run higher than rural GA."
+          }
+        ]
+      }
+    },
+    "Fort Gordon, GA": {
+      "rent_3br": [1350, 1750]
+    },
+    "Fort Greely, AK": {
+      "rent_3br": [1400, 2000]
+    },
+    "Fort Hamilton, NY": {
+      "rent_3br": [2800, 4200],
+      "utility": {
+        "as_of": "2026 planning (Bay Ridge / Brooklyn)",
+        "areas": [
+          {
+            "name": "Bay Ridge / Dyker Heights (11209)",
+            "zips": ["11209", "11228"],
+            "electric": [110, 210],
+            "gas_or_heat": [80, 220],
+            "water_trash": [70, 130],
+            "internet": [70, 120],
+            "season_note": "ConEd + NYC water/trash. Heat is often included in rent — read the lease."
+          }
+        ]
+      }
+    },
+    "Fort Hood, TX": {
+      "rent_3br": [1250, 1650]
+    },
+    "Fort Huachuca, AZ": {
+      "rent_3br": [1250, 1750],
+      "utility": {
+        "as_of": "2026 planning (Sierra Vista AZ)",
+        "areas": [
+          {
+            "name": "Sierra Vista (85635)",
+            "zips": ["85635", "85613"],
+            "electric": [140, 280],
+            "gas_or_heat": [15, 45],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Desert AC is the bill. Many homes are all-electric."
+          }
+        ]
+      }
+    },
+    "Fort Hunter Liggett, CA": {
+      "rent_3br": [1700, 2400],
+      "utility": {
+        "as_of": "2026 planning (King City / Paso Robles)",
+        "areas": [
+          {
+            "name": "King City / Paso (93930)",
+            "zips": ["93930", "93446"],
+            "electric": [120, 230],
+            "gas_or_heat": [25, 80],
+            "water_trash": [60, 110],
+            "internet": [65, 110],
+            "season_note": "Central Coast PG&E; inventory is thin near the post."
+          }
+        ]
+      }
+    },
+    "Fort Irwin, CA": {
+      "rent_3br": [1100, 1600],
+      "utility": {
+        "as_of": "2026 planning (Barstow CA)",
+        "areas": [
+          {
+            "name": "Barstow (92311)",
+            "zips": ["92311"],
+            "electric": [150, 300],
+            "gas_or_heat": [15, 50],
+            "water_trash": [50, 95],
+            "internet": [55, 95],
+            "season_note": "High-desert AC. Most families live on-post; off-post is Barstow."
+          }
+        ]
+      }
+    },
+    "Fort Jackson, SC": {
+      "rent_3br": [1350, 1850]
+    },
+    "Fort Knox, KY": {
+      "rent_3br": [1250, 1750],
+      "utility": {
+        "as_of": "2026 planning (Elizabethtown / Radcliff)",
+        "areas": [
+          {
+            "name": "Radcliff / Elizabethtown (40160)",
+            "zips": ["40160", "42701"],
+            "electric": [115, 220],
+            "gas_or_heat": [40, 120],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "KY dual-season: AC in summer, gas heat in winter."
+          }
+        ]
+      }
+    },
+    "Fort Leavenworth, KS": {
+      "rent_3br": [1350, 1850],
+      "utility": {
+        "as_of": "2026 planning (Leavenworth / Lansing)",
+        "areas": [
+          {
+            "name": "Leavenworth (66048)",
+            "zips": ["66048", "66043"],
+            "electric": [105, 195],
+            "gas_or_heat": [50, 140],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Midwest winters. Confirm which utilities the landlord includes."
+          }
+        ]
+      }
+    },
+    "Fort Lee, VA": {
+      "rent_3br": [1450, 2000],
+      "utility": {
+        "as_of": "2026 planning (Petersburg / Colonial Heights)",
+        "areas": [
+          {
+            "name": "Colonial Heights / Prince George (23834)",
+            "zips": ["23834", "23805"],
+            "electric": [115, 220],
+            "gas_or_heat": [40, 120],
+            "water_trash": [50, 95],
+            "internet": [55, 95],
+            "season_note": "Dominion Energy; summer AC + mild winter heat."
+          }
+        ]
+      }
+    },
+    "Fort Leonard Wood, MO": {
+      "rent_3br": [1100, 1550],
+      "utility": {
+        "as_of": "2026 planning (St. Robert / Waynesville)",
+        "areas": [
+          {
+            "name": "St. Robert (65584)",
+            "zips": ["65584", "65583"],
+            "electric": [110, 210],
+            "gas_or_heat": [45, 130],
+            "water_trash": [45, 85],
+            "internet": [50, 85],
+            "season_note": "Ozarks: cheap rent, dual-season utilities."
+          }
+        ]
+      }
+    },
+    "Fort McCoy, WI": {
+      "rent_3br": [1100, 1550],
+      "utility": {
+        "as_of": "2026 planning (Sparta / Tomah WI)",
+        "areas": [
+          {
+            "name": "Sparta / Tomah (54656)",
+            "zips": ["54656", "54660"],
+            "electric": [95, 170],
+            "gas_or_heat": [90, 240],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Wisconsin winter heating dominates Oct–Mar."
+          }
+        ]
+      }
+    },
+    "Fort McNair, DC": {
+      "rent_3br": [2800, 4000],
+      "utility": {
+        "as_of": "2026 planning (SW DC / Navy Yard)",
+        "areas": [
+          {
+            "name": "SW DC / Navy Yard (20024)",
+            "zips": ["20024", "20003"],
+            "electric": [90, 180],
+            "gas_or_heat": [60, 180],
+            "water_trash": [70, 130],
+            "internet": [70, 120],
+            "season_note": "DC Pepco + high water/trash. Many condos include some utilities."
+          }
+        ]
+      }
+    },
+    "Fort Meade, MD": {
+      "rent_3br": [2100, 2900],
+      "utility": {
+        "as_of": "2026 planning (Odenton / Crofton / Columbia)",
+        "areas": [
+          {
+            "name": "Odenton / Crofton (21113)",
+            "zips": ["21113", "21114"],
+            "electric": [110, 200],
+            "gas_or_heat": [55, 145],
+            "water_trash": [60, 110],
+            "internet": [70, 110],
+            "season_note": "BGE. HOA/trash fees are common in newer neighborhoods."
+          }
+        ]
+      }
+    },
+    "Fort Myer, VA": {
+      "rent_3br": [2800, 3800]
+    },
+    "Fort Polk, LA": {
+      "rent_3br": [1050, 1500]
+    },
+    "Fort Riley, KS": {
+      "rent_3br": [1150, 1650]
+    },
+    "Fort Rucker, AL": {
+      "rent_3br": [1150, 1650],
+      "utility": {
+        "as_of": "2026 planning (Enterprise / Daleville)",
+        "areas": [
+          {
+            "name": "Enterprise / Daleville (36330)",
+            "zips": ["36330", "36322"],
+            "electric": [130, 260],
+            "gas_or_heat": [20, 55],
+            "water_trash": [50, 90],
+            "internet": [50, 85],
+            "season_note": "Wiregrass AC. Many leases exclude electric."
+          }
+        ]
+      }
+    },
+    "Fort Sam Houston, TX": {
+      "rent_3br": [1400, 1950]
+    },
+    "Fort Shafter, HI": {
+      "rent_3br": [2700, 3800]
+    },
+    "Fort Sill, OK": {
+      "rent_3br": [950, 1300]
+    },
+    "Fort Stewart, GA": {
+      "rent_3br": [1200, 1550]
+    },
+    "Fort Story, VA": {
+      "rent_3br": [1700, 2400],
+      "utility": {
+        "as_of": "2026 planning (Virginia Beach oceanfront / Shore Dr)",
+        "areas": [
+          {
+            "name": "Virginia Beach Shore Dr (23455)",
+            "zips": ["23455", "23451"],
+            "electric": [120, 230],
+            "gas_or_heat": [25, 70],
+            "water_trash": [55, 100],
+            "internet": [60, 100],
+            "season_note": "Coastal humidity + flood insurance on some streets."
+          }
+        ]
+      }
+    },
+    "Fort Wainwright, AK": {
+      "rent_3br": [1750, 2450]
+    },
+    "Fort Walker, VA": {
+      "rent_3br": [1400, 1950],
+      "utility": {
+        "as_of": "2026 planning (Bowling Green / Fredericksburg south)",
+        "areas": [
+          {
+            "name": "Bowling Green / Carmel Church (22427)",
+            "zips": ["22427", "22546"],
+            "electric": [115, 210],
+            "gas_or_heat": [45, 130],
+            "water_trash": [50, 90],
+            "internet": [55, 95],
+            "season_note": "Many families commute toward Fredericksburg for schools."
+          }
+        ]
+      }
+    },
+    "Joint Base Elmendorf-Richardson, AK": {
+      "rent_3br": [1900, 2700]
+    },
+    "Joint Base Langley-Eustis, VA": {
+      "rent_3br": [1550, 2150],
+      "utility": {
+        "as_of": "2026 planning (Hampton / Newport News / Yorktown)",
+        "areas": [
+          {
+            "name": "Hampton / Yorktown (23666)",
+            "zips": ["23666", "23692"],
+            "electric": [120, 230],
+            "gas_or_heat": [30, 90],
+            "water_trash": [55, 100],
+            "internet": [60, 95],
+            "season_note": "Hampton Roads humidity. Dominion Energy."
+          }
+        ]
+      }
+    },
+    "Joint Base Lewis-McChord, WA": {
+      "rent_3br": [2000, 2600]
+    },
+    "Joint Base McGuire-Dix-Lakehurst, NJ": {
+      "rent_3br": [1900, 2700],
+      "utility": {
+        "as_of": "2026 planning (Wrightstown / Pemberton / Mount Holly)",
+        "areas": [
+          {
+            "name": "Pemberton / Mount Holly (08068)",
+            "zips": ["08068", "08060"],
+            "electric": [105, 190],
+            "gas_or_heat": [70, 180],
+            "water_trash": [55, 105],
+            "internet": [60, 105],
+            "season_note": "NJ winter heat + ACE/JCP&L. Confirm oil vs gas."
+          }
+        ]
+      }
+    },
+    "Joint Base San Antonio, TX": {
+      "rent_3br": [1400, 1950]
+    },
+    "Natick Soldier Systems Center, MA": {
+      "rent_3br": [2700, 3800],
+      "utility": {
+        "as_of": "2026 planning (Natick / Framingham)",
+        "areas": [
+          {
+            "name": "Natick / Framingham (01760)",
+            "zips": ["01760", "01702"],
+            "electric": [110, 200],
+            "gas_or_heat": [90, 230],
+            "water_trash": [60, 110],
+            "internet": [70, 120],
+            "season_note": "National Grid / Eversource. Winter heat is the expensive month."
+          }
+        ]
+      }
+    },
+    "Pentagon / National Capital Region, VA": {
+      "rent_3br": [2800, 3800],
+      "utility": {
+        "as_of": "2026 planning (Arlington / Alexandria)",
+        "areas": [
+          {
+            "name": "Arlington / Alexandria (22202)",
+            "zips": ["22202", "22301"],
+            "electric": [90, 180],
+            "gas_or_heat": [60, 175],
+            "water_trash": [70, 125],
+            "internet": [70, 120],
+            "season_note": "NCR condos often include some utilities; HOA fees are extra."
+          }
+        ]
+      }
+    },
+    "Picatinny Arsenal, NJ": {
+      "rent_3br": [2100, 2900],
+      "utility": {
+        "as_of": "2026 planning (Rockaway / Dover NJ)",
+        "areas": [
+          {
+            "name": "Rockaway / Dover (07866)",
+            "zips": ["07866", "07801"],
+            "electric": [105, 190],
+            "gas_or_heat": [75, 190],
+            "water_trash": [55, 105],
+            "internet": [65, 110],
+            "season_note": "North Jersey winter heat. JCP&L territory."
+          }
+        ]
+      }
+    },
+    "Presidio of Monterey, CA": {
+      "rent_3br": [2700, 3700],
+      "utility": {
+        "as_of": "2026 planning (Monterey / Seaside / Marina)",
+        "areas": [
+          {
+            "name": "Seaside / Marina (93955)",
+            "zips": ["93955", "93933"],
+            "electric": [100, 190],
+            "gas_or_heat": [25, 70],
+            "water_trash": [70, 130],
+            "internet": [70, 120],
+            "season_note": "Mild climate, high PG&E + water. Inventory is tight."
+          }
+        ]
+      }
+    },
+    "Redstone Arsenal, AL": {
+      "rent_3br": [1550, 2150],
+      "utility": {
+        "as_of": "2026 planning (Huntsville / Madison)",
+        "areas": [
+          {
+            "name": "Madison / Huntsville (35758)",
+            "zips": ["35758", "35806"],
+            "electric": [120, 240],
+            "gas_or_heat": [25, 70],
+            "water_trash": [50, 95],
+            "internet": [60, 95],
+            "season_note": "Huntsville summers are AC-heavy. Newer builds run less."
+          }
+        ]
+      }
+    },
+    "Rock Island Arsenal, IL": {
+      "rent_3br": [1050, 1500],
+      "utility": {
+        "as_of": "2026 planning (Moline / Davenport)",
+        "areas": [
+          {
+            "name": "Moline / Davenport (61265)",
+            "zips": ["61265", "52804"],
+            "electric": [95, 175],
+            "gas_or_heat": [70, 190],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Quad Cities winter heat. MidAmerican Energy."
+          }
+        ]
+      }
+    },
+    "Schofield Barracks, HI": {
+      "rent_3br": [2500, 3500]
+    },
+    "Sierra Army Depot, CA": {
+      "rent_3br": [950, 1450],
+      "utility": {
+        "as_of": "2026 planning (Susanville / Herlong)",
+        "areas": [
+          {
+            "name": "Susanville (96130)",
+            "zips": ["96130", "96113"],
+            "electric": [100, 200],
+            "gas_or_heat": [50, 150],
+            "water_trash": [45, 85],
+            "internet": [55, 100],
+            "season_note": "High-desert: cold winters, limited inventory near Herlong."
+          }
+        ]
+      }
+    },
+    "Tobyhanna Army Depot, PA": {
+      "rent_3br": [1250, 1750],
+      "utility": {
+        "as_of": "2026 planning (Pocono / Scranton corridor)",
+        "areas": [
+          {
+            "name": "Mount Pocono / Scranton (18344)",
+            "zips": ["18344", "18504"],
+            "electric": [105, 185],
+            "gas_or_heat": [80, 210],
+            "water_trash": [50, 90],
+            "internet": [55, 95],
+            "season_note": "Poconos winter heating (gas or oil) is the spike."
+          }
+        ]
+      }
+    },
+    "US Military Academy West Point, NY": {
+      "rent_3br": [2100, 3000],
+      "utility": {
+        "as_of": "2026 planning (Highland Falls / Cornwall)",
+        "areas": [
+          {
+            "name": "Highland Falls / Cornwall (10928)",
+            "zips": ["10928", "12518"],
+            "electric": [110, 200],
+            "gas_or_heat": [80, 210],
+            "water_trash": [55, 105],
+            "internet": [65, 110],
+            "season_note": "Hudson Valley winter heat. Off-post inventory is tight."
+          }
+        ]
+      }
+    },
+    "USAG Bavaria, Germany": {
+      "rent_3br": [1300, 1900]
+    },
+    "USAG Italy, Italy": {
+      "rent_3br": [1400, 2000]
+    },
+    "USAG Rheinland-Pfalz, Germany": {
+      "rent_3br": [1500, 2200]
+    },
+    "USAG Wiesbaden, Germany": {
+      "rent_3br": [1700, 2500]
+    },
+    "White Sands Missile Range, NM": {
+      "rent_3br": [1150, 1650],
+      "utility": {
+        "as_of": "2026 planning (Las Cruces / Alamogordo)",
+        "areas": [
+          {
+            "name": "Las Cruces (88011)",
+            "zips": ["88011", "88310"],
+            "electric": [130, 250],
+            "gas_or_heat": [20, 60],
+            "water_trash": [45, 85],
+            "internet": [50, 90],
+            "season_note": "Desert AC. Many families live in Las Cruces, not on the range."
+          }
+        ]
+      }
+    },
+    "Yuma Proving Ground, AZ": {
+      "rent_3br": [1250, 1750],
+      "utility": {
+        "as_of": "2026 planning (Yuma AZ)",
+        "areas": [
+          {
+            "name": "Yuma (85364)",
+            "zips": ["85364", "85365"],
+            "electric": [160, 320],
+            "gas_or_heat": [10, 35],
+            "water_trash": [50, 90],
+            "internet": [55, 90],
+            "season_note": "Summer electric is extreme — May–Sep is the high end of the range."
+          }
+        ]
+      }
+    }
+  }
+}

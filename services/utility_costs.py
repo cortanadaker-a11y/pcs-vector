@@ -626,8 +626,12 @@ def get_utility_costs_for_installation(
     is_oconus: bool = False,
 ) -> dict[str, Any]:
     """Return structured off-post utility ranges for the gaining post."""
-    if installation in _UTILITY_BY_INSTALL:
-        raw = _UTILITY_BY_INSTALL[installation]
+    raw = _UTILITY_BY_INSTALL.get(installation)
+    if raw is None:
+        from services.local_costs import get_utility_override
+
+        raw = get_utility_override(installation)
+    if raw and raw.get("areas"):
         areas = [_normalize_area(a) for a in raw["areas"]]
         return {
             "installation": installation,
