@@ -3114,6 +3114,54 @@ CUSTOM_CSS = """
         line-height: 1.4;
     }
 
+    .pcs-seo-faq {
+        margin: 1.35rem auto 0.35rem auto;
+        max-width: 40rem;
+        padding: 0.15rem 0.15rem 0.4rem 0.15rem;
+        color: #E8EEEA;
+    }
+
+    .pcs-seo-faq h2 {
+        margin: 0 0 0.45rem 0;
+        color: #FFFFFF;
+        font-size: 1.28rem;
+        font-weight: 850;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+    }
+
+    .pcs-seo-faq-lead {
+        margin: 0 0 0.95rem 0;
+        color: #C5D0CA;
+        font-size: 0.92rem;
+        line-height: 1.55;
+    }
+
+    .pcs-seo-faq-item {
+        margin: 0 0 0.55rem 0;
+        padding: 0.7rem 0.8rem 0.75rem 0.8rem;
+        background: rgba(12, 22, 18, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 0.75rem;
+    }
+
+    .pcs-seo-faq-item h3 {
+        margin: 0 0 0.35rem 0;
+        color: #F0D060;
+        font-size: 0.95rem;
+        font-weight: 800;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+    }
+
+    .pcs-seo-faq-item p {
+        margin: 0;
+        color: #E4EDE8;
+        font-size: 0.88rem;
+        line-height: 1.55;
+        font-weight: 500;
+    }
+
     .pcs-footer {
         margin: 0.55rem 0 0.05rem 0;
         padding: 0.55rem 0.1rem 0;
@@ -3335,6 +3383,33 @@ CUSTOM_CSS = """
 
         .pcs-faq-item span {
             font-size: 0.8rem !important;
+        }
+
+        .pcs-seo-faq {
+            margin-top: 1.1rem !important;
+        }
+
+        .pcs-seo-faq h2 {
+            font-size: 1.12rem !important;
+        }
+
+        .pcs-seo-faq-lead {
+            font-size: 0.86rem !important;
+            line-height: 1.5 !important;
+        }
+
+        .pcs-seo-faq-item {
+            padding: 0.65rem 0.7rem !important;
+            margin-bottom: 0.45rem !important;
+        }
+
+        .pcs-seo-faq-item h3 {
+            font-size: 0.88rem !important;
+        }
+
+        .pcs-seo-faq-item p {
+            font-size: 0.82rem !important;
+            line-height: 1.5 !important;
         }
 
         .pcs-footer span {

@@ -13,6 +13,7 @@ from components.bah_calculator import (
     render_bah_calculator,
     wrap_dom_panel,
 )
+from components.faq import render_home_faq
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
@@ -483,21 +484,7 @@ def _render_referral_hook() -> None:
 
 
 def _render_faq() -> None:
-    with st.expander("FAQ — quick definitions", expanded=False):
-        st.markdown(
-            """
-<div class="pcs-faq-grid">
-  <div class="pcs-faq-item"><strong>Free?</strong><span>Yes. The calculator and housing help cost nothing.</span></div>
-  <div class="pcs-faq-item"><strong>BAH</strong><span>Your monthly housing pay in the U.S. if you live off-post. In the barracks you do not get BAH.</span></div>
-  <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas housing pay — covers rent up to a max, plus a utilities allowance.</span></div>
-  <div class="pcs-faq-item"><strong>COLA</strong><span>Extra pay overseas for higher everyday costs. It is not for rent.</span></div>
-  <div class="pcs-faq-item"><strong>DLA</strong><span>One-time cash when you move (if your orders authorize it).</span></div>
-  <div class="pcs-faq-item"><strong>Estimates</strong><span>Rent and utilities are ballpark numbers for planning — confirm before you sign.</span></div>
-  <div class="pcs-faq-item"><strong>Cost of Living Index</strong><span>Typical rent plus utilities now vs your new post — higher or lower.</span></div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
+    render_home_faq()
 
 
 def render_home() -> None:

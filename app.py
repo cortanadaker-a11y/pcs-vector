@@ -24,14 +24,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("pcs_vector")
 
 st.set_page_config(
-    page_title="PCS Vector — PCS Finance Calculator",
+    page_title="PCS Vector — Free Army PCS BAH Calculator (2026)",
     page_icon="🧭",
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={
         "About": (
-            "PCS Vector helps Soldiers who are about to PCS understand housing money "
-            "and local costs. Built For Soldiers; By Soldiers."
+            "PCS Vector is a free Army PCS finance calculator for BAH, OHA, COLA, "
+            "rent, utilities, and gas. Built For Soldiers; By Soldiers. "
+            "Not affiliated with the U.S. Department of Defense."
         ),
     },
 )

@@ -265,51 +265,176 @@ PRICING_INCLUDES = [
     "Generated in minutes after payment",
 ]
 
+FAQ_LEAD = (
+    "PCS Vector is a free Army PCS finance calculator for Soldiers comparing duty stations. "
+    "These answers cover 2026 Basic Allowance for Housing (BAH), Overseas Housing Allowance (OHA), "
+    "Cost of Living Allowance (COLA), Dislocation Allowance (DLA), barracks rules, and how to "
+    "match with a local housing agent at your new post."
+)
+
 FAQ_ITEMS = [
     {
-        "q": "What do I get for $25?",
-        "a": "A personalized 8-section PCS strategic plan written in a direct, senior-advisor tone — "
-        "not a generic checklist. You get clear recommendations, risk analysis, and time-bound next steps "
-        "based on your family's inputs. View it in the app and receive a professional PDF by email. "
-        "One report per purchase.",
+        "q": "What is PCS Vector?",
+        "a": (
+            "PCS Vector is a free Army PCS finance calculator built for Soldiers, by Soldiers. "
+            "It compares housing pay and local costs between your current installation and your "
+            "new duty station, then can connect you with a military-approved local housing agent. "
+            "Use it to plan a CONUS or OCONUS permanent change of station before you sign a lease."
+        ),
     },
     {
-        "q": "How is this different from free PCS resources?",
-        "a": "Free groups and checklists give fragments — housing tips here, school rumors there. "
-        "PCS Vector synthesizes your priorities, installation data, BAH math, and family situation into "
-        "one decision-grade plan with dependencies, timelines, and explicit tradeoffs.",
+        "q": "Is the PCS Vector calculator free?",
+        "a": (
+            "Yes. The BAH, OHA, COLA, rent, utility, gas, and DLA calculator is free. "
+            "Connecting with a PCS Wayfinder for housing help is also free. There is no "
+            "subscription and no paywall on the comparison tool."
+        ),
     },
     {
-        "q": "How long does the form take?",
-        "a": "Most families finish in 3–5 minutes across three short sections. Your answers stay saved "
-        "if you need a break before checkout.",
+        "q": "What is BAH (Basic Allowance for Housing) for an Army PCS?",
+        "a": (
+            "BAH is monthly housing pay for Soldiers living off-post in the United States. "
+            "The 2026 rate depends on your rank, dependent status, and duty location. "
+            "If rent is less than BAH, you usually keep the difference. "
+            "PCS Vector looks up BAH for your current post and new post so you can see the monthly change. "
+            "Confirm the official amount on your LES and with finance."
+        ),
     },
     {
-        "q": "When is my report generated?",
-        "a": "Immediately after successful Stripe payment. You'll see a confirmation screen, then your "
-        "report builds automatically — usually under a minute.",
+        "q": "Do Soldiers get BAH in the barracks?",
+        "a": (
+            "Generally no. Single Soldiers assigned to government quarters with a meal card "
+            "do not receive BAH, and they do not receive OHA overseas. "
+            "Check Barracks + meal card in PCS Vector and those lines go to zero. "
+            "BAH-Partial is only a few dollars if anything. Soldiers with dependents still "
+            "receive the with-dependents housing rate. Confirm with housing and finance."
+        ),
     },
     {
-        "q": "How do I get my PDF?",
-        "a": "Enter your email in step 1. After payment, the PDF is **automatically emailed** to that "
-        "address. You can also download it on the report page. Save your order reference (PCS-XXXXXXXX) "
-        "and use **Retrieve Report** if you lose your tab.",
+        "q": "What is OHA vs BAH overseas?",
+        "a": (
+            "OHA (Overseas Housing Allowance) is housing pay at foreign posts such as "
+            "Camp Humphreys, Korea; Germany; Japan; and Italy. It is not BAH. "
+            "OHA reimburses actual rent up to a locality max and adds a utilities allowance. "
+            "Hawaii, Alaska, and Puerto Rico typically use BAH plus COLA, not OHA. "
+            "The calculator labels the system so you do not mix the two."
+        ),
     },
     {
-        "q": "Is my data stored or shared?",
-        "a": "Form answers are used to generate your report and are not sold. Payment is processed "
-        "securely by Stripe — we never see your card number.",
+        "q": "What is COLA on a military PCS?",
+        "a": (
+            "COLA (Cost of Living Allowance) is extra pay for higher everyday costs at some "
+            "overseas and non-foreign OCONUS locations. It is not rent money and it is not BAH. "
+            "COLA depends on the location index, your rank, years of service, and number of dependents. "
+            "Barracks COLA is usually reduced. PCS Vector estimates COLA from 2026 tables — verify on your LES."
+        ),
     },
     {
-        "q": "Which installations are supported?",
-        "a": f"PCS Vector includes tailored data for **{INSTALLATION_COUNT} Army installations** — "
-        "full major CONUS coverage plus primary OCONUS locations (Korea, Japan, Germany, Italy, Hawaii, "
-        "and more). Names use traditional post titles (e.g. Fort Bragg, Fort Benning, Fort Hood). "
-        "If your post isn't listed, choose **Other CONUS** or **Other OCONUS** for solid general guidance.",
+        "q": "What is DLA (Dislocation Allowance)?",
+        "a": (
+            "DLA is one-time cash the Army may pay when you PCS, if your orders authorize it. "
+            "It helps with deposits and move-in costs. It is not a travel advance and it is not monthly BAH. "
+            "The calculator shows a planning DLA for your rank and dependents. "
+            "Check your orders and finance office before you count on it."
+        ),
     },
     {
-        "q": "Can I get a refund?",
-        "a": "If something goes wrong with your report, contact support through the email on your "
-        "Stripe receipt. We're committed to making it right.",
+        "q": "How does the Army PCS finance calculator work?",
+        "a": (
+            "Enter rank, dependents, years of service, current post, and new post. "
+            "PCS Vector looks up 2026 BAH or OHA plus COLA, then shows typical rent, utilities, "
+            "DLA, and average gas at both locations. The large numbers are your total housing "
+            "package now versus the gaining duty station so you can see the monthly change in seconds."
+        ),
+    },
+    {
+        "q": "What is the Cost of Living Index in PCS Vector?",
+        "a": (
+            "The Cost of Living Index compares typical rent plus utilities at your current post "
+            "versus your new post. It is a planning snapshot of housing-related costs, not the "
+            "official DoD COLA index. “Higher” means everyday housing costs look more expensive "
+            "at the new location; “lower” means they look cheaper."
+        ),
+    },
+    {
+        "q": "Are rent, utility, and gas prices official DoD numbers?",
+        "a": (
+            "No. BAH, OHA, COLA, and DLA come from 2026 allowance tables. "
+            "Typical rent and utilities are local planning estimates for off-post housing. "
+            "Average gas uses EIA weekly regular gasoline, mapped from the installation zip code "
+            "and state. Treat those as ballpark figures and confirm before you sign a lease."
+        ),
+    },
+    {
+        "q": "Which Army posts does PCS Vector cover?",
+        "a": (
+            f"PCS Vector includes {INSTALLATION_COUNT}+ Army installations across CONUS and OCONUS, "
+            "including Fort Bragg, Fort Hood, Fort Campbell, Fort Carson, Fort Drum, Fort Benning, "
+            "Joint Base Lewis-McChord, Korea, Germany, Japan, Italy, Hawaii, and Alaska. "
+            "We use traditional post names (Fort Bragg, not Fort Liberty). "
+            "If your exact post is not listed, pick the closest market and verify with finance."
+        ),
+    },
+    {
+        "q": "Are these 2026 BAH and OHA rates?",
+        "a": (
+            "Yes. The calculator uses 2026 BAH, OHA, COLA, and DLA planning tables. "
+            "The Department of Defense can update allowances during the year, so the number on "
+            "your LES is still the source of truth. PCS Vector is a planning tool, not a pay statement."
+        ),
+    },
+    {
+        "q": "What is a PCS Wayfinder?",
+        "a": (
+            "PCS Wayfinders are military-approved local housing agents at your new duty station. "
+            "After you run the calculator, enter your first name and email to connect. "
+            "The referral is free. They can help you look at rentals or buying against your "
+            "BAH or OHA. Destination, rank, and dependents come from the calculator so you do not re-enter them."
+        ),
+    },
+    {
+        "q": "Is PCS Vector affiliated with the Army or DoD?",
+        "a": (
+            "No. PCS Vector is an independent planning tool. It is not an official U.S. Army or "
+            "Department of Defense website and is not endorsed by the DoD. "
+            "Use it to prepare for a PCS, then confirm every figure with your finance office, "
+            "housing office, and orders."
+        ),
+    },
+    {
+        "q": "What is the difference between CONUS and OCONUS housing pay?",
+        "a": (
+            "CONUS (the contiguous United States) uses BAH. Foreign OCONUS posts use OHA plus COLA. "
+            "Alaska, Hawaii, and Puerto Rico are non-foreign OCONUS and typically use BAH plus COLA, "
+            "not OHA. Mixing BAH with OHA is a common PCS mistake — the calculator shows which "
+            "system applies at each post."
+        ),
+    },
+    {
+        "q": "Does BAH change if I have dependents?",
+        "a": (
+            "Yes. BAH and OHA have with-dependents and without-dependents rates. "
+            "A spouse or children usually increase the housing rate at the same location. "
+            "PCS Vector uses the dependent count you enter. The barracks (no BAH) rule applies "
+            "only when dependents are zero."
+        ),
+    },
+    {
+        "q": "How do I get help finding a place at my new duty station?",
+        "a": (
+            "Set your new post in the PCS calculator, then tap Connect With A PCS Wayfinder "
+            "and enter your first name and email. We pass destination, rank, and dependents "
+            "to a local military-approved agent. The match is free and does not change your BAH, "
+            "OHA, or COLA."
+        ),
+    },
+    {
+        "q": "Who is PCS Vector for?",
+        "a": (
+            "PCS Vector is for Army Soldiers and families preparing a permanent change of station — "
+            "junior enlisted through officers, single or with dependents, CONUS or OCONUS. "
+            "Spouses use it to see how BAH, rent, and utilities change at the gaining installation "
+            "before house-hunting. It is a planning calculator, not legal, tax, or official finance advice."
+        ),
     },
 ]
