@@ -488,7 +488,7 @@ def _render_faq() -> None:
             """
 <div class="pcs-faq-grid">
   <div class="pcs-faq-item"><strong>Free?</strong><span>Yes. The calculator and housing help cost nothing.</span></div>
-  <div class="pcs-faq-item"><strong>BAH</strong><span>Your monthly housing pay in the U.S. If rent is less, you keep the rest.</span></div>
+  <div class="pcs-faq-item"><strong>BAH</strong><span>Your monthly housing pay in the U.S. if you live off-post. In the barracks you do not get BAH.</span></div>
   <div class="pcs-faq-item"><strong>OHA</strong><span>Overseas housing pay — covers rent up to a max, plus a utilities allowance.</span></div>
   <div class="pcs-faq-item"><strong>COLA</strong><span>Extra pay overseas for higher everyday costs. It is not for rent.</span></div>
   <div class="pcs-faq-item"><strong>DLA</strong><span>One-time cash when you move (if your orders authorize it).</span></div>

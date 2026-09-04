@@ -264,7 +264,7 @@ def apply_calculator_snapshot_to_form(snapshot: dict[str, Any]) -> str:
             pass
 
     if snapshot.get("barracks_meal_card") and num_deps == 0:
-        note = "Barracks + meal card (reduced OCONUS COLA ~63%) — confirm housing plan."
+        note = "Barracks + meal card — no BAH/OHA (government quarters). Confirm with housing/finance."
         existing = str(data.get("specific_concerns") or "").strip()
         if note not in existing:
             data["specific_concerns"] = f"{existing}\n{note}".strip() if existing else note

@@ -304,6 +304,12 @@ def get_housing_package(
     oconus = get_oconus_record(installation)
     oconus_flag = is_oconus_installation(installation) or oconus is not None
     root = _load_oconus()
+    in_gov_q = bool(barracks_meal_card) and deps_n == 0
+    barracks_note = (
+        " Barracks + meal card: BAH/OHA is not paid in government quarters "
+        "(BAH-Partial is a few dollars — shown as $0). Meal card replaces BAS. "
+        "OCONUS COLA, if any, is reduced (~63%)."
+    )
 
     # --- Foreign OCONUS: OHA + COLA ---
     if oconus and oconus.get("housing_system") == "OHA":
@@ -318,7 +324,18 @@ def get_housing_package(
             barracks_meal_card=barracks_meal_card,
         )
         cola = int(cola_info.get("cola_monthly_usd") or 0)
+        found = oha_total is not None
+        if in_gov_q and found:
+            rent_max, util, oha_total = 0, 0, 0
         total = (oha_total + cola) if oha_total is not None else None
+        disclaimer = (
+            "OHA reimburses actual rent up to the locality max (plus utility allowance). "
+            "Without dependents: 90% rent ceiling + 75% utility. "
+            "COLA uses spendable income from grade, years of service, and # of dependents "
+            "(DoD FMR Vol 7A Ch 68). Verify on LES / DTMO."
+        )
+        if in_gov_q:
+            disclaimer += barracks_note
         return {
             "installation": installation,
             "pay_grade": pay_grade,
@@ -327,7 +344,7 @@ def get_housing_package(
             "years_of_service": yos,
             "is_oconus": True,
             "housing_system": "OHA",
-            "housing_label": "OHA (rent max + utilities)",
+            "housing_label": "Barracks (no OHA)" if in_gov_q else "OHA (rent max + utilities)",
             "housing_monthly_usd": oha_total,
             "oha_rent_max_usd": rent_max,
             "oha_utility_usd": util,
@@ -341,14 +358,10 @@ def get_housing_package(
             "effective_date": oconus.get("oha_effective_date")
             or root.get("effective_date", "2026-01-01"),
             "source": root.get("source", ""),
-            "found": oha_total is not None,
+            "found": found,
             "is_estimate": True,
-            "disclaimer": (
-                "OHA reimburses actual rent up to the locality max (plus utility allowance). "
-                "Without dependents: 90% rent ceiling + 75% utility. "
-                "COLA uses spendable income from grade, years of service, and # of dependents "
-                "(DoD FMR Vol 7A Ch 68). Verify on LES / DTMO."
-            ),
+            "in_government_quarters": in_gov_q,
+            "disclaimer": disclaimer,
         }
 
     # --- Non-foreign OCONUS (HI/PR): BAH + COLA ---
@@ -384,9 +397,21 @@ def get_housing_package(
         oconus_flag = True
         is_est = True
 
+    found = bah_amt is not None
+    if in_gov_q and found:
+        bah_amt = 0
+        disclaimer += barracks_note
+
     total = None
     if bah_amt is not None:
         total = int(bah_amt) + int(cola)
+
+    if in_gov_q:
+        housing_label = "Barracks (no BAH)"
+    elif housing_system.startswith("BAH"):
+        housing_label = "BAH"
+    else:
+        housing_label = "OHA"
 
     return {
         "installation": installation,
@@ -396,7 +421,7 @@ def get_housing_package(
         "years_of_service": yos,
         "is_oconus": oconus_flag,
         "housing_system": housing_system,
-        "housing_label": "BAH" if housing_system.startswith("BAH") else "OHA",
+        "housing_label": housing_label,
         "housing_monthly_usd": int(bah_amt) if bah_amt is not None else None,
         "oha_rent_max_usd": None,
         "oha_utility_usd": None,
@@ -409,8 +434,9 @@ def get_housing_package(
         "currency_note": currency_note,
         "effective_date": bah.get("effective_date") or get_bah_effective_date(),
         "source": bah.get("source") or root.get("source", ""),
-        "found": bah_amt is not None,
+        "found": found,
         "is_estimate": is_est,
+        "in_government_quarters": in_gov_q,
         "disclaimer": disclaimer,
     }
 
@@ -489,6 +515,34 @@ def format_housing_callout(
             f"{who}: housing allowance for {install} is not fully on file — "
             f"verify OHA/BAH and COLA with finance ({dep}{yos_bit})."
         )
+
+    if package.get("in_government_quarters"):
+        parts = [
+            f"{who}, barracks + meal card at {install}: no BAH/OHA "
+            f"(government quarters; {dep}{yos_bit})."
+        ]
+        if cola:
+            parts.append(
+                f"Estimated COLA is about ${cola:,}/mo (reduced barracks rate)."
+            )
+        parts.append("Confirm with housing and finance — BAH-Partial is a few dollars if anything.")
+        if current_package and current_package.get("total_monthly_usd") is not None and total is not None:
+            cur_name = current_package.get("installation") or "your current post"
+            cur_tot = int(current_package["total_monthly_usd"])
+            delta = int(total) - cur_tot
+            if delta > 0:
+                parts.append(
+                    f"That is ${delta:,}/mo more than your current package at {cur_name} "
+                    f"(≈ ${cur_tot:,}/mo total)."
+                )
+            elif delta < 0:
+                parts.append(
+                    f"That is ${abs(delta):,}/mo less than your current package at {cur_name} "
+                    f"(≈ ${cur_tot:,}/mo total)."
+                )
+            else:
+                parts.append(f"Same total package as {cur_name} (≈ ${cur_tot:,}/mo).")
+        return " ".join(parts)
 
     if system == "OHA":
         rent = package.get("oha_rent_max_usd")

@@ -158,7 +158,9 @@ def _arrive_cash(rent_mid: int | None, dla_usd: float | None, util_mid: int | No
     }
 
 
-def _system_chip(system: str) -> str:
+def _system_chip(system: str, *, barracks: bool = False, cola: int = 0) -> str:
+    if barracks:
+        return "Barracks + COLA" if int(cola or 0) > 0 else "Barracks"
     if system == "OHA":
         return "OHA + COLA"
     if system == "BAH_PLUS_COLA":
@@ -248,11 +250,11 @@ def render_bah_calculator() -> None:
     # Always render this widget (never mount/unmount) — toggling it with
     # dependents was crashing Streamlit on rerun.
     barracks_on = st.checkbox(
-        "Barracks + meal card (may lower COLA)",
+        "Barracks + meal card (no BAH)",
         value=False,
         key="bah_calc_barracks",
         disabled=with_dependents,
-        help="Only applies with 0 dependents.",
+        help="Single Soldiers in the barracks do not get BAH or OHA. Meal card replaces BAS. OCONUS COLA is reduced.",
     )
     if with_dependents:
         barracks_on = False
@@ -341,9 +343,14 @@ def render_bah_calculator() -> None:
         cur_mid = int(cur_market["mid_usd"])
 
     # Per-side systems (Germany OHA+COLA → Jackson BAH must compare TOTALS)
-    system_chip = _system_chip(system)
+    tgt_barracks = bool(pkg.get("in_government_quarters"))
+    cur_barracks = bool(has_compare and cur and cur.get("in_government_quarters"))
     cur_sys = (cur.get("housing_system") or "BAH") if (has_compare and cur) else None
-    cur_sys_chip = _system_chip(cur_sys) if cur_sys else ""
+    cur_cola_preview = int(cur.get("cola_monthly_usd") or 0) if (has_compare and cur) else 0
+    system_chip = _system_chip(system, barracks=tgt_barracks, cola=cola)
+    cur_sys_chip = (
+        _system_chip(cur_sys, barracks=cur_barracks, cola=cur_cola_preview) if cur_sys else ""
+    )
     cur_total = (
         int(cur["total_monthly_usd"])
         if has_compare and cur and cur.get("total_monthly_usd") is not None
