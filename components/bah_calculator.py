@@ -542,7 +542,6 @@ def render_bah_calculator() -> None:
                 </div>
                 {rollup_html}
             </div>
-            <div class="pcs-partner-foot">Planning figures · verify LES / finance / DTMO before you sign</div>
         </div>
         """
     )

@@ -461,7 +461,9 @@ CUSTOM_CSS = """
     }
 
     #pcs-match-panel.pcs-ref-open [class*="st-key-referral_open_btn"],
-    .pcs-face-section-match.pcs-ref-open [class*="st-key-referral_open_btn"] {
+    .pcs-face-section-match.pcs-ref-open [class*="st-key-referral_open_btn"],
+    #pcs-match-panel.pcs-ref-open .pcs-way-kicker,
+    .pcs-face-section-match.pcs-ref-open .pcs-way-kicker {
         display: none !important;
         height: 0 !important;
         min-height: 0 !important;
@@ -470,18 +472,27 @@ CUSTOM_CSS = """
         overflow: hidden !important;
     }
 
+    .pcs-way-kicker {
+        margin: 0 0 0.45rem 0 !important;
+        padding: 0 !important;
+        text-align: center;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #F0D060 !important;
+        line-height: 1.35;
+    }
+
     #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
     .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
-        white-space: normal !important;
-        min-height: 5.4rem !important;
-        height: auto !important;
-        font-size: 0.92rem !important;
-        font-weight: 800 !important;
-        line-height: 1.38 !important;
-        letter-spacing: -0.01em !important;
-        padding: 0.9rem 1.05rem !important;
+        white-space: nowrap !important;
+        min-height: 3.4rem !important;
+        font-size: 1.08rem !important;
+        font-weight: 900 !important;
+        line-height: 1.2 !important;
+        padding: 0.7rem 1rem !important;
         margin-top: 0 !important;
-        text-align: center !important;
     }
 
     #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"],
@@ -3298,7 +3309,9 @@ CUSTOM_CSS = """
         text-align: center;
         font-size: 0.7rem !important;
         color: #9CA3AF !important;
-        margin-top: 0.75rem !important;
+        margin-top: 0.7rem !important;
+        margin-bottom: 0.15rem !important;
+        padding-top: 0.45rem !important;
     }
 
     /* ── Mobile-first polish (35-loop pass) ── */
@@ -3467,10 +3480,15 @@ CUSTOM_CSS = """
             margin-top: 0.2rem !important;
         }
 
+        .pcs-way-kicker {
+            font-size: 0.66rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
         #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
-            min-height: 5.8rem !important;
-            font-size: 0.86rem !important;
-            padding: 0.8rem 0.85rem !important;
+            min-height: 3.25rem !important;
+            font-size: 1.02rem !important;
+            padding: 0.65rem 0.75rem !important;
         }
 
         .pcs-seo-faq h2 {
@@ -4398,15 +4416,13 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match
 #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
 .st-key-pcs_calc_card #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
 div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
-  white-space: normal !important;
-  min-height: 5.4rem !important;
-  height: auto !important;
-  font-size: 0.92rem !important;
-  font-weight: 800 !important;
-  line-height: 1.38 !important;
-  padding: 0.9rem 1.05rem !important;
+  white-space: nowrap !important;
+  min-height: 3.4rem !important;
+  font-size: 1.08rem !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  padding: 0.7rem 1rem !important;
   margin-top: 0 !important;
-  text-align: center !important;
 }
 
 .st-key-pcs_calc_card #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"],

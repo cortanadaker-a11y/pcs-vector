@@ -431,9 +431,18 @@ def _render_referral_hook() -> None:
         unsafe_allow_html=True,
     )
 
+    dest_bit = _short_dest(dest, 22) if dest else ""
+    kicker = (
+        f"Military-approved agents · {dest_bit}"
+        if dest_bit
+        else "Military-approved local agents · worldwide"
+    )
+    st.markdown(
+        f'<p class="pcs-way-kicker">{safe_html(kicker)}</p>',
+        unsafe_allow_html=True,
+    )
     opened = st.button(
-        "Our PCS Wayfinders are military-approved local agents across the globe, "
-        "ready to help. Click here to find a new home — Free",
+        "Find a home — Free ➔",
         type="primary",
         use_container_width=True,
         key="referral_open_btn",
@@ -464,9 +473,9 @@ def _render_referral_hook() -> None:
         key="referral_submit_btn",
     )
     if ready:
-        st.caption("Free · no obligation · military-approved local agents")
+        st.caption("Free · no obligation")
     else:
-        st.caption("Pick a New post above, then connect — Free")
+        st.caption("Pick a New post above first")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
@@ -535,12 +544,12 @@ def render_home() -> None:
         render_bah_calculator()
         _render_referral_hook()
 
-    _render_faq()
     st.markdown(
         """
         <div class="pcs-footer">
-            <span>Verify LES / finance before you sign.</span>
+            <span>Planning figures · verify LES / finance / DTMO before you sign</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
+    _render_faq()
