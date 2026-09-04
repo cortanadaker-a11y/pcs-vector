@@ -11,6 +11,7 @@ from components.form_options import RANK_PAY_GRADES
 from components.html_utils import safe_html
 from services.bah_rates import list_bah_installations
 from services.dla_rates import get_dla_rate
+from services.gas_prices import get_gas_price_for_installation
 from services.housing_allowances import compare_housing_packages
 from services.installation_data import (
     SUPPORTED_INSTALLATIONS,
@@ -416,6 +417,7 @@ def render_bah_calculator() -> None:
             rollup_html = ""
         left_rent = f"{_money_html(cur_rent_lo)} – {_money_html(cur_rent_hi)}"
         left_util = f"{_money_html(int(cur_util_n or 0))}/mo"
+        left_gas = (get_gas_price_for_installation(current) or {}).get("label") or "—"
     else:
         arrow_html = f"""
         <div class="pcs-partner-arrow pcs-partner-arrow-solo">
@@ -432,9 +434,11 @@ def render_bah_calculator() -> None:
         rollup_html = ""
         left_rent = "—"
         left_util = "—"
+        left_gas = "—"
 
     right_rent = f"{_money_html(market_low)} – {_money_html(market_high)}"
     right_util = f"{_money_html(util_n)}/mo" if util_n else "—"
+    right_gas = (get_gas_price_for_installation(gaining) or {}).get("label") or "—"
 
     # Allowance rows: show each line only if it applies to Current and/or Target
     allowance_rows = ""
@@ -518,6 +522,11 @@ def render_bah_calculator() -> None:
                     <span class="pcs-est-side">{left_util}</span>
                     <span class="pcs-est-label">Utilities</span>
                     <span class="pcs-est-side pcs-est-side-new">{right_util}</span>
+                </div>
+                <div class="pcs-est-row">
+                    <span class="pcs-est-side">{left_gas}</span>
+                    <span class="pcs-est-label">Avg gas</span>
+                    <span class="pcs-est-side pcs-est-side-new">{right_gas}</span>
                 </div>
                 <div class="pcs-est-row">
                     <span class="pcs-est-side">—</span>

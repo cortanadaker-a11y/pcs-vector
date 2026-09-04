@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-08-31",
+  "source": "eia_weekly_regular",
+  "unit": "usd_per_gallon",
+  "prices": {
+    "U.S.": 4.071,
+    "East Coast (PADD1)": 3.937,
+    "New England (PADD 1A)": 4.096,
+    "Central Atlantic (PADD 1B)": 4.117,
+    "Lower Atlantic (PADD 1C)": 3.783,
+    "Midwest (PADD 2)": 3.847,
+    "Gulf Coast (PADD 3)": 3.618,
+    "Rocky Mountain (PADD 4)": 4.266,
+    "West Coast (PADD 5)": 5.206,
+    "West Coast less California": 4.823,
+    "California": 5.52,
+    "Colorado": 4.132,
+    "Florida": 3.825,
+    "Massachusetts": 4.068,
+    "Minnesota": 3.955,
+    "New York": 4.126,
+    "Ohio": 3.797,
+    "Texas": 3.577,
+    "Washington": 5.259,
+    "Boston": 4.084,
+    "Chicago": 4.243,
+    "Cleveland": 3.972,
+    "Denver": 4.164,
+    "Houston": 3.522,
+    "Los Angeles": 5.532,
+    "Miami": 3.879,
+    "New York City": 4.081,
+    "San Francisco": 5.552,
+    "Seattle": 5.412
+  },
+  "oconus_estimates": {
+    "Germany": 6.85,
+    "Italy": 7.1,
+    "Japan": 4.55,
+    "ROK": 4.75,
+    "South Korea": 4.75
+  }
+}
