@@ -440,6 +440,56 @@ CUSTOM_CSS = """
         background-image: none !important;
     }
 
+    /* Wayfinder gate: start with one engaging CTA; fields mount but stay hidden */
+    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_first_name"],
+    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_email_address"],
+    #pcs-match-panel:not(.pcs-ref-open) [data-testid="stHorizontalBlock"],
+    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_submit_btn"],
+    #pcs-match-panel:not(.pcs-ref-open) [data-testid="stCaptionContainer"],
+    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_first_name"],
+    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_email_address"],
+    .pcs-face-section-match:not(.pcs-ref-open) [data-testid="stHorizontalBlock"],
+    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_submit_btn"],
+    .pcs-face-section-match:not(.pcs-ref-open) [data-testid="stCaptionContainer"] {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        border: 0 !important;
+    }
+
+    #pcs-match-panel.pcs-ref-open [class*="st-key-referral_open_btn"],
+    .pcs-face-section-match.pcs-ref-open [class*="st-key-referral_open_btn"] {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
+    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
+        white-space: normal !important;
+        min-height: 5.4rem !important;
+        height: auto !important;
+        font-size: 0.92rem !important;
+        font-weight: 800 !important;
+        line-height: 1.38 !important;
+        letter-spacing: -0.01em !important;
+        padding: 0.9rem 1.05rem !important;
+        margin-top: 0 !important;
+        text-align: center !important;
+    }
+
+    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"],
+    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
     /* Nuke theme-blue labels (was #1e3a5f from config.toml) */
     .pcs-calc-face [data-testid="stWidgetLabel"],
     .pcs-calc-face [data-testid="stWidgetLabel"] p,
@@ -3114,10 +3164,33 @@ CUSTOM_CSS = """
         line-height: 1.4;
     }
 
-    .pcs-seo-faq {
-        margin: 1.35rem auto 0.35rem auto;
+    .st-key-pcs_faq_box,
+    [class*="st-key-pcs_faq_box"] {
+        margin-top: 0.85rem !important;
         max-width: 40rem;
-        padding: 0.15rem 0.15rem 0.4rem 0.15rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .st-key-pcs_faq_box [data-testid="stExpander"],
+    [class*="st-key-pcs_faq_box"] [data-testid="stExpander"] {
+        background: rgba(12, 22, 18, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 0.75rem !important;
+    }
+
+    .st-key-pcs_faq_box [data-testid="stExpander"] p,
+    .st-key-pcs_faq_box [data-testid="stExpander"] span,
+    [class*="st-key-pcs_faq_box"] [data-testid="stExpander"] p {
+        color: #D5DFD9 !important;
+        font-weight: 700 !important;
+        font-size: 0.88rem !important;
+    }
+
+    .pcs-seo-faq {
+        margin: 0.35rem auto 0.15rem auto;
+        max-width: 40rem;
+        padding: 0.15rem 0.05rem 0.25rem 0.05rem;
         color: #E8EEEA;
     }
 
@@ -3385,8 +3458,19 @@ CUSTOM_CSS = """
             font-size: 0.8rem !important;
         }
 
+        .st-key-pcs_faq_box,
+        [class*="st-key-pcs_faq_box"] {
+            margin-top: 0.7rem !important;
+        }
+
         .pcs-seo-faq {
-            margin-top: 1.1rem !important;
+            margin-top: 0.2rem !important;
+        }
+
+        #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
+            min-height: 5.8rem !important;
+            font-size: 0.86rem !important;
+            padding: 0.8rem 0.85rem !important;
         }
 
         .pcs-seo-faq h2 {
@@ -4309,6 +4393,25 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match
   font-weight: 900 !important;
   min-height: 3.4rem !important;
   line-height: 1.2 !important;
+}
+
+#pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
+.st-key-pcs_calc_card #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] button {
+  white-space: normal !important;
+  min-height: 5.4rem !important;
+  height: auto !important;
+  font-size: 0.92rem !important;
+  font-weight: 800 !important;
+  line-height: 1.38 !important;
+  padding: 0.9rem 1.05rem !important;
+  margin-top: 0 !important;
+  text-align: center !important;
+}
+
+.st-key-pcs_calc_card #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(#pcs-face-marker) #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_open_btn"] {
+  margin-top: 0 !important;
 }
 </style>
 """

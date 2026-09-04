@@ -108,7 +108,8 @@ def _inject_head() -> None:
 
 
 def render_home_faq() -> None:
-    """Always-visible FAQ (not a collapsed expander) so crawlers and LLMs can read it."""
+    """Collapsed FAQ in the UI; full Q&A stays in JSON-LD for crawlers / LLMs."""
+    _inject_head()
     items_html = []
     for item in FAQ_ITEMS:
         items_html.append(
@@ -127,8 +128,9 @@ def render_home_faq() -> None:
   {"".join(items_html)}
 </section>
 """
-    st.html(block)
-    _inject_head()
+    with st.container(key="pcs_faq_box"):
+        with st.expander("FAQ — BAH, OHA, COLA & more", expanded=False):
+            st.html(block)
 
 
 def render_faq(title: str | None = None) -> None:

@@ -142,6 +142,15 @@ def _tag_page_face() -> None:
     collapseIframes(wrap);
     tightenWells(wrap);
     darkenFields(wrap);
+
+    var gate = doc.getElementById("pcs-ref-gate");
+    var panel = doc.getElementById("pcs-match-panel") ||
+                wrap.querySelector(".pcs-face-section-match");
+    if (gate && panel) {
+      if (gate.getAttribute("data-open") === "1") panel.classList.add("pcs-ref-open");
+      else panel.classList.remove("pcs-ref-open");
+    }
+
     doc.documentElement.classList.add("pcs-dark-app");
     doc.body.classList.add("pcs-dark-app");
   }
@@ -354,6 +363,8 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
   if (btn) {{
     btn.onclick = function (e) {{
       e.preventDefault();
+      var opener = doc.querySelector('[class*="st-key-referral_open_btn"] button');
+      if (opener && opener.offsetParent !== null) opener.click();
       scrollToReferral();
     }};
   }}
@@ -409,10 +420,27 @@ def _render_referral_hook() -> None:
 
     dest = calc["destination"]
     ready = bool(dest)
+    gate_open = bool(st.session_state.get("referral_gate_open"))
 
-    # Compact contact strip → orange CTA (not st.form — forms inject
-    # "Press Enter to submit form" tooltips on every text field)
-    st.markdown('<div id="pcs-match-start"></div><div id="pcs-referral"></div>', unsafe_allow_html=True)
+    # Always mount opener + fields (CSS shows one or the other) so the
+    # match-panel wrap is not rebuilt on click — that used to crash widgets.
+    # Not st.form — forms inject "Press Enter to submit form" tooltips.
+    st.markdown(
+        f'<div id="pcs-match-start"></div><div id="pcs-referral"></div>'
+        f'<div id="pcs-ref-gate" data-open="{1 if gate_open else 0}" hidden></div>',
+        unsafe_allow_html=True,
+    )
+
+    opened = st.button(
+        "Our PCS Wayfinders are military-approved local agents across the globe, "
+        "ready to help. Click here to find a new home — Free",
+        type="primary",
+        use_container_width=True,
+        key="referral_open_btn",
+    )
+    if opened and not gate_open:
+        st.session_state.referral_gate_open = True
+        st.rerun()
 
     n1, n2 = st.columns(2)
     with n1:
@@ -429,13 +457,16 @@ def _render_referral_hook() -> None:
         )
 
     submitted = st.button(
-        "Connect With A PCS Wayfinder ➔",
+        "Connect with a PCS Wayfinder ➔",
         type="primary",
         use_container_width=True,
         disabled=not ready,
         key="referral_submit_btn",
     )
-    st.caption("PCS Wayfinders are our military-approved local agents — Free")
+    if ready:
+        st.caption("Free · no obligation · military-approved local agents")
+    else:
+        st.caption("Pick a New post above, then connect — Free")
 
     if submitted:
         first_name = str(st.session_state.get("referral_first_name") or first_name or "")
