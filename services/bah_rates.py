@@ -62,11 +62,27 @@ def get_bah_rate(
             "found": amount is not None,
         }
 
-    # Planning fallback for CONUS posts not yet in bah_2026.json
+    # CONUS / AK / HI only. Foreign OCONUS and Puerto Rico use OHA — never a $1,650 stub.
     try:
+        from services.housing_allowances import get_oconus_record, is_oconus_installation
         from services.installation_data import INSTALLATIONS, _canonical_installation_name
 
         canonical = _canonical_installation_name(installation_label)
+        oconus = get_oconus_record(canonical or installation_label)
+        if (oconus and oconus.get("housing_system") == "OHA") or (
+            is_oconus_installation(installation_label)
+            and (oconus or {}).get("housing_system") != "BAH_PLUS_COLA"
+        ):
+            return {
+                "monthly_usd": None,
+                "mha": (oconus or {}).get("locality"),
+                "effective_date": data.get("effective_date"),
+                "source": "OHA locality (not BAH). Verify at DTMO OHA lookup / finance.",
+                "with_dependents": with_dependents,
+                "found": False,
+                "is_estimate": False,
+            }
+
         profile = INSTALLATIONS.get(canonical) if canonical else None
         if profile is not None:
             amount = profile.bah_rates.get(pay_grade, profile.bah_rates.get("E-5"))

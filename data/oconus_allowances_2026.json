@@ -4,7 +4,8 @@
   "notes": {
     "OHA": "Foreign OCONUS. Max OHA = rent ceiling + utility/recurring maintenance. Without-deps = 90% rent + 75% util. Pays actual rent up to max.",
     "COLA": "Monthly \u2248 spendable(annual base pay, # command-sponsored dependents 0\u20135) \u00d7 (index\u2212100)/100/12. Index can be null (no COLA).",
-    "HI_PR": "Hawaii and Puerto Rico use BAH + OCONUS COLA (same spendable formula), not OHA."
+    "HI_AK": "Hawaii and Alaska use BAH (bah_2026.json) plus OCONUS COLA from the spendable-income formula. Not OHA.",
+    "PR_TERRITORIES": "Puerto Rico, Guam, USVI, and other U.S. territories use OHA + COLA, not BAH. Fort Buchanan locality is PR080 (San Juan)."
   },
   "locations": {
     "Camp Humphreys, South Korea": {
@@ -334,13 +335,22 @@
       "currency_note": "Non-foreign OCONUS: BAH (bah_2026.json) plus OCONUS COLA from spendable-income formula. Not OHA."
     },
     "Fort Buchanan, PR": {
-      "housing_system": "BAH_PLUS_COLA",
+      "housing_system": "OHA",
       "country": "Puerto Rico",
       "locality": "San Juan (incl Bayamon, Carolina, and Fort Buchanan)",
       "cola_code": "PR080",
       "cola_index": 124,
       "cola_index_effective": "2025-03-16",
-      "currency_note": "Non-foreign OCONUS: BAH (bah_2026.json) plus OCONUS COLA from spendable-income formula. Not OHA."
+      "oha_code": "PR080",
+      "currency_code": "USD",
+      "usd_per_local": 1.0,
+      "oha_util_local": null,
+      "oha_miha_local": null,
+      "oha_without_rent_factor": 0.9,
+      "oha_without_util_factor": 0.75,
+      "oha_rent_local": {},
+      "oha_effective_date": "2026-08-01",
+      "currency_note": "U.S. territory: OHA (not BAH) plus OCONUS COLA. Rent ceilings are published in USD at DTMO OHA lookup (locality PR080). Verify the current ceiling and utility allowance with the Fort Buchanan housing office / DTMO before you lease."
     },
     "Joint Base Elmendorf-Richardson, AK": {
       "housing_system": "BAH_PLUS_COLA",

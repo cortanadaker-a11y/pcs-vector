@@ -364,7 +364,7 @@ def get_housing_package(
             "disclaimer": disclaimer,
         }
 
-    # --- Non-foreign OCONUS (HI/PR): BAH + COLA ---
+    # --- Non-foreign OCONUS (HI/AK): BAH + COLA. Puerto Rico is OHA (handled above). ---
     bah = get_bah_rate(installation, pay_grade, with_dependents=with_dependents)
     bah_amt = bah.get("monthly_usd")
     cola = 0

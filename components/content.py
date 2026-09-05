@@ -314,9 +314,10 @@ FAQ_ITEMS = [
         "q": "What is OHA vs BAH overseas?",
         "a": (
             "OHA (Overseas Housing Allowance) is housing pay at foreign posts such as "
-            "Camp Humphreys, Korea; Germany; Japan; and Italy. It is not BAH. "
+            "Camp Humphreys, Korea; Germany; Japan; and Italy — and at U.S. territories "
+            "including Fort Buchanan, Puerto Rico. It is not BAH. "
             "OHA reimburses actual rent up to a locality max and adds a utilities allowance. "
-            "Hawaii, Alaska, and Puerto Rico typically use BAH plus COLA, not OHA. "
+            "Hawaii and Alaska use BAH plus COLA, not OHA. "
             "The calculator labels the system so you do not mix the two."
         ),
     },
@@ -405,8 +406,9 @@ FAQ_ITEMS = [
         "q": "What is the difference between CONUS and OCONUS housing pay?",
         "a": (
             "CONUS (the contiguous United States) uses BAH. Foreign OCONUS posts use OHA plus COLA. "
-            "Alaska, Hawaii, and Puerto Rico are non-foreign OCONUS and typically use BAH plus COLA, "
-            "not OHA. Mixing BAH with OHA is a common PCS mistake — the calculator shows which "
+            "Alaska and Hawaii are non-foreign OCONUS and use BAH plus COLA. "
+            "Puerto Rico (Fort Buchanan) is a U.S. territory and uses OHA plus COLA, not BAH. "
+            "Mixing BAH with OHA is a common PCS mistake — the calculator shows which "
             "system applies at each post."
         ),
     },

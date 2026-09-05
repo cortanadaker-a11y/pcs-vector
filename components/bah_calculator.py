@@ -275,7 +275,19 @@ def render_bah_calculator() -> None:
 
     if not pkg.get("found") or pkg.get("total_monthly_usd") is None:
         _store_snapshot({"pay_grade": pay_grade})
-        st.warning(f"No 2026 rates for {pay_grade} at {gaining}. Try another post or ask finance.")
+        if (pkg.get("housing_system") or "") == "OHA":
+            loc = pkg.get("locality") or gaining
+            idx = pkg.get("cola_index")
+            cola_bit = f" COLA index is {idx}." if idx is not None else ""
+            st.warning(
+                f"{gaining} uses OHA (not BAH). Look up the current rent ceiling and "
+                f"utility allowance at the DTMO OHA Rate Lookup for {loc}.{cola_bit} "
+                "Do not use a CONUS BAH figure for this post."
+            )
+        else:
+            st.warning(
+                f"No 2026 rates for {pay_grade} at {gaining}. Try another post or ask finance."
+            )
         return
 
     system = pkg.get("housing_system") or "BAH"
