@@ -17,7 +17,7 @@ from components.faq import render_home_faq
 from components.form_options import PAY_GRADE_TO_RANK
 from components.html_utils import safe_html
 from services.referral_lead import (
-    build_redirect_to_form_html,
+    build_prefill_url,
     build_referral_row,
     format_dependents_label,
     format_rank_label,
@@ -414,43 +414,8 @@ def _render_sticky_referral_cta(calc: dict[str, str]) -> None:
     )
 
 
-def _render_referral_hook() -> None:
-    snap = get_calculator_snapshot() or {}
-    calc = _calc_fields_from_snap(snap)
-
-    dest = calc["destination"]
-    ready = bool(dest)
-    gate_open = bool(st.session_state.get("referral_gate_open"))
-
-    # Always mount opener + fields (CSS shows one or the other) so the
-    # match-panel wrap is not rebuilt on click — that used to crash widgets.
-    # Not st.form — forms inject "Press Enter to submit form" tooltips.
-    st.markdown(
-        f'<div id="pcs-match-start"></div><div id="pcs-referral"></div>'
-        f'<div id="pcs-ref-gate" data-open="{1 if gate_open else 0}" hidden></div>',
-        unsafe_allow_html=True,
-    )
-
-    dest_bit = _short_dest(dest, 22) if dest else ""
-    kicker = (
-        f"Military-approved agents · {dest_bit}"
-        if dest_bit
-        else "Military-approved local agents · worldwide"
-    )
-    st.markdown(
-        f'<p class="pcs-way-kicker">{safe_html(kicker)}</p>',
-        unsafe_allow_html=True,
-    )
-    opened = st.button(
-        "Find a home — Free ➔",
-        type="primary",
-        use_container_width=True,
-        key="referral_open_btn",
-    )
-    if opened and not gate_open:
-        st.session_state.referral_gate_open = True
-        st.rerun()
-
+def _render_referral_fields(*, snap: dict, ready: bool) -> None:
+    """First name / Email / Connect — rendered server-side once the gate is open."""
     n1, n2 = st.columns(2)
     with n1:
         first_name = st.text_input(
@@ -503,14 +468,68 @@ def _render_referral_hook() -> None:
             st.error("Enter a valid email address (example: name@email.com).")
         else:
             st.session_state.referral_lead = {**row, "calculator": live}
-
+            # Keep the Apps Script webhook (no-op when not configured).
             submit_referral_via_apps_script(row)
+            st.session_state.referral_prefill_url = build_prefill_url(row)
 
-            st.html(
-                build_redirect_to_form_html(row),
-                unsafe_allow_javascript=True,
+    prefill_url = st.session_state.get("referral_prefill_url")
+    if prefill_url:
+        # Plain link (no window.top.location.assign) — works even when
+        # iframe/top-navigation JS is blocked.
+        st.success("You're set — open your pre-filled form and tap **Submit**.")
+        st.link_button(
+            "Open my pre-filled form ➔",
+            prefill_url,
+            type="primary",
+            use_container_width=True,
+        )
+
+
+def _render_referral_hook() -> None:
+    snap = get_calculator_snapshot() or {}
+    calc = _calc_fields_from_snap(snap)
+
+    dest = calc["destination"]
+    ready = bool(dest)
+    gate_open = bool(st.session_state.get("referral_gate_open"))
+
+    # Server-side gate: render EITHER the opener OR the fields + Connect.
+    # Visibility no longer depends on iframe JS adding .pcs-ref-open to
+    # #pcs-match-panel (that JS was unreliable, leaving the fields hidden).
+    # Not st.form — forms inject "Press Enter to submit form" tooltips.
+    st.markdown(
+        f'<div id="pcs-match-start"></div><div id="pcs-referral"></div>'
+        f'<div id="pcs-ref-gate" data-open="{1 if gate_open else 0}" hidden></div>',
+        unsafe_allow_html=True,
+    )
+
+    # wrap_dom_panel() reparents these blocks with JS, so the number of
+    # top-level elements here must stay constant across reruns or React
+    # crashes. All gate-dependent content lives inside ONE keyed container;
+    # its children can change freely because the container node itself moves.
+    with st.container(key="referral_gate_body"):
+        if not gate_open:
+            dest_bit = _short_dest(dest, 22) if dest else ""
+            kicker = (
+                f"Military-approved agents · {dest_bit}"
+                if dest_bit
+                else "Military-approved local agents · worldwide"
             )
-            st.success("Opening your pre-filled form — tap **Submit** on the next page.")
+            st.markdown(
+                f'<p class="pcs-way-kicker">{safe_html(kicker)}</p>',
+                unsafe_allow_html=True,
+            )
+            opened = st.button(
+                "Find a home — Free ➔",
+                type="primary",
+                use_container_width=True,
+                key="referral_open_btn",
+            )
+            if opened:
+                st.session_state.referral_gate_open = True
+                st.rerun()
+        else:
+            _render_referral_fields(snap=snap, ready=ready)
 
     st.markdown('<div id="pcs-match-end"></div>', unsafe_allow_html=True)
     wrap_dom_panel(
