@@ -440,24 +440,17 @@ CUSTOM_CSS = """
         background-image: none !important;
     }
 
-    /* Wayfinder gate: start with one engaging CTA; fields mount but stay hidden */
-    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_first_name"],
-    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_email_address"],
-    #pcs-match-panel:not(.pcs-ref-open) [data-testid="stHorizontalBlock"],
-    #pcs-match-panel:not(.pcs-ref-open) [class*="st-key-referral_submit_btn"],
-    #pcs-match-panel:not(.pcs-ref-open) [data-testid="stCaptionContainer"],
-    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_first_name"],
-    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_email_address"],
-    .pcs-face-section-match:not(.pcs-ref-open) [data-testid="stHorizontalBlock"],
-    .pcs-face-section-match:not(.pcs-ref-open) [class*="st-key-referral_submit_btn"],
-    .pcs-face-section-match:not(.pcs-ref-open) [data-testid="stCaptionContainer"] {
-        display: none !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        border: 0 !important;
+    /* Wayfinder gate: views/home.py renders EITHER the opener OR the fields
+       server-side (session_state.referral_gate_open). The old
+       :not(.pcs-ref-open) hide rules were removed — they depended on iframe JS
+       adding .pcs-ref-open, which often never ran, leaving fields hidden. */
+    #pcs-match-panel [data-testid="stLinkButton"] a,
+    .pcs-face-section-match [data-testid="stLinkButton"] a {
+        background: #FB923C !important;
+        border-color: #FB923C !important;
+        color: #FFFFFF !important;
+        font-weight: 900 !important;
+        margin-top: 0.5rem !important;
     }
 
     #pcs-match-panel.pcs-ref-open [class*="st-key-referral_open_btn"],
