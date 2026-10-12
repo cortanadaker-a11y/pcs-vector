@@ -151,6 +151,21 @@ def monthly_base_pay(pay_grade: str, years_of_service: int = 4) -> float | None:
     return pay if pay > 0 else None
 
 
+def annual_cola_compensation(
+    pay_grade: str, years_of_service: int = 4, *, with_dependents: bool = False
+) -> int | None:
+    """DTMO annual-compensation bracket (lower bound) for grade x YOS x dependency status."""
+    tables = _load_cola_tables()
+    comp = tables.get("cola_compensation_min_usd") or {}
+    grade = _normalize_pay_grade(pay_grade)
+    row = (comp.get(grade) or {}).get("with" if with_dependents else "without")
+    if not row:
+        return None
+    bps = tables.get("yos_breakpoints") or [0, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+    idx = min(_yos_pay_index(years_of_service, bps), len(row) - 1)
+    return int(row[idx])
+
+
 def annual_spendable_income(annual_compensation: float, num_dependents: int) -> int:
     """Look up average annual spendable income (CY COLA table)."""
     tables = _load_cola_tables()
@@ -196,8 +211,11 @@ def estimate_monthly_cola(
             "note": "Index at or below 100 — no COLA payable.",
         }
 
+    comp = annual_cola_compensation(
+        pay_grade, years_of_service, with_dependents=int(num_dependents) > 0
+    )
     monthly = monthly_base_pay(pay_grade, years_of_service)
-    if monthly is None:
+    if comp is None and monthly is None:
         return {
             "cola_monthly_usd": 0,
             "cola_index": int(index),
@@ -207,8 +225,9 @@ def estimate_monthly_cola(
             "note": f"No base pay for {pay_grade} at {years_of_service} YOS.",
         }
 
-    annual_pay = monthly * 12
-    spendable = annual_spendable_income(annual_pay, num_dependents)
+    annual_pay = (monthly or 0) * 12
+    # DTMO uses an annual-compensation bracket (not base pay alone) to pick spendable income.
+    spendable = annual_spendable_income(comp if comp is not None else annual_pay, num_dependents)
     cola = spendable * (index - 100) / 100.0 / 12.0
     if barracks_meal_card and int(num_dependents) == 0:
         cola *= 0.63
@@ -220,7 +239,8 @@ def estimate_monthly_cola(
         "cola_monthly_usd": cola_i,
         "cola_index": int(index) if index == int(index) else index,
         "annual_base_pay_usd": int(round(annual_pay)),
-        "monthly_base_pay_usd": round(monthly, 2),
+        "monthly_base_pay_usd": round(monthly, 2) if monthly is not None else None,
+        "annual_compensation_bracket_usd": comp,
         "annual_spendable_usd": spendable,
         "years_of_service": int(years_of_service),
         "num_dependents": max(0, min(5, int(num_dependents))),

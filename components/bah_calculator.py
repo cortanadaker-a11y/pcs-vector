@@ -278,11 +278,11 @@ def render_bah_calculator() -> None:
         if (pkg.get("housing_system") or "") == "OHA":
             loc = pkg.get("locality") or gaining
             idx = pkg.get("cola_index")
-            cola_bit = f" COLA index is {idx}." if idx is not None else ""
-            st.warning(
-                f"{gaining} uses OHA (not BAH). Look up the current rent ceiling and "
-                f"utility allowance at the DTMO OHA Rate Lookup for {loc}.{cola_bit} "
-                "Do not use a CONUS BAH figure for this post."
+            cola_bit = f" COLA index: {idx}." if idx is not None else ""
+            st.info(
+                f"{gaining} uses OHA (Overseas Housing Allowance), not BAH. "
+                f"This locality's OHA table isn't loaded yet, so get your exact rent ceiling "
+                f"and utility allowance from the DTMO OHA Rate Lookup ({loc}).{cola_bit}"
             )
         else:
             st.warning(
