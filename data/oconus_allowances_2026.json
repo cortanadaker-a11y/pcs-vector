@@ -1,6 +1,6 @@
 {
-  "effective_date": "2026-10-01",
-  "source": "OHA: DTMO OHA Rate Lookup (rent ceilings, utility, MIHA) and DTMO exchange rates, pay period 1 Oct 2026. COLA: DTMO Overseas COLA indices (pay period 1-15 Oct 2026) with the CY2026 spendable-income table and DTMO annual-compensation brackets. Verified against the DTMO calculators on 11 Oct 2026. Always verify on LES / DTMO.",
+  "effective_date": "2026-10-16",
+  "source": "OHA: DTMO OHA Rate Lookup (rent ceilings, utility, MIHA) and DTMO exchange rates. Local-currency ceilings: pay period 1 Oct 2026 (unchanged 16 Oct). Exchange rates: pay period 16 Oct 2026 (KRW 1295.0831995379, JPY 151.51869999128 per USD; EUR 0.844 unchanged). Source: https://www.defensetravel.dod.mil/neorates/report/index.php (DTMO OHA calculator), re-verified 18 Oct 2026. COLA: DTMO Overseas COLA indices (pay period 1-15 Oct 2026) with the CY2026 spendable-income table and DTMO annual-compensation brackets. Verified against the DTMO calculators on 11 Oct 2026. Always verify on LES / DTMO.",
   "notes": {
     "OHA": "Foreign OCONUS. Max OHA = rent ceiling + utility/recurring maintenance. Without-deps = 90% rent + 75% util. Pays actual rent up to max.",
     "COLA": "Monthly = spendable(DTMO annual-compensation bracket for grade x YOS x with/without dependents, # command-sponsored dependents 0-5) x (index-100)/100/12. Index can be null (no COLA).",
@@ -17,7 +17,7 @@
       "cola_index_effective": "2026-09-16",
       "oha_code": "KR025",
       "currency_code": "KRW",
-      "usd_per_local": 0.0007630353,
+      "usd_per_local": 0.0007721512,
       "oha_util_local": 1068238,
       "oha_miha_local": 386676,
       "oha_without_rent_factor": 0.9,
@@ -48,9 +48,9 @@
         "E-3": 1777778,
         "O-7+": 3184449
       },
-      "oha_effective_date": "2026-10-01",
-      "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in KRW; USD uses DTMO rate 1 USD = 1310.56 KRW (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "oha_effective_date": "2026-10-16",
+      "fx_refreshed_on": "2026-10-16",
+      "currency_note": "OHA ceilings in KRW; USD uses DTMO rate 1 USD = 1295.08 KRW (pay period 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "Camp Casey, South Korea": {
       "housing_system": "OHA",
@@ -61,7 +61,7 @@
       "cola_index_effective": "2026-09-16",
       "oha_code": "KR177",
       "currency_code": "KRW",
-      "usd_per_local": 0.0007630353,
+      "usd_per_local": 0.0007721512,
       "oha_util_local": 1068238,
       "oha_miha_local": 386676,
       "oha_without_rent_factor": 0.9,
@@ -92,9 +92,9 @@
         "E-3": 1455556,
         "O-7+": 2060000
       },
-      "oha_effective_date": "2026-10-01",
-      "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in KRW; USD uses DTMO rate 1 USD = 1310.56 KRW (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "oha_effective_date": "2026-10-16",
+      "fx_refreshed_on": "2026-10-16",
+      "currency_note": "OHA ceilings in KRW; USD uses DTMO rate 1 USD = 1295.08 KRW (pay period 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "Camp Zama, Japan": {
       "housing_system": "OHA",
@@ -105,7 +105,7 @@
       "cola_index_effective": "2026-10-01",
       "oha_code": "JP045",
       "currency_code": "JPY",
-      "usd_per_local": 0.0067379224,
+      "usd_per_local": 0.0065998454,
       "oha_util_local": 112012,
       "oha_miha_local": 65477,
       "oha_without_rent_factor": 0.9,
@@ -136,9 +136,9 @@
         "E-3": 220000,
         "O-7+": 280000
       },
-      "oha_effective_date": "2026-10-01",
-      "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in JPY; USD uses DTMO rate 1 USD = 148.414 JPY (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "oha_effective_date": "2026-10-16",
+      "fx_refreshed_on": "2026-10-16",
+      "currency_note": "OHA ceilings in JPY; USD uses DTMO rate 1 USD = 151.519 JPY (pay period 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "USAG Bavaria, Germany": {
       "housing_system": "OHA",
@@ -182,7 +182,7 @@
       },
       "oha_effective_date": "2026-10-01",
       "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026, unchanged for 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "USAG Rheinland-Pfalz, Germany": {
       "housing_system": "OHA",
@@ -226,7 +226,7 @@
       },
       "oha_effective_date": "2026-10-01",
       "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026, unchanged for 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "USAG Wiesbaden, Germany": {
       "housing_system": "OHA",
@@ -270,7 +270,7 @@
       },
       "oha_effective_date": "2026-10-01",
       "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026, unchanged for 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "USAG Italy, Italy": {
       "housing_system": "OHA",
@@ -314,7 +314,7 @@
       },
       "oha_effective_date": "2026-10-01",
       "fx_refreshed_on": "2026-10-01",
-      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
+      "currency_note": "OHA ceilings in EUR; USD uses DTMO rate 1 USD = 0.844 EUR (pay period 1 Oct 2026, unchanged for 16 Oct 2026; DTMO refreshes the rate on the 1st and 16th). Without dependents: 90% rent ceiling + 75% utility. OHA pays actual rent up to max."
     },
     "Schofield Barracks, HI": {
       "housing_system": "BAH_PLUS_COLA",
