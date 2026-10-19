@@ -15,7 +15,12 @@ META_DESCRIPTION = (
     "Free Army PCS calculator: compare 2026 BAH, OHA, COLA, rent, utilities, "
     "and gas between duty stations. Built for Soldiers. Not affiliated with DoD."
 )
-CANONICAL_URL = "https://pcs-vector-hnfyzcpqmtty2mpwpztpbf.streamlit.app/"
+# Canonical = the static site (same calculator, crawlable HTML). Search Console was picking
+# pcsvector.streamlit.app as canonical over pcsvector.com. Streamlit Community Cloud serves
+# Googlebot a prerendered snapshot of this document, so head tags written below do reach it,
+# but Cloud also adds its own <link rel="canonical" href="https://pcsvector.streamlit.app">;
+# the script rewrites every canonical link (including late-added ones) to this URL.
+CANONICAL_URL = "https://pcsvector.com/"
 
 
 def _faq_schema() -> dict:
@@ -86,13 +91,30 @@ def _inject_head() -> None:
   upsertMeta("property", "og:type", "website");
   upsertMeta("property", "og:url", {canon_js});
   upsertMeta("name", "robots", "index, follow");
-  var link = head.querySelector('link[rel="canonical"]');
-  if (!link) {{
-    link = doc.createElement("link");
-    link.setAttribute("rel", "canonical");
-    head.appendChild(link);
+  var canon = {canon_js};
+  function fixCanonical() {{
+    var links = head.querySelectorAll('link[rel="canonical"]');
+    if (!links.length) {{
+      var link = doc.createElement("link");
+      link.setAttribute("rel", "canonical");
+      link.setAttribute("href", canon);
+      head.appendChild(link);
+      return;
+    }}
+    // Exactly one canonical, pointing at the static site (conflicting canonicals get ignored).
+    for (var i = 0; i < links.length; i++) {{
+      if (i === 0) {{
+        if (links[i].getAttribute("href") !== canon) links[i].setAttribute("href", canon);
+      }} else {{
+        links[i].remove();
+      }}
+    }}
   }}
-  link.setAttribute("href", {canon_js});
+  fixCanonical();
+  if (!doc.__pcsCanonObs && window.parent.MutationObserver) {{
+    doc.__pcsCanonObs = new window.parent.MutationObserver(fixCanonical);
+    doc.__pcsCanonObs.observe(head, {{ childList: true, subtree: true, attributes: true, attributeFilter: ["href"] }});
+  }}
   var old = doc.getElementById("pcs-faq-jsonld");
   if (old) old.remove();
   var s = doc.createElement("script");
