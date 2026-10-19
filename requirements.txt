@@ -1,7 +1,2 @@
-# PCS Vector — pinned for reproducible Streamlit Cloud deploys
-# streamlit 1.52+: st.html JS/st.link_button(type=, use_container_width=) used by the
-# Wayfinder gate; <2 avoids untested major-version API changes.
+# PCS Vector (retired): redirect page to https://pcsvector.com/. Full app: tag streamlit-final-2026-10-18.
 streamlit>=1.52.0,<2.0.0
-requests>=2.31.0,<3.0.0
-reportlab>=4.0.0,<5.0.0
-stripe>=8.0.0,<16.0.0
